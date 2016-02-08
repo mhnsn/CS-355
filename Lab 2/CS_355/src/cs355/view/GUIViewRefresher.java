@@ -97,7 +97,6 @@ public class GUIViewRefresher implements ViewRefresher {
 				
 				g2d.fillPolygon(xCoords, yCoords, 3);
 			}
-
 		}
 		
 		if(usingControllerShape)

@@ -22,13 +22,17 @@ public class GUIModel extends CS355Drawing {
 	public int addShape(Shape s)
 	{
 		shapeList.add(0, s);
+		this.setChanged();
+		notifyObservers();
 		return 0;
 	}
-
+	
 	@Override
 	public void deleteShape(int index)
 	{
 		shapeList.remove(index);
+		this.setChanged();
+		notifyObservers();
 	}
 
 	@Override
@@ -37,6 +41,8 @@ public class GUIModel extends CS355Drawing {
 		Shape s = shapeList.get(index);
 		shapeList.remove(index);
 		shapeList.add(s);
+		this.setChanged();
+		notifyObservers();
 	}
 
 	@Override
@@ -45,6 +51,8 @@ public class GUIModel extends CS355Drawing {
 		Shape s = shapeList.get(index);
 		shapeList.remove(index);
 		shapeList.add(0,s);
+		this.setChanged();
+		notifyObservers();
 	}
 
 	@Override
@@ -53,6 +61,8 @@ public class GUIModel extends CS355Drawing {
 		Shape s = shapeList.get(index);
 		shapeList.remove(index);
 		shapeList.add((index + 1), s);
+		this.setChanged();
+		notifyObservers();
 	}
 
 	@Override
@@ -61,6 +71,8 @@ public class GUIModel extends CS355Drawing {
 		Shape s = shapeList.get(index);
 		shapeList.remove(index);
 		shapeList.add((index - 1), s);
+		this.setChanged();
+		notifyObservers();
 	}
 
 	@Override
@@ -86,5 +98,7 @@ public class GUIModel extends CS355Drawing {
 	public void setShapes(List<Shape> shapes)
 	{
 		shapeList = (ArrayList<Shape>) shapes;
+		this.setChanged();
+		notifyObservers();
 	}
 }

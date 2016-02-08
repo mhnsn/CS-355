@@ -149,7 +149,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 					drawingComplete = false;
 					printState		= true;
 					
-					handleStateMachine();
+//					handleStateMachine();
 				}
 				break;
 //			case State.submitShapeToModel:
@@ -160,8 +160,25 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 
 	private void submitShape()
 	{
-		model.addShape(getCurrentShape());
-		setCurrentShape(null);
+		if(getCurrentShape() != null)
+		{
+			int modelSize 	= model.getShapes().size();
+			int newSize 	= model.addShape(getCurrentShape());
+			setCurrentShape(null);
+			
+			if(modelSize == newSize)
+			{
+				System.out.println("Error: Model size did not change.");
+			}
+			else
+			{
+				System.out.println("Model size: " + modelSize);
+			}
+		}
+		else
+		{
+			System.out.println("Error? There's no current shape.");
+		}
 	}
 	
 	private void handleDrawing(Point2D location)
@@ -640,7 +657,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 
 	public static void setCurrentShape(Shape currentShape)
 	{
-		System.out.println("Current shape: " + getCurrentShape());
 		GUIController.currentShape = currentShape;
 	}
 }
