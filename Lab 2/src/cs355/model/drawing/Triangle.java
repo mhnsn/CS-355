@@ -24,7 +24,7 @@ public class Triangle extends Shape {
 	private double Aca;
 	private double Bca;
 	private double Cca;
-	
+
 	Point2D.Double aV;
 	Point2D.Double bV;
 	Point2D.Double cV;
@@ -252,13 +252,12 @@ public class Triangle extends Shape {
 			maxY = c.y;
 		}
 		
-		Point2D.Double tl = new Point2D.Double((maxX+minX)/2, (maxY+minY)/2 );
-
 		boundWidth 	= (maxX-minX);
 		boundHeight = (maxY-minY);
-
+		
+		Point2D.Double tl = new Point2D.Double((maxX+minX)/2, (maxY+minY)/2);
+				
 		boundingBox = new Rectangle(Color.WHITE,tl,boundWidth,boundHeight);
-//		boundingBox.setBounds(boundWidth/2, boundHeight/2);
 				
 		return boundingBox;
 	}
@@ -281,7 +280,7 @@ public class Triangle extends Shape {
 		updatePoints();
 	}
 	
-	private void updatePoints()
+	public void updatePoints()
 	{
 		if(aV == null || bV == null || cV == null)
 		{
@@ -293,6 +292,22 @@ public class Triangle extends Shape {
 		a = new Point2D.Double(center.x + aV.x, center.y + aV.y);
 		b = new Point2D.Double(center.x + bV.x, center.y + bV.y);
 		c = new Point2D.Double(center.x + cV.x, center.y + cV.y);
+		setBounds();
 		calculateEquations();
 	}
+	
+	/**
+	 * @return the aV
+	 */
+	public Point2D.Double getaV() { return aV; }
+
+	/**
+	 * @return the bV
+	 */
+	public Point2D.Double getbV() { return bV; }
+
+	/**
+	 * @return the cV
+	 */
+	public Point2D.Double getcV() { return cV; }
 }

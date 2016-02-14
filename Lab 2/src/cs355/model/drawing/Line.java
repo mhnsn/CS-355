@@ -47,6 +47,7 @@ public class Line extends Shape {
 	 */
 	public Point2D.Double getEnd()
 	{
+		updateEnd();
 		return end;
 	}
 

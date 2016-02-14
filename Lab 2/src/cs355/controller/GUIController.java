@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.io.File;
@@ -86,7 +87,15 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 			case State.selectShape:
 				if(GUIModel.getSelectedShape() != null)
 				{
-					handleShapeMovement(e);
+					Circle handle = rotationHandleClicked(e);
+					if(handle != null)
+					{
+						handleRotation(e,handle);
+					}
+					else
+					{
+						handleShapeMovement(e);
+					}
 				}
 				break;
 			default:
@@ -95,6 +104,39 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		}
 	}
 	
+	private void handleRotation(MouseEvent e, Circle handle)
+	{
+		GUIModel.getSelectedShape().setRotation(calculateAngleOfRotation(e, handle));
+	}
+
+	private double calculateAngleOfRotation(MouseEvent e, Circle handle)
+	{
+		Line2D vectorToHandle = new Line2D.Double(handle.getCenter(), GUIModel.getSelectedCenter());
+		Line2D vectorToMouse  = new Line2D.Double(e.getPoint(), GUIModel.getSelectedCenter());
+		
+	    double angle1 = Math.atan2(vectorToHandle.getY1() - vectorToHandle.getY2(),
+	                               vectorToHandle.getX1() - vectorToHandle.getX2());
+	    double angle2 = Math.atan2(vectorToMouse.getY1() - vectorToMouse.getY2(),
+	                               vectorToMouse.getX1() - vectorToMouse.getX2());
+	    return angle1-angle2;
+	}
+
+	private Circle rotationHandleClicked(MouseEvent e)
+	{
+		Rectangle r = GUIModel.getSelectedShape().getBoundingBox();
+		Point2D.Double p = new Point2D.Double(r.getUpperLeft().getX()-10, r.getUpperLeft().getY()-10);
+		Circle handle = new Circle(Color.WHITE, p, 5);
+		
+		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
+		
+		if(handle.pointInShape(clickLocation, 0))
+		{
+			return handle;
+		}
+		
+		return null;
+	}
+
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
@@ -138,7 +180,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 				clickLocations.clear();
 				clickLocations.add(clickLocation);
 				saveCenter(e);
-//				handleShapeMovement(e);
 			}
 		}
 	}
@@ -248,9 +289,9 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		t.translate(dX, dY);
 		
 		Point2D.Double newCenter = (Double) t.transform(GUIModel.getSelectedCenter(), null);
-		System.out.print("New center: (" + newCenter.x + ", " + newCenter.y + ")");
-		System.out.print("\tdX: " + dX);
-		System.out.println(", dY: " + dY);
+//		System.out.print("New center: (" + newCenter.x + ", " + newCenter.y + ")");
+//		System.out.print("\tdX: " + dX);
+//		System.out.println(", dY: " + dY);
 //		System.out.println("\tClickLocations[0]: (" + clickLocations.get(0).getX() + ", " + clickLocations.get(0).getY() + ")");
 		
 		GUIModel.getSelectedShape().setCenter(newCenter);
