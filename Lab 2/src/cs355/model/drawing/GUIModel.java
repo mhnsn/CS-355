@@ -1,5 +1,6 @@
 package cs355.model.drawing;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
@@ -110,12 +111,29 @@ public class GUIModel extends CS355Drawing {
 	{
 		for(Shape s : getShapes())
 		{
-			if(s.pointInShape(pointClicked,4))
+			Point2D.Double objectCoord = worldToObject(pointClicked, s);
+			
+			if(s.pointInShape(objectCoord,4))
 			{
 				return s;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param pointClicked
+	 * @param s
+	 * @return
+	 */
+	public static Point2D.Double worldToObject(Point2D.Double pointClicked, Shape s)
+	{
+		AffineTransform worldToObject	= new AffineTransform();
+		Point2D.Double objectCoord 		= new Point2D.Double();
+		worldToObject.rotate(-s.getRotation());
+		worldToObject.translate(-s.getCenter().getX(), -s.getCenter().getY());
+		worldToObject.transform(pointClicked,objectCoord);
+		return objectCoord;
 	}
 	
 	/**

@@ -115,7 +115,7 @@ public abstract class Shape {
 		return true;
 	}
 	
-	public boolean inBounds(Point2D.Double point, double tolerance)
+	protected boolean inBounds(Point2D.Double point, double tolerance)
 	{
 		if(center.x - boundWidth  - tolerance > point.x
 		|| center.x + boundWidth  + tolerance < point.x
@@ -132,5 +132,17 @@ public abstract class Shape {
 		Rectangle bounds = new Rectangle(Color.WHITE,this.center,boundWidth*2,boundHeight*2);
 		bounds.setBounds(boundWidth, boundHeight);
 		return bounds;
+	}
+
+	/**
+	 * @param s
+	 * @return
+	 */
+	public AffineTransform objectToWorld()
+	{
+		AffineTransform objToWorld = new AffineTransform();
+		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
+		objToWorld.rotate(this.getRotation());
+		return objToWorld;
 	}
 }

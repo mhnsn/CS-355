@@ -71,17 +71,17 @@ public class Triangle extends Shape {
 		Cca = -(Aca*c.x + Bca*c.y);
 	}
 	
-	double lineAB(Point2D.Double pt)
+	public double lineAB(Point2D.Double pt)
 	{
 		return Aab*pt.x + Bab*pt.y + Cab;
 	}
 	
-	double lineBC(Point2D.Double pt)
+	public double lineBC(Point2D.Double pt)
 	{
 		return Abc*pt.x + Bbc*pt.y + Cbc;
 	}
 	
-	double lineCA(Point2D.Double pt)
+	public double lineCA(Point2D.Double pt)
 	{
 		return Aca*pt.x + Bca*pt.y + Cca;
 	}
