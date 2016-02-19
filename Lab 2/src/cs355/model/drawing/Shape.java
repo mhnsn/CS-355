@@ -3,6 +3,7 @@ package cs355.model.drawing;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 
 /**
  * This is the base class for all of your shapes.
@@ -115,12 +116,12 @@ public abstract class Shape {
 		return true;
 	}
 	
-	public boolean inBounds(Point2D.Double point, double tolerance)
+	protected boolean inBounds(Point2D.Double point, double tolerance)
 	{
-		if(center.x - boundWidth  - tolerance > point.x
-		|| center.x + boundWidth  + tolerance < point.x
-		|| center.y - boundHeight - tolerance > point.y
-		|| center.y + boundHeight + tolerance < point.y)
+		if(-boundWidth	- tolerance > point.x
+		||  boundWidth	+ tolerance < point.x
+		|| -boundHeight	- tolerance > point.y
+		||  boundHeight	+ tolerance < point.y)
 		{
 			return false;
 		}
@@ -132,5 +133,50 @@ public abstract class Shape {
 		Rectangle bounds = new Rectangle(Color.WHITE,this.center,boundWidth*2,boundHeight*2);
 		bounds.setBounds(boundWidth, boundHeight);
 		return bounds;
+	}
+
+	/**
+	 * @param s
+	 * @return
+	 */
+	public AffineTransform getObjectToWorld()
+	{
+		AffineTransform objToWorld = new AffineTransform();
+		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
+		objToWorld.rotate(this.getRotation());
+		return objToWorld;
+	}
+
+	/**
+	 * @param pointClicked TODO
+	 * @param s
+	 * @return
+	 */
+	public Point2D.Double objectToWorld(Point2D.Double pointClicked)
+	{
+		return (Double) getObjectToWorld().transform(pointClicked, new Point2D.Double());
+	}
+	
+	/**
+	 * @param pointClicked
+	 * @param s
+	 * @return
+	 */
+	public Point2D.Double worldToObject(Point2D.Double pointClicked)
+	{
+		AffineTransform worldToObject	= new AffineTransform();
+		worldToObject.rotate(-this.getRotation());
+		worldToObject.translate(-this.getCenter().getX(), -this.getCenter().getY());
+		return (Double) worldToObject.transform(pointClicked,new Point2D.Double());
+	}
+
+	public AffineTransform getBoundingBoxTransform()
+	{
+		return getObjectToWorld();
+	}
+
+	public Circle getHandle()
+	{
+		return new Circle(Color.WHITE,this.getBoundingBox().getUpperLeft(),10);
 	}
 }

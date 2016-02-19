@@ -81,14 +81,16 @@ public class Rectangle extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!inBounds(objPt, tolerance))
 		{
 			return false;
 		}
 		
-		if(pt.x < (this.center.x + (this.width/2)) && pt.x > (this.center.x - (this.width/2)))
+		if(objPt.x <= this.width/2 && objPt.x >= (-this.width/2))
 		{
-			if(pt.y < (this.center.y + (this.height/2)) && pt.y > (this.center.y - (this.height/2)))
+			if(objPt.y <= this.height/2 && objPt.y >= (-this.height/2))
 			{
 				return true;
 			}

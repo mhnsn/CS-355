@@ -109,7 +109,7 @@ public class GUIModel extends CS355Drawing {
 	public Shape getClickedShape(Point2D.Double pointClicked)
 	{
 		for(Shape s : getShapes())
-		{
+		{			
 			if(s.pointInShape(pointClicked,4))
 			{
 				return s;
@@ -117,6 +117,7 @@ public class GUIModel extends CS355Drawing {
 		}
 		return null;
 	}
+
 	
 	/**
 	 * @return the selectedShape
@@ -134,6 +135,7 @@ public class GUIModel extends CS355Drawing {
 		selectedShape = shape;
 		if(shape == null)
 		{
+			System.out.println("Selected shape is null");
 			setSelectedCenter(null);
 			return;
 		}

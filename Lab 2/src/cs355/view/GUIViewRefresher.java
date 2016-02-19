@@ -1,14 +1,13 @@
 package cs355.view;
 
-import java.awt.BasicStroke;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 import cs355.GUIFunctions;
-import cs355.controller.GUIController;
+import cs355.controller.StateMachine;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
 import cs355.model.drawing.GUIModel;
@@ -39,30 +38,35 @@ public class GUIViewRefresher implements ViewRefresher {
 	public void refreshView(Graphics2D g2d)
 	{
 		boolean usingControllerShape = false;
-		if(GUIController.getCurrentShape() != null)
+		if(StateMachine.getCurrentShape() != null)
 		{
 			usingControllerShape = true;
-			modelShapes.add(GUIController.getCurrentShape());
+			modelShapes.add(StateMachine.getCurrentShape());
 		}
 				
 		for(Shape s : modelShapes)
 		{
-			g2d.setColor(s.getColor());
+			AffineTransform objToWorld = s.getObjectToWorld();
+			g2d.setColor(s.getColor());	
+			g2d.setTransform(objToWorld);
+			
 			if(s.getClass().equals(cs355.model.drawing.Line.class))
 			{
 				Line line = (Line) s;
 				
-				g2d.drawLine( 	(int) line.getCenter().getX(),
-								(int) line.getCenter().getY(),
-								(int) line.getEnd().getX(),
-								(int) line.getEnd().getY());
+				g2d.setTransform(objToWorld);
+				
+				g2d.drawLine(	(int) 0,
+								(int) 0,
+								(int) (line.getEndV().getX()),
+								(int) (line.getEndV().getY()));
 			}
 			else if(s.getClass().equals(cs355.model.drawing.Square.class))
 			{
 				Square sq = (Square) s;
 
-				g2d.fillRect((int) (sq.getUpperLeft().getX()),
-								(int) (sq.getUpperLeft().getY()),
+				g2d.fillRect(	(int) -(sq.getSize()/2),
+								(int) -(sq.getSize()/2),
 								(int) sq.getSize(),
 								(int) sq.getSize());
 			}
@@ -70,32 +74,37 @@ public class GUIViewRefresher implements ViewRefresher {
 			{
 				Rectangle r = (Rectangle) s;
 
-				g2d.fillRect(	(int) r.getUpperLeft().getX(),
-								(int) r.getUpperLeft().getY(),
+				g2d.fillRect(	(int) -(r.getWidth()/2),
+								(int) -(r.getHeight()/2),
 								(int) r.getWidth(),
 								(int) r.getHeight());
 			}
 			else if(s.getClass().equals(cs355.model.drawing.Circle.class))
 			{
 				Circle c = (Circle) s;
-				g2d.fillOval(	(int) (c.getCenter().getX()-c.getRadius()),
-								(int) (c.getCenter().getY()-c.getRadius()),
+
+				g2d.fillOval(	(int) (-c.getRadius()),
+								(int) (-c.getRadius()),
 								(int) c.getRadius()*2,
 								(int) c.getRadius()*2);
 			}
 			else if(s.getClass().equals(cs355.model.drawing.Ellipse.class))
 			{
 				Ellipse e = (Ellipse) s;
-				g2d.fillOval(	(int) (e.getCenter().getX()-e.getWidth()),
-								(int) (e.getCenter().getY()-e.getHeight()),
+
+				g2d.fillOval(	(int) (-e.getWidth()),
+								(int) (-e.getHeight()),
 								(int) e.getWidth()*2,
 								(int) e.getHeight()*2);
 			}
 			else if(s.getClass().equals(cs355.model.drawing.Triangle.class))
 			{
 				Triangle t = (Triangle) s;
-				int xCoords[] = { (int)t.getA().getX(), (int) t.getB().getX(), (int) t.getC().getX()};
-				int yCoords[] = { (int)t.getA().getY(), (int) t.getB().getY(), (int) t.getC().getY()};
+
+				t.cleanup();
+				
+				int xCoords[] = { (int) t.getA().getX(), (int) t.getB().getX(), (int) t.getC().getX()};
+				int yCoords[] = { (int) t.getA().getY(), (int) t.getB().getY(), (int) t.getC().getY()};
 				
 				g2d.fillPolygon(xCoords, yCoords, 3);
 			}
@@ -105,17 +114,28 @@ public class GUIViewRefresher implements ViewRefresher {
 		if(s != null)
 		{
 			Rectangle c = s.getBoundingBox();
+			g2d.setTransform(s.getBoundingBoxTransform());
+			
 			g2d.setColor(c.getColor());
-//			Stroke st = g2d.getStroke();
-//			g2d.setStroke();
-			g2d.drawRect( 	(int) c.getUpperLeft().getX(),
-							(int) c.getUpperLeft().getY(),
+			g2d.drawRect(	(int) -(c.getWidth()/2),
+							(int) -(c.getHeight()/2),
 							(int) c.getWidth(),
 							(int) c.getHeight());
-			g2d.drawOval(	(int) c.getUpperLeft().getX() - 5,
-							(int) c.getUpperLeft().getY() - 5,
-							5,
-							5);
+			if(StateMachine.isRotationFlag())
+			{
+				g2d.fillOval(	(int) (-c.getWidth()/2)-5,
+								(int) (-c.getHeight()/2)-5,
+								(int) 10,
+								(int) 10);
+			}
+			else
+			{
+				g2d.drawOval(	(int) (-c.getWidth()/2)-5,
+						(int) (-c.getHeight()/2)-5,
+						(int) 10,
+						(int) 10);
+
+			}
 		}
 		
 		if(usingControllerShape)
