@@ -1,6 +1,7 @@
 package cs355.model.drawing;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
@@ -10,8 +11,8 @@ import java.awt.geom.Point2D;
 public class Line extends Shape {
 
 	// The ending point of the line.
-	private Point2D.Double end;
-	private Point2D.Double endV;
+	Point2D.Double end;	// world-coordinate end
+	private Point2D.Double endV;// object-coordinate vector of line
 
 	/**
 	 * Basic constructor that sets all fields.
@@ -26,19 +27,19 @@ public class Line extends Shape {
 		
 		setBounds( Math.abs(end.x-start.x), Math.abs(end.y-start.y));
 
-		// Set the field.
-		endV = new Point2D.Double(end.x-start.x, end.y-start.y);
+		// Set the vector for the end
+		setEndV(new Point2D.Double(end.x-start.x, end.y-start.y));
 		updateEnd();
 	}
 
 	private void updateEnd()
 	{
-		if(endV == null)
+		if(getEndV() == null)
 		{
-			endV = new Point2D.Double(end.x-center.x, end.y-center.y);
+			setEndV(new Point2D.Double(end.x-center.x, end.y-center.y));
 		}
 
-		end = new Point2D.Double(center.x + endV.x, center.y + endV.y);
+		end = new Point2D.Double(center.x + getEndV().x, center.y + getEndV().y);
 	}
 
 	/**
@@ -47,17 +48,17 @@ public class Line extends Shape {
 	 */
 	public Point2D.Double getEnd()
 	{
-		updateEnd();
 		return end;
 	}
 
 	/**
 	 * Setter for this Line's ending point.
-	 * @param end the new ending point for the Line.
+	 * @param end the new ending point for the Line in world coordinates
 	 */
 	public void setEnd(Point2D.Double end)
 	{
-		this.end = end;
+		this.setEndV(end);
+		updateEnd();
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class Line extends Shape {
 	/**
 	 * Add your code to do an intersection test
 	 * here. You <i>will</i> need the tolerance.
-	 * @param pt = the point to test against.
+	 * @param objPt = the point to test against.
 	 * @param tolerance = the allowable tolerance.
 	 * @return true if pt is in the shape,
 	 *		   false otherwise.
@@ -78,7 +79,9 @@ public class Line extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!inBounds(objPt, tolerance))
 		{
 			return false;
 		}
@@ -91,13 +94,13 @@ public class Line extends Shape {
 		double x0, x1, x2;
 		double y0, y1, y2;
 		
-		x0 = pt.x;
-		x1 = this.center.x;
-		x2 = this.end.x;
+		x0 = objPt.x;
+		x1 = 0;
+		x2 = this.getEndV().x;
 		
-		y0 = pt.y;
-		y1 = this.center.y;
-		y2 = this.end.y;
+		y0 = objPt.y;
+		y1 = 0;
+		y2 = this.getEndV().y;
 		
 		double yDist = y2 - y1; // y2-y1
 		double xDist = x2 - x1; // x2-x1
@@ -115,49 +118,110 @@ public class Line extends Shape {
 	@Override
 	public boolean inBounds(Point2D.Double point, double tolerance)
 	{
-		if(center.x - tolerance	> point.x
-		|| end.x 	+ tolerance	< point.x
-		|| center.y - tolerance > point.y
-		|| end.y 	+ tolerance	< point.y)
+		updateEnd();
+		
+		int quadrant = 0;
+		if(getEndV().x > 0)
 		{
-			return false;
+			if(getEndV().y > 0)
+			{
+				quadrant = 1;
+			}
+			else
+			{
+				quadrant = 4;
+			}
 		}
+		else
+		{
+			if(getEndV().y > 0)
+			{
+				quadrant = 2;
+			}
+			else
+			{
+				quadrant = 3;
+			}
+		}
+		
+		switch(quadrant)
+		{
+			case 1:
+				if(0 - tolerance	> point.x				// left bound check
+				|| (2*boundWidth) 	+ tolerance	< point.x
+				|| 0 - tolerance > point.y					// bottom bound check
+				|| (2*boundHeight) 	+ tolerance	< point.y)
+				{
+					return false;
+				}
+				break;
+			case 2:
+				if(0 + tolerance	< point.x				// right bound
+				|| -(2*boundWidth) 	- tolerance	> point.x
+				|| 0 - tolerance > point.y					// bottom bound
+				|| (2*boundHeight) 	+ tolerance	< point.y)
+				{
+					return false;
+				}
+				break;
+			case 3:
+				if(0 + tolerance	< point.x
+				|| -(2*boundWidth) 	- tolerance	> point.x
+				|| 0 + tolerance < point.y
+				|| -(2*boundHeight) - tolerance	> point.y)
+				{
+					return false;
+				}
+				break;
+			case 4:
+				if(0 - tolerance	> point.x				// left bound check
+				|| (2*boundWidth) 	+ tolerance	< point.x				
+				|| 0 + tolerance < point.y
+				|| -(2*boundHeight) - tolerance	> point.y)
+				{
+					return false;
+				}
+				break;
+			default:
+				break;
+		}		
 		return true;
 	}
 	
 	@Override
 	public Rectangle getBoundingBox()
 	{
-		Point2D.Double tl = new Point2D.Double();
-		if(center.x < end.x)
-		{
-			if(center.y < end.y)
-			{
-				tl.setLocation(center.x, center.y);
-			}
-			else
-			{
-				tl.setLocation(center.x, end.y);
-			}
-		}
-		else
-		{
-			if(center.y < end.y)
-			{
-				tl.setLocation(end.x, center.y);
-			}
-			else
-			{
-				tl.setLocation(end.x, end.y);
-			}			
-		}
+		Point2D.Double rc = new Point2D.Double();
+		rc.setLocation( (center.x) + getEndV().x / 2, (center.y) + getEndV().y / 2 );
 		
-		// in all cases, tl is the top-left of the bounding box.
-		// add half of height and width to box, then pass in
-		tl.setLocation(tl.x + (boundWidth), tl.y + (boundHeight) );
-		
-		return new Rectangle(Color.WHITE,tl,boundWidth*2,boundHeight*2);
+		return new Rectangle(Color.WHITE,rc,boundWidth*2,boundHeight*2);
 	}
 	
+	@Override
+	public String toString()
+	{
+		String centerData = "Center: (" + center.x + ", " + center.y + ")\r\n";
+		String vectorData = "Vector: (" + getEndV().x + ", " + getEndV().y + ")\r\n";
+
+		return centerData + vectorData;
+	}
+
+	public Point2D.Double getEndV()
+	{
+		return endV;
+	}
+
+	public void setEndV(Point2D.Double endV)
+	{
+		this.endV = endV;
+	}
 	
+	@Override
+	public AffineTransform getBoundingBoxTransform()
+	{
+		AffineTransform bt = getObjectToWorld();
+		bt.translate( endV.x/2, endV.y/2  );
+		
+		return bt;
+	}
 }

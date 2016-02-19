@@ -2,6 +2,7 @@ package cs355.solution;
 
 import cs355.GUIFunctions;
 import cs355.controller.GUIController;
+import cs355.controller.StateMachine;
 import cs355.model.drawing.GUIModel;
 import cs355.view.GUIViewRefresher;
 
@@ -31,6 +32,6 @@ public class CS355 {
 		c.setModelView(model, vr);
 		
 		GUIFunctions.createCS355Frame(c, vr);
-		GUIFunctions.changeSelectedColor(GUIController.getCurrentColor());
+		GUIFunctions.changeSelectedColor(StateMachine.getCurrentColor());
 		GUIFunctions.refresh();	}
 }

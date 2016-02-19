@@ -73,7 +73,7 @@ public class Ellipse extends Shape {
 	/**
 	 * Add your code to do an intersection test
 	 * here. You shouldn't need the tolerance.
-	 * @param pt = the point to test against.
+	 * @param objPt = the point to test against.
 	 * @param tolerance = the allowable tolerance.
 	 * @return true if pt is in the shape,
 	 *		   false otherwise.
@@ -81,13 +81,15 @@ public class Ellipse extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!getBoundingBox().inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!getBoundingBox().inBounds(objPt, tolerance))
 		{
 			return false;
 		}
 		
-		double xNum = pt.x - this.center.x;
-		double yNum = pt.y - this.center.y;
+		double xNum = objPt.x;
+		double yNum = objPt.y;
 		
 		xNum *= xNum;
 		yNum *= yNum;
