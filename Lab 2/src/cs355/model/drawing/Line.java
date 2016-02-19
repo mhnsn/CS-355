@@ -1,7 +1,6 @@
 package cs355.model.drawing;
 
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
@@ -71,7 +70,7 @@ public class Line extends Shape {
 	/**
 	 * Add your code to do an intersection test
 	 * here. You <i>will</i> need the tolerance.
-	 * @param pt = the point to test against.
+	 * @param objPt = the point to test against.
 	 * @param tolerance = the allowable tolerance.
 	 * @return true if pt is in the shape,
 	 *		   false otherwise.
@@ -79,7 +78,9 @@ public class Line extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!inBounds(objPt, tolerance))
 		{
 			return false;
 		}
@@ -92,15 +93,11 @@ public class Line extends Shape {
 		double x0, x1, x2;
 		double y0, y1, y2;
 		
-		x0 = pt.x;
-//		x1 = this.center.x;
-//		x2 = this.end.x;
+		x0 = objPt.x;
 		x1 = 0;
 		x2 = this.getEndV().x;
 		
-		y0 = pt.y;
-//		y1 = this.center.y;
-//		y2 = this.end.y;
+		y0 = objPt.y;
 		y1 = 0;
 		y2 = this.getEndV().y;
 		

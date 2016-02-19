@@ -50,7 +50,7 @@ public class Circle extends Shape {
 	/**
 	 * Add your code to do an intersection test
 	 * here. You shouldn't need the tolerance.
-	 * @param pt = the point to test against.
+	 * @param objPt = the point to test against.
 	 * @param tolerance = the allowable tolerance.
 	 * @return true if pt is in the shape,
 	 *		   false otherwise.
@@ -58,12 +58,14 @@ public class Circle extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!inBounds(objPt, tolerance))
 		{
 			return false;
 		}
 		
-		if(this.center.distance(pt) < this.radius)
+		if(new Point2D.Double(0,0).distance(objPt) <= this.radius)
 		{
 			return true;
 		}

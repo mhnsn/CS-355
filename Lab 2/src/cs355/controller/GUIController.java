@@ -5,24 +5,13 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import cs355.GUIFunctions;
 import cs355.model.drawing.Circle;
-import cs355.model.drawing.Ellipse;
 import cs355.model.drawing.GUIModel;
-import cs355.model.drawing.Line;
-import cs355.model.drawing.Rectangle;
-import cs355.model.drawing.Shape;
-import cs355.model.drawing.Square;
-import cs355.model.drawing.Triangle;
 import cs355.view.GUIViewRefresher;
 
 public class GUIController implements CS355Controller, MouseListener, MouseMotionListener

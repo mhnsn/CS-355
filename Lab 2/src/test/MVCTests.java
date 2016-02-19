@@ -25,12 +25,13 @@ public class MVCTests {
 			String[] testClasses = new String[]
 			{					
 					"test.GUIModelTest",
-					"test.LineTest",
-					"test.TriangleTest",
-					"test.CircleTest",
-					"test.EllipseTest",
-					"test.SquareTest",
-					"test.RectangleTest"
+					"test.ShapeTest"
+//					"test.LineTest",
+//					"test.TriangleTest",
+//					"test.CircleTest",
+//					"test.EllipseTest",
+//					"test.SquareTest",
+//					"test.RectangleTest"
 			};
 			
 			setup();

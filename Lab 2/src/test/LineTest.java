@@ -1,16 +1,15 @@
 package test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cs355.model.drawing.GUIModel;
 import cs355.model.drawing.Line;
 import cs355.model.drawing.Rectangle;
 
@@ -50,7 +49,7 @@ public class LineTest {
 	public final void testPointInShape()
 	{
 		Point2D.Double objectCoord 		= new Point2D.Double();
-		objectCoord = GUIModel.worldToObject(new Point2D.Double((centerX+endX)/2, (centerY+endY)/2), L);
+		objectCoord = L.worldToObject(new Point2D.Double((centerX+endX)/2, (centerY+endY)/2));
 		
 		assertTrue(L.pointInShape(objectCoord, 4.0));
 	}

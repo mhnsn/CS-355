@@ -22,7 +22,7 @@ public class Square extends Shape {
 	{
 		// Initialize the superclass.
 		super(color, center);
-		setBounds( size / 2, size / 2 );
+		setBounds( size, size );
 
 		// Set the field.
 		this.size = size;
@@ -49,7 +49,7 @@ public class Square extends Shape {
 	/**
 	 * Add your code to do an intersection test
 	 * here. You shouldn't need the tolerance.
-	 * @param pt = the point to test against.
+	 * @param objPt = the point to test against.
 	 * @param tolerance = the allowable tolerance.
 	 * @return true if pt is in the shape,
 	 *		   false otherwise.
@@ -57,14 +57,16 @@ public class Square extends Shape {
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
-		if(!inBounds(pt, tolerance))
+		Point2D.Double objPt = worldToObject(pt);
+
+		if(!inBounds(objPt, tolerance))
 		{
 			return false;
 		}
 		
-		if(pt.x < (this.center.x + (this.size/2)) && pt.x > (this.center.x - (this.size/2)))
+		if(objPt.x <= ((this.size/2)) && objPt.x >= ((-this.size/2)))
 		{
-			if(pt.y < (this.center.y + (this.size/2)) && pt.y > (this.center.y - (this.size/2)))
+			if(objPt.y <= ((this.size/2)) && objPt.y >= ((-this.size/2)))
 			{
 				return true;
 			}

@@ -46,7 +46,7 @@ public class GUIViewRefresher implements ViewRefresher {
 				
 		for(Shape s : modelShapes)
 		{
-			AffineTransform objToWorld = s.objectToWorld();
+			AffineTransform objToWorld = s.getObjectToWorld();
 			g2d.setColor(s.getColor());	
 			g2d.setTransform(objToWorld);
 			

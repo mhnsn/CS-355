@@ -82,7 +82,7 @@ public class StateMachine
 		clickLocations			= new ArrayList<Point2D>();
 	}
 	
-//	void tick(MouseEvent e)
+//	void tick()
 	void tick()
 	{
 		if(e != null)
@@ -103,7 +103,7 @@ public class StateMachine
 			printState = false;
 		}
 		
-		// perform state actions
+// perform state actions
 		switch(StateMachine.current)
 		{
 			case StateMachine.init:
@@ -140,7 +140,7 @@ public class StateMachine
 				break;
 		}
 		
-		// update state
+// update state
 		switch(StateMachine.current)
 		{
 			case StateMachine.init:
@@ -186,6 +186,8 @@ public class StateMachine
 				break;
 		}
 	}
+
+//	end tick function
 
 	private void handleShapeOperations(Double currentMouseLocation)
 	{
@@ -268,23 +270,26 @@ public class StateMachine
 	
 	boolean shapeClicked(Double clickLocation)
 	{
-		if(GUIModel.getSelectedShape() != null)
+		// deselect current clicked shape if there is one, then return
+		if(GUIModel.getSelectedShape() != null)	
 		{
 			GUIModel.setSelectedShape(null);			
 			return false;
 		}
-		
-		Shape s = GUIController.getModel().getClickedShape(clickLocation);
-		if(s != null)
+		else	// if not, check for a clicked shape
 		{
-			GUIModel.setSelectedShape(s);
+			Shape s = GUIController.getModel().getClickedShape(clickLocation);
+			if(s != null)
+			{
+				GUIModel.setSelectedShape(s);
+				GUIFunctions.refresh();
+				return true;
+			}
+			
+			GUIModel.setSelectedShape(null);
 			GUIFunctions.refresh();
-			return true;
+			return false;
 		}
-		
-		GUIModel.setSelectedShape(null);
-		GUIFunctions.refresh();
-		return false;
 	}
 	void saveCenter(MouseEvent e)
 	{
@@ -513,8 +518,10 @@ public class StateMachine
 			default:
 				return;
 		}
-				
-		setCurrentShape((Shape) new Triangle(getCurrentColor(), (Double) clickLocations.get(0), (Double) clickLocations.get(1), p3));
+		
+		Point2D.Double center = Triangle.calculateCenter((Double) clickLocations.get(0), (Double) clickLocations.get(1), p3);
+		
+		setCurrentShape((Shape) new Triangle(getCurrentColor(), center, (Double) clickLocations.get(0), (Double) clickLocations.get(1), p3));
 	}
 
 	private void submitShape()

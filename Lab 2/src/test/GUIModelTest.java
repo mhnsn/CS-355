@@ -39,9 +39,11 @@ public class GUIModelTest {
 											new Point2D.Double(50, 100));
 		E = new Ellipse		(Color.WHITE, 	new Point2D.Double(0, 0), 50, 100);
 		R = new Rectangle	(Color.WHITE, 	new Point2D.Double(0, 0), 50, 100);
-		T = new Triangle	(Color.WHITE, 	new Point2D.Double(0, 50),
-											new Point2D.Double(-50, -25),
-											new Point2D.Double(50, -25));
+	
+//		T = new Triangle	(Color.WHITE, 	new Point2D.Double(0, 50),
+//											new Point2D.Double(-50, -25),
+//											new Point2D.Double(50, -25));
+		
 		S = new Square		(Color.WHITE, 	new Point2D.Double(0, 0), 75);
 		
 		model = new GUIModel();
