@@ -135,6 +135,7 @@ public class GUIModel extends CS355Drawing {
 		selectedShape = shape;
 		if(shape == null)
 		{
+			System.out.println("Selected shape is null");
 			setSelectedCenter(null);
 			return;
 		}

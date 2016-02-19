@@ -22,7 +22,7 @@ public class Circle extends Shape {
 	{
 		// Initialize the superclass.
 		super(color, center);
-		setBounds(radius, radius);
+		setBounds(radius*2, radius*2);
 		
 
 		// Set the field.

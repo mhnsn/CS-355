@@ -1,6 +1,7 @@
 package cs355.model.drawing;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
@@ -191,9 +192,9 @@ public class Line extends Shape {
 	public Rectangle getBoundingBox()
 	{
 		Point2D.Double rc = new Point2D.Double();
-		rc.setLocation( (center.x) - getEndV().x / 2, (center.y) - getEndV().y / 2 );
+		rc.setLocation( (center.x) + getEndV().x / 2, (center.y) + getEndV().y / 2 );
 		
-		return new Rectangle(Color.WHITE,center,boundWidth*2,boundHeight*2);
+		return new Rectangle(Color.WHITE,rc,boundWidth*2,boundHeight*2);
 	}
 	
 	@Override
@@ -213,5 +214,14 @@ public class Line extends Shape {
 	public void setEndV(Point2D.Double endV)
 	{
 		this.endV = endV;
+	}
+	
+	@Override
+	public AffineTransform getBoundingBoxTransform()
+	{
+		AffineTransform bt = getObjectToWorld();
+		bt.translate( endV.x/2, endV.y/2  );
+		
+		return bt;
 	}
 }

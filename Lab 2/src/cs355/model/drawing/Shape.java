@@ -154,12 +154,8 @@ public abstract class Shape {
 	 */
 	public Point2D.Double objectToWorld(Point2D.Double pointClicked)
 	{
-		AffineTransform objToWorld = new AffineTransform();
-		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
-		objToWorld.rotate(this.getRotation());
-		
-		return (Double) objToWorld.transform(pointClicked, new Point2D.Double());
-	}	
+		return (Double) getObjectToWorld().transform(pointClicked, new Point2D.Double());
+	}
 	
 	/**
 	 * @param pointClicked
@@ -169,10 +165,18 @@ public abstract class Shape {
 	public Point2D.Double worldToObject(Point2D.Double pointClicked)
 	{
 		AffineTransform worldToObject	= new AffineTransform();
-		Point2D.Double objectCoord 		= new Point2D.Double();
 		worldToObject.rotate(-this.getRotation());
 		worldToObject.translate(-this.getCenter().getX(), -this.getCenter().getY());
-		worldToObject.transform(pointClicked,objectCoord);
-		return objectCoord;
-	}	
+		return (Double) worldToObject.transform(pointClicked,new Point2D.Double());
+	}
+
+	public AffineTransform getBoundingBoxTransform()
+	{
+		return getObjectToWorld();
+	}
+
+	public Circle getHandle()
+	{
+		return new Circle(Color.WHITE,this.getBoundingBox().getUpperLeft(),10);
+	}
 }

@@ -29,6 +29,9 @@ public class StateMachine
 	final static String drawing 			= "drawing";
 	final static String submitShapeToModel 	= "submitShapeToModel";
 	final static String selectShape			= "selectShape";
+	static final String haveShape 			= "haveShape";
+	static final String move 				= "move";
+	static final String rotate 				= "rotate";
 
 	// state flags
 	static boolean	startDrawingFlag;
@@ -42,6 +45,7 @@ public class StateMachine
 	static boolean	mousePressedFlag;
 	static boolean	mouseEnteredFlag;
 	static boolean	mouseExitedFlag;
+	private static boolean rotationFlag;
 
 	static private boolean debug		= true;
 	static private boolean printState;
@@ -52,6 +56,7 @@ public class StateMachine
 	static private int		buttonClicked;
 	static ArrayList<Point2D> 	clickLocations;	
 	static private Point2D.Double		currentMouseLocation;
+	static private Circle	rotationHandle;
 	
 	static MouseEvent e;
 	Point2D.Double clickLocation;
@@ -83,13 +88,13 @@ public class StateMachine
 	}
 	
 //	void tick()
+
 	void tick()
 	{
 		if(e != null)
 		{
 			if(mouseClickedFlag || mousePressedFlag)
 			{
-				mouseClickedFlag = mousePressedFlag = false;
 				clickLocation = new Point2D.Double(e.getX(), e.getY());
 			}
 			setCurrentMouseLocation(new Point2D.Double(e.getX(), e.getY()));
@@ -110,31 +115,17 @@ public class StateMachine
 				break;
 			case StateMachine.drawing:
 				handleDrawing(getCurrentMouseLocation());
-				GUIFunctions.refresh();
 				break;
 			case StateMachine.selectShape:
-				if(mouseDraggedFlag = true)
-				{
-					mouseDraggedFlag = false;
-					if(GUIModel.getSelectedShape() != null)
-					{
-						Circle handle = rotationHandleClicked(e);
-						if(handle != null)
-						{
-							handleRotation(e,handle);
-						}
-						else
-						{
-							handleShapeMovement(e);
-						}
-					}
-				}
-				if(mousePressedFlag = true)
-				{
-					mousePressedFlag = false;
-				}
-				
 				handleShapeOperations(getCurrentMouseLocation());
+				break;
+			case StateMachine.haveShape:
+				break;
+			case StateMachine.move:
+				handleMove(e);
+				break;
+			case StateMachine.rotate:
+				handleRotation(e);
 				break;
 			default:
 				break;
@@ -180,11 +171,80 @@ public class StateMachine
 				if(getButtonClicked() != GUIController.selectButton)
 				{
 					StateMachine.current = StateMachine.init;
+					printState		= true;
+				}
+				if(GUIModel.getSelectedShape() != null)
+				{
+					StateMachine.current = StateMachine.haveShape;
+					printState		= true;
 				}
 				break;
+			case StateMachine.haveShape:
+				if(rotationFlag)
+				{
+					StateMachine.current = StateMachine.rotate;
+					printState		= true;
+				}
+				if(mouseClickedFlag && GUIModel.getSelectedShape() != null)
+				{
+					mouseClickedFlag = false;
+					StateMachine.current = StateMachine.move;
+					printState		= true;
+				}
+				if(buttonClicked != GUIController.selectButton)
+				{
+					StateMachine.current = StateMachine.init;
+					GUIModel.setSelectedCenter(null);
+					GUIModel.setSelectedShape(null);
+					printState		= true;
+				}
+				if(GUIModel.getSelectedShape() == null)
+				{
+					StateMachine.current = StateMachine.init;
+					printState		= true;
+				}
+				break;
+			case StateMachine.move:
+				if(mouseClickedFlag)
+				{
+					if(GUIController.getModel().getClickedShape(clickLocation) == GUIModel.getSelectedShape())
+					{
+						StateMachine.current = StateMachine.rotate;
+					}
+					else
+					{
+						StateMachine.current = StateMachine.haveShape;						
+					}
+					printState		 = true;
+					mouseClickedFlag = false;
+				}
+				break;
+			case StateMachine.rotate:
+				if(!rotationFlag)
+				{
+//					StateMachine.current = StateMachine.haveShape;
+					printState		= true;
+				}
+				if(mouseClickedFlag)
+				{
+					mouseClickedFlag = false;
+					rotationFlag 	 = false;
+					if(GUIController.getModel().getClickedShape(clickLocation) == GUIModel.getSelectedShape())
+					{
+						StateMachine.current = StateMachine.move;
+					}
+					else
+					{
+						StateMachine.current = StateMachine.haveShape;						
+					}
+					printState		 = true;
+				}
+				break;
+
 			default:
 				break;
 		}
+		GUIFunctions.refresh();
 	}
 
 //	end tick function
@@ -193,25 +253,21 @@ public class StateMachine
 	{
 				
 	}
-	private void handleShapeMovement(MouseEvent e)
+	void handleMove(MouseEvent e)
 	{
-		AffineTransform t = new AffineTransform();
-		double dX = (e.getX() - clickLocations.get(0).getX());
-		double dY = (e.getY() - clickLocations.get(0).getY());
-		t.translate(dX, dY);
-		
-		Point2D.Double newCenter = (Double) t.transform(GUIModel.getSelectedCenter(), null);
-//		System.out.print("New center: (" + newCenter.x + ", " + newCenter.y + ")");
-//		System.out.print("\tdX: " + dX);
-//		System.out.println(", dY: " + dY);
-//		System.out.println("\tClickLocations[0]: (" + clickLocations.get(0).getX() + ", " + clickLocations.get(0).getY() + ")");
-		
-		GUIModel.getSelectedShape().setCenter(newCenter);
-		GUIFunctions.refresh();
+		if(!isRotationFlag())
+		{
+			AffineTransform t = new AffineTransform();
+			double dX = (e.getX() - clickLocations.get(0).getX());
+			double dY = (e.getY() - clickLocations.get(0).getY());
+			t.translate(dX, dY);
+			
+			Point2D.Double newCenter = (Double) t.transform(GUIModel.getSelectedCenter(), null);
+			
+			GUIModel.getSelectedShape().setCenter(newCenter);
+			GUIFunctions.refresh();
+		}
 	}
-	/**
-	 * 
-	 */
 	private void handleDrawing(Point2D location)
 	{
 		// draw based on shape selection
@@ -263,9 +319,10 @@ public class StateMachine
 			}
 		}
 	}
-	void handleRotation(MouseEvent e, Circle handle)
+	void handleRotation(MouseEvent e)
 	{
-		GUIModel.getSelectedShape().setRotation(calculateAngleOfRotation(e, handle));
+		GUIModel.getSelectedShape().setRotation(calculateAngleOfRotation(e, rotationHandle));
+		GUIFunctions.refresh();
 	}
 	
 	boolean shapeClicked(Double clickLocation)
@@ -518,10 +575,8 @@ public class StateMachine
 			default:
 				return;
 		}
-		
-		Point2D.Double center = Triangle.calculateCenter((Double) clickLocations.get(0), (Double) clickLocations.get(1), p3);
-		
-		setCurrentShape((Shape) new Triangle(getCurrentColor(), center, (Double) clickLocations.get(0), (Double) clickLocations.get(1), p3));
+				
+		setCurrentShape((Shape) new Triangle(getCurrentColor(), null, (Double) clickLocations.get(0), (Double) clickLocations.get(1), p3));
 	}
 
 	private void submitShape()
@@ -545,13 +600,14 @@ public class StateMachine
 	
 	Circle rotationHandleClicked(MouseEvent e)
 	{
-		if(GUIModel.getSelectedShape() == null)
+		if(GUIModel.getSelectedShape() == null || e.getClickCount() == 0)
 		{
 			return null;
 		}
+
 		Rectangle r = GUIModel.getSelectedShape().getBoundingBox();
 		Point2D.Double p = new Point2D.Double(r.getUpperLeft().getX()-10, r.getUpperLeft().getY()-10);
-		Circle handle = new Circle(Color.WHITE, p, 5);
+		Circle handle = new Circle(Color.WHITE, p, 20);
 		
 		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
 		
@@ -562,10 +618,9 @@ public class StateMachine
 		
 		return null;
 	}
-	void clearDrawingInfo()
+	static void clearDrawingInfo()
 	{
 		clickLocations.clear();
-		System.out.println("Click locations cleared.");
 		printState = true;
 	}
 	
@@ -584,14 +639,20 @@ public class StateMachine
 
 	private double calculateAngleOfRotation(MouseEvent e, Circle handle)
 	{
-		Line2D vectorToHandle = new Line2D.Double(handle.getCenter(), GUIModel.getSelectedCenter());
+		if(rotationHandle == null)
+		{
+			rotationHandle = GUIModel.getSelectedShape().getHandle();
+		}
+		
+		Line2D vectorToHandle = new Line2D.Double(rotationHandle.getCenter(), GUIModel.getSelectedCenter());
 		Line2D vectorToMouse  = new Line2D.Double(e.getPoint(), GUIModel.getSelectedCenter());
 		
 	    double angle1 = Math.atan2(vectorToHandle.getY1() - vectorToHandle.getY2(),
 	                               vectorToHandle.getX1() - vectorToHandle.getX2());
 	    double angle2 = Math.atan2(vectorToMouse.getY1() - vectorToMouse.getY2(),
 	                               vectorToMouse.getX1() - vectorToMouse.getX2());
-	    return angle1-angle2;
+	    
+	    return angle2-angle1;
 	}
 
 	public static void setButtonClicked(int buttonClicked)	
@@ -613,9 +674,9 @@ public class StateMachine
 		return currentMouseLocation;
 	}
 
-	public static void setCurrentMouseLocation(Point2D.Double currentMouseLocation)
+	public static void setCurrentMouseLocation(Point2D.Double c)
 	{
-		StateMachine.currentMouseLocation = currentMouseLocation;
+		currentMouseLocation = c;
 	}
 	int registerClick(Point2D.Double p)
 	{
@@ -628,5 +689,23 @@ public class StateMachine
 //			System.out.println("\tP.y: " + q.getY());
 //		}
 		return clickLocations.size();
+	}
+
+	public static boolean isRotationFlag() {
+		return rotationFlag;
+	}
+
+	public static void setRotationFlag(boolean val) {
+		rotationFlag = val;
+	}
+
+	public void setRotationHandle(Circle handle)
+	{
+		rotationHandle = handle;
+	}
+
+	public static void lowerFlags()
+	{
+		setRotationFlag(false);
 	}
 }

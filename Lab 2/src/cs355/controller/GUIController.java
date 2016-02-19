@@ -12,6 +12,7 @@ import java.util.Iterator;
 import cs355.GUIFunctions;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.GUIModel;
+import cs355.model.drawing.Shape;
 import cs355.view.GUIViewRefresher;
 
 public class GUIController implements CS355Controller, MouseListener, MouseMotionListener
@@ -45,37 +46,18 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		StateMachine.mouseDraggedFlag = true;
 		StateMachine.e = e;
 		state.tick();
-//		switch (State.current)
-//		{
-//			case State.selectShape:
-//				if(GUIModel.getSelectedShape() != null)
-//				{
-//					Circle handle = rotationHandleClicked(e);
-//					if(handle != null)
-//					{
-//						handleRotation(e,handle);
-//					}
-//					else
-//					{
-//						handleShapeMovement(e);
-//					}
-//				}
-//				break;
-//			default:
-//				mouseMoved(e);
-//				break;
-//		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
 		StateMachine.mouseMovedFlag = true;
-//		if(StateMachine.mouseEnteredFlag)
-//		{
-//			StateMachine.setCurrentMouseLocation(new Point2D.Double(e.getX(), e.getY()));
-//		}
 		StateMachine.e = e;
+		
+		if(StateMachine.isRotationFlag() && StateMachine.getCurrentShape() != null)
+		{
+			state.handleRotation(e);
+		}
 		state.tick();
 	}
 	@Override
@@ -84,11 +66,45 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		StateMachine.mouseClickedFlag = true;
 		StateMachine.e = e;
 		state.registerClick(new Point2D.Double(e.getX(), e.getY()));
-		if(StateMachine.current == StateMachine.init)
-		{
-			StateMachine.startDrawingFlag = true;
-		}
+		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
 
+		if(StateMachine.mouseEnteredFlag)
+		{
+			if(StateMachine.current == StateMachine.init)
+			{
+				StateMachine.startDrawingFlag = true;
+			}
+			if(StateMachine.current == StateMachine.selectShape)
+			{
+				if(state.shapeClicked(clickLocation))
+				{
+					StateMachine.clickLocations.clear();
+					StateMachine.clickLocations.add(clickLocation);
+					state.saveCenter(e);
+				}
+			}
+			if(StateMachine.current == StateMachine.haveShape)
+			{
+				Circle handle = state.rotationHandleClicked(e);
+				if(handle != null)
+				{
+					StateMachine.setRotationFlag(true);
+					state.setRotationHandle(handle);
+					state.handleRotation(e);
+				}
+			}
+			else
+			{
+				Shape cur = GUIModel.getSelectedShape();
+				if(cur != model.getClickedShape(clickLocation))
+				{
+					if(cur != null)
+					{
+						GUIModel.setSelectedShape(cur);
+					}
+				}
+			}
+		}
 		state.tick();
 	}
 	@Override
@@ -104,6 +120,8 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		StateMachine.mouseExitedFlag  = true;
 		StateMachine.mouseEnteredFlag = false;
+		StateMachine.clearDrawingInfo();
+		StateMachine.lowerFlags();
 		StateMachine.e = e;
 		state.tick();
 	}
@@ -112,21 +130,23 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		StateMachine.mousePressedFlag = true;
 		StateMachine.e = e;
-		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
-		if(StateMachine.current == StateMachine.selectShape)
-		{
-			Circle c = state.rotationHandleClicked(e);
-			if(c != null)
-			{
-				state.handleRotation(e, c);
-			}
-			else if(state.shapeClicked(clickLocation))
-			{
-				StateMachine.clickLocations.clear();
-				StateMachine.clickLocations.add(clickLocation);
-				state.saveCenter(e);
-			}
-		}
+//		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
+//		if(StateMachine.current == StateMachine.selectShape)
+//		{
+//			Circle handle = state.rotationHandleClicked(e);
+//			if(handle != null)
+//			{
+//				state.setRotationFlag(true);
+//				state.setRotationHandle(handle);
+//			}
+//
+//			if(state.shapeClicked(clickLocation))
+//			{
+//				StateMachine.clickLocations.clear();
+//				StateMachine.clickLocations.add(clickLocation);
+//				state.saveCenter(e);
+//			}
+//		}
 		state.tick();
 	}
 
@@ -141,7 +161,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void colorButtonHit(Color c)	
 	{
-		state.clearDrawingInfo();
+		StateMachine.clearDrawingInfo();
 		StateMachine.setCurrentColor(c);
 		GUIFunctions.changeSelectedColor(StateMachine.getCurrentColor());
 		state.tick();
@@ -150,42 +170,42 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void lineButtonHit()			
 	{
-		StateMachine.setButtonClicked(lineButton);	 state.clearDrawingInfo();
+		StateMachine.setButtonClicked(lineButton);	 StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void squareButtonHit()		
 	{
-		StateMachine.setButtonClicked(squareButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(squareButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void rectangleButtonHit()	
 	{
-		StateMachine.setButtonClicked(rectangleButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(rectangleButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void circleButtonHit()		
 	{
-		StateMachine.setButtonClicked(circleButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(circleButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void ellipseButtonHit()		
 	{
-		StateMachine.setButtonClicked(ellipseButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(ellipseButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void triangleButtonHit()		
 	{
-		StateMachine.setButtonClicked(triangleButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(triangleButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 	
@@ -193,24 +213,23 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	public void selectButtonHit()		
 	{
 		StateMachine.setButtonClicked(selectButton);
-		state.clearDrawingInfo();
+		StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void zoomInButtonHit()		
 	{
-		StateMachine.setButtonClicked(zoomInButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(zoomInButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void zoomOutButtonHit()		
 	{
-		StateMachine.setButtonClicked(zoomOutButton); state.clearDrawingInfo();
+		StateMachine.setButtonClicked(zoomOutButton); StateMachine.clearDrawingInfo();
 		state.tick();
 	}
-
 
 
 	@Override
@@ -228,7 +247,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	public void openScene(File file)
 	{
 	}
-
 
 	@Override
 	public void keyPressed(Iterator<Integer> iterator)
@@ -254,12 +272,10 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doDeleteShape()
 	{
-		// TODO: this
 	}
 	@Override
 	public void doEdgeDetection()
 	{
-		// TODO: this
 	}
 	@Override
 	public void doSharpen()
@@ -320,18 +336,12 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doSendToFront()
 	{
-		// TODO: this
 	}
 
 	@Override
 	public void doSendtoBack()
 	{
-		// TODO: this
 	}
-
-
-
-
 
 	public static GUIModel getModel()
 	{

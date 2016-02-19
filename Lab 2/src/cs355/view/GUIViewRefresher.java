@@ -101,13 +101,10 @@ public class GUIViewRefresher implements ViewRefresher {
 			{
 				Triangle t = (Triangle) s;
 
-				if(t.getaV() == null || t.getbV() == null || t.getcV() == null)
-				{
-					t.updatePoints();
-				}
+				t.cleanup();
 				
-				int xCoords[] = { (int) t.getaV().getX(), (int) t.getbV().getX(), (int) t.getcV().getX()};
-				int yCoords[] = { (int) t.getaV().getY(), (int) t.getbV().getY(), (int) t.getcV().getY()};
+				int xCoords[] = { (int) t.getA().getX(), (int) t.getB().getX(), (int) t.getC().getX()};
+				int yCoords[] = { (int) t.getA().getY(), (int) t.getB().getY(), (int) t.getC().getY()};
 				
 				g2d.fillPolygon(xCoords, yCoords, 3);
 			}
@@ -117,42 +114,28 @@ public class GUIViewRefresher implements ViewRefresher {
 		if(s != null)
 		{
 			Rectangle c = s.getBoundingBox();
-			AffineTransform objToWorld = new AffineTransform();
-//			if(s.getClass() == Triangle.class)
-//			{
-//				objToWorld.translate(s.getBoundingBox().getCenter().getX(), s.getBoundingBox().getCenter().getY());
-//			}
-//			else if(s.getClass() == Line.class)
-//			{
-//				objToWorld.translate(s.getBoundingBox().getCenter().getX(), s.getBoundingBox().getCenter().getY());
-//			}
-//			else
-//			{
-				objToWorld.translate(c.getCenter().getX(), c.getCenter().getY());
-//			}
-			objToWorld.rotate(s.getRotation());
-			g2d.setTransform(objToWorld);
-
+			g2d.setTransform(s.getBoundingBoxTransform());
 			
 			g2d.setColor(c.getColor());
-//			Stroke st = g2d.getStroke();
-//			g2d.setStroke();
-//			g2d.drawRect( 	(int) c.getUpperLeft().getX(),
-//							(int) c.getUpperLeft().getY(),
-//							(int) c.getWidth(),
-//							(int) c.getHeight());
 			g2d.drawRect(	(int) -(c.getWidth()/2),
-								(int) -(c.getHeight()/2),
-								(int) c.getWidth(),
-								(int) c.getHeight());
-//			g2d.drawOval(	(int) c.getUpperLeft().getX() - 5,
-//							(int) c.getUpperLeft().getY() - 5,
-//							5,
-//							5);
-			g2d.drawOval(	(int) (-c.getWidth()/2)-5,
-							(int) (-c.getHeight()/2)-5,
-							(int) 10,
-							(int) 10);
+							(int) -(c.getHeight()/2),
+							(int) c.getWidth(),
+							(int) c.getHeight());
+			if(StateMachine.isRotationFlag())
+			{
+				g2d.fillOval(	(int) (-c.getWidth()/2)-5,
+								(int) (-c.getHeight()/2)-5,
+								(int) 10,
+								(int) 10);
+			}
+			else
+			{
+				g2d.drawOval(	(int) (-c.getWidth()/2)-5,
+						(int) (-c.getHeight()/2)-5,
+						(int) 10,
+						(int) 10);
+
+			}
 		}
 		
 		if(usingControllerShape)

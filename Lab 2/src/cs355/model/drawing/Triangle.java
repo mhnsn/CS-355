@@ -1,6 +1,7 @@
 package cs355.model.drawing;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 /**
@@ -32,120 +33,38 @@ public class Triangle extends Shape {
 	Point2D.Double bV;
 	Point2D.Double cV;
 
-	/**
-	 * Basic constructor that sets all fields.
-	 * @param color the color for the new shape.
-	 * @param center the center of the new shape.
-	 * @param a the first point, relative to the center.
-	 * @param b the second point, relative to the center.
-	 * @param c the third point, relative to the center.
-	 */
 	public Triangle(Color color, Point2D.Double center, Point2D.Double a, Point2D.Double b, Point2D.Double c)
 	{
 		// Initialize the superclass.
 		super(color, center);
 		
-		// Set fields.
-		this.a = a;
-		this.b = b;
-		this.c = c;
+		this.center = center = calculateCenter(a,b,c);
 		
+		// Set fields.
 		a = new Point2D.Double(a.x - center.x, a.y - center.y);
 		b = new Point2D.Double(b.x - center.x, b.y - center.y);
 		c = new Point2D.Double(c.x - center.x, c.y - center.y);
 		
+		this.a = a;
+		this.b = b;
+		this.c = c;
+				
 		cleanup();
 	}
-	/**
-	 * 
-	 */
-	private void cleanup()
-	{
-		setBounds();
-		calculateEquations();
-	}
-	/**
-	 * Alternate constructor that sets fields based on locations of corners.
-	 * @param color the color for the new shape.
-	 * @param p1 the first point,  relative to the center.
-	 * @param p2 the second point, relative to the center.
-	 * @param p3 the third point,  relative to the center.
-	 */
 
-	/**
-	 * @return
-	 */
-	private Rectangle setBounds()
-	{
-		minX = a.x;
-		minY = a.y;
-		maxX = a.x;
-		maxY = a.y;
-		
-		// find minX
-		if(minX > b.x) { minX = b.x; }
-		if(minX > c.x) { minX = c.x; }
-		// find minY		
-		if(minY > b.y) { minY = b.y; }
-		if(minY > c.y) { minY = c.y; }
-		// find maxX
-		if(maxX < b.x) { maxX = b.x; }
-		if(maxX < c.x) { maxX = c.x; }
-		// find maxY
-		if(maxY < b.y) { maxY = b.y; }
-		if(maxY < c.y) { maxY = c.y; }
-		
-		boundWidth 	= (maxX-minX);
-		boundHeight = (maxY-minY);
-		
-		Point2D.Double center = new Point2D.Double((maxX+minX)/2, (maxY+minY)/2);
-
-		boundingBox = new Rectangle(Color.WHITE,center,boundWidth,boundHeight);
-				
-		return boundingBox;
-	}
-	
-	private void calculateEquations()
-	{
-		Aab = -(b.y-a.y);
-		Bab = b.x-a.x;
-		Cab = -(Aab*a.x + Bab*a.y);
-		
-		Abc = -(c.y-b.y);
-		Bbc = c.x-b.x;
-		Cbc = -(Abc*b.x + Bbc*b.y);
-
-		Aca = -(a.y-c.y);
-		Bca = a.x-c.x;		
-		Cca = -(Aca*c.x + Bca*c.y);
-		
-		a = new Point2D.Double(a.x - center.x, a.y - center.y);
-		b = new Point2D.Double(b.x - center.x, b.y - center.y);
-		c = new Point2D.Double(c.x - center.x, c.y - center.y);		
-	}
-	
-	public static Point2D.Double calculateCenter(Point2D.Double a, Point2D.Double b, Point2D.Double c)
+	private Point2D.Double calculateCenter(Point2D.Double a, Point2D.Double b, Point2D.Double c)
 	{
 		Point2D.Double center 	= new Point2D.Double();
 		
-		Point2D.Double midpoint = new Point2D.Double((a.x + b.x)/2, (a.y + b.y)/2);
-		center.setLocation(c.x + (2/3)*(midpoint.x - c.x), c.y + (2/3)*(midpoint.y - c.y));
+		center.setLocation((a.x + b.x + c.x)/3 , (a.y + b.y + c.y)/3 );
 
-		a = new Point2D.Double(a.x-center.x, a.y-center.y);
-		b = new Point2D.Double(b.x-center.x, b.y-center.y);
-		c = new Point2D.Double(c.x-center.x, c.y-center.y);
+//		a = new Point2D.Double(a.x-center.x, a.y-center.y);
+//		b = new Point2D.Double(b.x-center.x, b.y-center.y);
+//		c = new Point2D.Double(c.x-center.x, c.y-center.y);
 		
 		return center;
 	}
 	
-	/**
-	 * Add your code to do an intersection test
-	 * here. You shouldn't need the tolerance.
-	 * @param objPt = the point to test against.
-	 * @param tolerance = the allowable tolerance.
-	 * @return true if pt is in the shape,
-	 *		   false otherwise.
-	 */
 	@Override
 	public boolean pointInShape(Point2D.Double pt, double tolerance)
 	{
@@ -184,33 +103,94 @@ public class Triangle extends Shape {
 		return false;
 	}
 	
-	/**
-	 * @return the aV
-	 */
-	public Point2D.Double getaV() { return aV; }
-	/**
-	 * @return the bV
-	 */
-	public Point2D.Double getbV() { return bV; }
-	/**
-	 * @return the cV
-	 */
-	public Point2D.Double getcV() { return cV; }	
-	/**
-	 * Getter for the first point.
-	 * @return the first point as a Java point.
-	 */
+	public Point2D.Double getA() { return a; }
 
-	public double lineAB(Point2D.Double pt)
+	public Point2D.Double getB() { return b; }
+
+	public Point2D.Double getC() { return c; }	
+
+
+	private double lineAB(Point2D.Double pt)
 	{
 		return Aab*pt.x + Bab*pt.y + Cab;
 	}
-	public double lineBC(Point2D.Double pt)
+	
+	private double lineBC(Point2D.Double pt)
 	{
 		return Abc*pt.x + Bbc*pt.y + Cbc;
 	}
-	public double lineCA(Point2D.Double pt)
+	
+	private double lineCA(Point2D.Double pt)
 	{
 		return Aca*pt.x + Bca*pt.y + Cca;
+	}
+	
+	public void setCenter(Point2D.Double pt)
+	{
+		this.center = pt;
+	}
+	
+	public void cleanup()
+	{
+		setBounds();
+		calculateEquations();
+	}
+
+	private void calculateEquations()
+	{
+		Aab = -(b.y-a.y);
+		Bab = b.x-a.x;
+		Cab = -(Aab*a.x + Bab*a.y);
+		
+		Abc = -(c.y-b.y);
+		Bbc = c.x-b.x;
+		Cbc = -(Abc*b.x + Bbc*b.y);
+
+		Aca = -(a.y-c.y);
+		Bca = a.x-c.x;		
+		Cca = -(Aca*c.x + Bca*c.y);
+		
+//		a = new Point2D.Double(a.x - center.x, a.y - center.y);
+//		b = new Point2D.Double(b.x - center.x, b.y - center.y);
+//		c = new Point2D.Double(c.x - center.x, c.y - center.y);		
+	}
+	
+	private Rectangle setBounds()
+	{
+		minX = a.x;
+		minY = a.y;
+		maxX = a.x;
+		maxY = a.y;
+		
+		// find minX
+		if(minX > b.x) { minX = b.x; }
+		if(minX > c.x) { minX = c.x; }
+		// find minY		
+		if(minY > b.y) { minY = b.y; }
+		if(minY > c.y) { minY = c.y; }
+		// find maxX
+		if(maxX < b.x) { maxX = b.x; }
+		if(maxX < c.x) { maxX = c.x; }
+		// find maxY
+		if(maxY < b.y) { maxY = b.y; }
+		if(maxY < c.y) { maxY = c.y; }
+		
+		boundWidth 	= (maxX-minX);
+		boundHeight = (maxY-minY);
+		
+		Point2D.Double pt = new Point2D.Double(maxX-(boundWidth/2), maxY-(boundHeight/2));
+	
+		boundingBox = new Rectangle(Color.WHITE,pt,boundWidth,boundHeight);
+				
+		return boundingBox;
+	}
+
+	@Override
+	public AffineTransform getBoundingBoxTransform()
+	{
+		AffineTransform bt = getObjectToWorld();
+		bt.translate(boundingBox.center.x, boundingBox.center.y );
+		
+		return bt;
 	}
 }
