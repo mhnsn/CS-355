@@ -60,6 +60,10 @@ public class StateMachine
 	
 	static MouseEvent e;
 	Point2D.Double clickLocation;
+
+	// translation offset
+	private double dX;
+	private double dY;
 	
 	// initializer
 	StateMachine()
@@ -258,14 +262,22 @@ public class StateMachine
 		if(!isRotationFlag())
 		{
 			AffineTransform t = new AffineTransform();
-			double dX = (e.getX() - clickLocations.get(0).getX());
-			double dY = (e.getY() - clickLocations.get(0).getY());
+			if(dX == dY && dX == 0)
+			{
+				dX = (e.getX() - clickLocations.get(0).getX());
+				dY = (e.getY() - clickLocations.get(0).getY());
+			}
 			t.translate(dX, dY);
 			
 			Point2D.Double newCenter = (Double) t.transform(GUIModel.getSelectedCenter(), null);
 			
 			GUIModel.getSelectedShape().setCenter(newCenter);
 			GUIFunctions.refresh();
+		}
+		else
+		{
+			GUIFunctions.printf("Entered else statement of handleMove.");
+			dX = dY = 0;
 		}
 	}
 	private void handleDrawing(Point2D location)

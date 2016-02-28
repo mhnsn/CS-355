@@ -223,9 +223,8 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[648, 616]"/>
+      <Dimension value="[664, 648]"/>
     </Property>
-    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="menuBar"/>
@@ -250,29 +249,24 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="zoomInBtn" max="32767" attributes="0"/>
-                          <Component id="selectBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="triangleBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="ellipseBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="circleBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="rectBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="squareBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="lineBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="colorBtn" alignment="0" max="32767" attributes="0"/>
-                          <Component id="zoomOutBtn" alignment="1" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="zoomInBtn" max="32767" attributes="0"/>
+                      <Component id="selectBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="triangleBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="ellipseBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="circleBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="rectBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="squareBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="lineBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="colorBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="zoomOutBtn" alignment="1" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="imageBtn" alignment="1" max="32767" attributes="0"/>
-                          <Component id="houseBtn" alignment="1" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="imageBtn" alignment="0" max="32767" attributes="0"/>
+                      <Component id="houseBtn" alignment="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="vertScrollBar" max="32767" attributes="0"/>
                   <Component id="colorCanvas" max="32767" attributes="0"/>
