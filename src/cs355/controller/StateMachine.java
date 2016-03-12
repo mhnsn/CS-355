@@ -741,6 +741,10 @@ public class StateMachine
 	public static void setCurrentColor(Color currentColor)	
 	{
 		StateMachine.currentColor = currentColor;
+		if(StateMachine.current == StateMachine.haveShape)
+		{
+			GUIModel.getSelectedShape().setColor(currentColor);
+		}
 	}
 
 	public static Point2D.Double getCurrentMouseLocation()
