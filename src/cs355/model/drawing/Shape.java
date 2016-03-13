@@ -2,8 +2,11 @@ package cs355.model.drawing;
 
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+
+import cs355.controller.StateMachine;
 
 /**
  * This is the base class for all of your shapes.
@@ -142,10 +145,11 @@ public abstract class Shape {
 	 */
 	public AffineTransform getObjectToWorld()
 	{
-		AffineTransform objToWorld = new AffineTransform();
-		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
-		objToWorld.rotate(this.getRotation());
-		return objToWorld;
+//		AffineTransform objToWorld = new AffineTransform();
+//		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
+//		objToWorld.rotate(this.getRotation());
+//		return objToWorld;
+		return StateMachine.objectToWorld(this);
 	}
 
 	/**
@@ -165,10 +169,20 @@ public abstract class Shape {
 	 */
 	public Point2D.Double worldToObject(Point2D.Double pointClicked)
 	{
-		AffineTransform worldToObject	= new AffineTransform();
-		worldToObject.rotate(-this.getRotation());
-		worldToObject.translate(-this.getCenter().getX(), -this.getCenter().getY());
-		return (Double) worldToObject.transform(pointClicked,new Point2D.Double());
+//		AffineTransform worldToObject	= new AffineTransform();
+//		worldToObject.rotate(-this.getRotation());
+//		worldToObject.translate(-this.getCenter().getX(), -this.getCenter().getY());
+//		return (Double) worldToObject.transform(pointClicked,new Point2D.Double());
+		
+		try
+		{
+			return (Double) StateMachine.objectToWorld(this).createInverse().transform(pointClicked, null);
+		}
+		catch (NoninvertibleTransformException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public AffineTransform getBoundingBoxTransform()

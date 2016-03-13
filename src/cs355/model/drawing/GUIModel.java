@@ -142,4 +142,5 @@ public class GUIModel extends CS355Drawing {
 	{
 		return selectedShape.getCenter();
 	}
+
 }

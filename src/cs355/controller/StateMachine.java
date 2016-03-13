@@ -37,7 +37,6 @@ public class StateMachine
 	// state flags
 	static boolean	startDrawingFlag;
 	static private boolean	drawingCompleteFlag;
-	static private boolean 	selectButtonPressedFlag;
 	static boolean  buttonClickedFlag;
 	static boolean  mouseDraggedFlag;
 	static boolean  mouseMovedFlag;
@@ -57,20 +56,21 @@ public class StateMachine
 	static private int		buttonClicked;
 	static ArrayList<Point2D> 	clickLocations;
 	static private Point2D.Double		currentMouseLocation;
-	static private Circle	rotationHandle;
 	
 	static MouseEvent e;
+
+	private static Double viewOrigin;
 	Point2D.Double clickLocation;
 
 	// translation offset
 	private Vector<Object> 	moveOffset;
 	private Point2D.Double	rotationOffset;
 
-
 	private boolean noTransition;
 
-	
+	///////////////////////////////////////////////////////
 	// initializer
+
 	StateMachine()
 	{
 		current = init;
@@ -80,7 +80,6 @@ public class StateMachine
 		
 		
 		startDrawingFlag		=
-		selectButtonPressedFlag =
 		buttonClickedFlag		=
 		drawingCompleteFlag 	= 
 		mouseDraggedFlag		=
@@ -97,9 +96,12 @@ public class StateMachine
 		
 		moveOffset				= new Vector<Object>();
 		rotationOffset			= null;
+		viewOrigin				= new Point2D.Double(0, 0);
 	}
-	
-//	void tick()
+
+	// initializer
+	///////////////////////////////////////////////////////
+	//	void tick()
 
 	void tick()
 	{
@@ -136,7 +138,7 @@ public class StateMachine
 				handleDrawing(getCurrentMouseLocation());
 				break;
 			case StateMachine.selectShape:
-				handleShapeOperations(getCurrentMouseLocation());
+//				handleShapeOperations(getCurrentMouseLocation());
 				break;
 			case StateMachine.haveShape:
 				if(buttonClickedFlag && (buttonClicked == GUIController.colorButton))
@@ -170,8 +172,7 @@ public class StateMachine
 					{
 						case GUIController.selectButton:
 							StateMachine.current	= StateMachine.selectShape;
-							selectButtonPressedFlag	= false;
-							printState		= true;
+						printState		= true;
 							break;
 						default:
 							break;
@@ -270,135 +271,9 @@ public class StateMachine
 		GUIFunctions.refresh();
 	}
 
-//	end tick function
-
-	private void handleShapeOperations(Double currentMouseLocation)
-	{
-				
-	}
-	
-	void handleMove(MouseEvent e)
-	{
-		if(GUIModel.getSelectedShape() == null)
-		{
-			// TODO: this shouldn't be necessary! What's going on here?
-			return;
-		}
-		// calculate offset if necessary. Store the initial position as well.
-		if(doInitMove())
-		{
-			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
-			moveOffset		= new Vector<Object>();
-			moveOffset.addElement(clickLocation.getX()-GUIModel.getSelectedShape().getCenter().getX());
-			moveOffset.addElement(clickLocation.getY()-GUIModel.getSelectedShape().getCenter().getY());
-		}
-		// calculate dX and dY
-		double dX = (e.getX() - clickLocation.getX());
-		double dY = (e.getY() - clickLocation.getY());
-		
-		// new center = initial click + dY + dX - offset
-		Point2D.Double newCenter = (Double) new Point2D.Double(clickLocation.getX() + dX - (double) moveOffset.get(0),
-																clickLocation.getY() + dY - (double) moveOffset.get(1));
-		// assign new location and refresh
-		GUIModel.getSelectedShape().setCenter(newCenter);
-		GUIFunctions.refresh();
-	}
-	
-	private boolean doInitMove()
-	{
-		if(clickLocation == null || moveOffset == null)
-		{
-			return true;
-		}
-		else if(moveOffset.isEmpty())
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private void handleDrawing(Point2D location)
-	{
-		// draw based on shape selection
-		if(StateMachine.current == StateMachine.drawing)
-		{
-			switch (getButtonClicked())
-			{
-				case GUIController.colorButton:
-					break;
-				case GUIController.lineButton:
-					createNewLine(location);
-					break;
-				case GUIController.squareButton:
-					try
-					{
-						if(clickLocations.size() > 0)
-						{
-							createNewSquare(location);
-						}
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					break;
-				case GUIController.rectangleButton:
-					createNewRectangle(location);
-					break;
-				case GUIController.circleButton:
-					createNewCircle(location);
-					break;
-				case GUIController.ellipseButton:
-					createNewEllipse(location);
-					break;
-				case GUIController.triangleButton:
-					try
-					{
-						createNewTriangle(location);
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					break;
-				case GUIController.selectButton:
-					StateMachine.current = StateMachine.selectShape;
-					break;
-				default:
-			}
-		}
-	}
-	void handleRotation(MouseEvent e)
-	{
-		if(GUIModel.getSelectedShape() == null)	// this shouldn't be necessary and could be optimized out.
-		{
-			return;
-		}
-		
-		// calculate offset if necessary. Store the initial position as well.
-		if(doInitRotate())
-		{
-			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
-			rotationOffset	= clickLocation;
-		}
-		// calculate dTheta
-		double dTheta 		= calculateAngleOfRotation(e.getPoint());
-		
-		// assign new rotation value and refresh
-		GUIModel.getSelectedShape().setRotation(dTheta);
-//		System.out.println(GUIModel.getSelectedShape().getRotation());
-//		System.out.println("\t" + dTheta);
-		GUIFunctions.refresh();
-	}
-	
-	private boolean doInitRotate()
-	{
-		if(clickLocation == null || rotationOffset == null)
-		{
-			return true;
-		}
-		return false;
-	}
+	// tick function
+	///////////////////////////////////////////////////////
+	//		Shape selection and manipulation
 
 	boolean shapeClicked(Double clickLocation)
 	{
@@ -429,6 +304,113 @@ public class StateMachine
 		GUIFunctions.refresh();
 		return false;
 	}
+	
+	private boolean doInitMove()
+	{
+		if(clickLocation == null || moveOffset == null)
+		{
+			return true;
+		}
+		else if(moveOffset.isEmpty())
+		{
+			return true;
+		}
+		return false;
+	}	
+	private boolean doInitRotate()
+	{
+		if(clickLocation == null || rotationOffset == null)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	void handleMove(MouseEvent e)
+	{
+		if(GUIModel.getSelectedShape() == null)
+		{
+			// TODO: this shouldn't be necessary! What's going on here?
+			return;
+		}
+		// calculate offset if necessary. Store the initial position as well.
+		if(doInitMove())
+		{
+			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
+			moveOffset		= new Vector<Object>();
+			moveOffset.addElement(clickLocation.getX()-GUIModel.getSelectedShape().getCenter().getX());
+			moveOffset.addElement(clickLocation.getY()-GUIModel.getSelectedShape().getCenter().getY());
+		}
+		// calculate dX and dY
+		double dX = (e.getX() - clickLocation.getX());
+		double dY = (e.getY() - clickLocation.getY());
+		
+		// new center = initial click + dY + dX - offset
+		Point2D.Double newCenter = (Double) new Point2D.Double(clickLocation.getX() + dX - (double) moveOffset.get(0),
+																clickLocation.getY() + dY - (double) moveOffset.get(1));
+		// assign new location and refresh
+		GUIModel.getSelectedShape().setCenter(newCenter);
+		GUIFunctions.refresh();
+	}	
+	void handleRotation(MouseEvent e)
+	{
+		if(GUIModel.getSelectedShape() == null)	// this shouldn't be necessary and could be optimized out.
+		{
+			return;
+		}
+		
+		// calculate offset if necessary. Store the initial position as well.
+		if(doInitRotate())
+		{
+			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
+			rotationOffset	= clickLocation;
+		}
+		// calculate dTheta
+		double dTheta 		= calculateAngleOfRotation(e.getPoint());
+		
+		// assign new rotation value and refresh
+		GUIModel.getSelectedShape().setRotation(dTheta);
+//		System.out.println(GUIModel.getSelectedShape().getRotation());
+//		System.out.println("\t" + dTheta);
+		GUIFunctions.refresh();
+	}
+	
+	Circle rotationHandleClicked(MouseEvent e)
+	{
+		if(GUIModel.getSelectedShape() == null)
+		{
+			return null;
+		}
+
+	//create a point as the center of a new circle, then make circle
+		Circle handle = GUIModel.getSelectedShape().getHandle();
+	//create a click for the mouse event
+		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());		
+	//check if click is within handle
+		if(handle.pointInShape(clickLocation, 0))
+		{
+			return handle;	// TODO: clicking the rotation handle while an object is rotated no longer works.
+		}
+		
+		return null;
+	}
+	private double calculateAngleOfRotation(Point2D p1)
+	{
+		Line2D vectorToHandle = new Line2D.Double(GUIModel.getSelectedShape().getBoundingBox().getUpperLeft(), GUIModel.getSelectedCenter());
+		Line2D vectorToMouse  = new Line2D.Double(p1, GUIModel.getSelectedCenter());
+
+		
+	    double angle1 = Math.atan2(vectorToHandle.getY1() - vectorToHandle.getY2(),
+	                               vectorToHandle.getX1() - vectorToHandle.getX2());
+	    double angle2 = Math.atan2(vectorToMouse.getY1() - vectorToMouse.getY2(),
+	                               vectorToMouse.getX1() - vectorToMouse.getX2());
+	    
+	    return angle2-angle1;
+	}
+		
+	//		Shape selection and manipulation
+	///////////////////////////////////////////////////////
+	//				Shape creation
 	
 	private void createNewLine(Point2D mouseLoc)
 	{		
@@ -656,6 +638,128 @@ public class StateMachine
 		setCurrentShape((Shape) new Triangle(getCurrentColor(), null, (Double) clickLocations.get(0), (Double) clickLocations.get(1), p3));
 	}
 
+	//				Shape creation
+	///////////////////////////////////////////////////////
+	//				Drawing
+	
+	int registerClick(Point2D.Double p)
+	{
+		clickLocations.add(p);
+		clickLocation = p;
+
+		return clickLocations.size();
+	}
+	
+	private void handleDrawing(Point2D location)
+	{
+		// draw based on shape selection
+		if(StateMachine.current == StateMachine.drawing)
+		{
+			switch (getButtonClicked())
+			{
+				case GUIController.colorButton:
+					break;
+				case GUIController.lineButton:
+					createNewLine(location);
+					break;
+				case GUIController.squareButton:
+					try
+					{
+						if(clickLocations.size() > 0)
+						{
+							createNewSquare(location);
+						}
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					break;
+				case GUIController.rectangleButton:
+					createNewRectangle(location);
+					break;
+				case GUIController.circleButton:
+					createNewCircle(location);
+					break;
+				case GUIController.ellipseButton:
+					createNewEllipse(location);
+					break;
+				case GUIController.triangleButton:
+					try
+					{
+						createNewTriangle(location);
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					break;
+				case GUIController.selectButton:
+					StateMachine.current = StateMachine.selectShape;
+					break;
+				default:
+			}
+		}
+	}
+	static void clearDrawingInfo()
+	{
+		clickLocations.clear();
+		printState = true;
+	}
+
+	//				Drawing
+	///////////////////////////////////////////////////////
+	//				Getters and setters
+
+	public static int 	getButtonClicked()	
+	{
+		return buttonClicked;
+	}
+	public static void setButtonClicked(int buttonClicked)	
+	{
+		StateMachine.buttonClicked = buttonClicked;
+		buttonClickedFlag = true;
+	}
+
+	public static Color getCurrentColor()	
+	{
+		return currentColor;
+	}
+	public static void setCurrentColor(Color currentColor)	
+	{
+		StateMachine.currentColor = currentColor;
+		if(StateMachine.current == StateMachine.haveShape)
+		{
+			GUIModel.getSelectedShape().setColor(currentColor);
+		}
+	}
+
+	public static Shape getCurrentShape()
+	{
+		return currentShape;
+	}
+	public static void setCurrentShape(Shape shape)			
+	{
+		if(shape != null)
+		{
+//			System.out.println("Current shape is " + shape.toString());
+		}
+		currentShape = shape;
+	}
+
+	public static Point2D.Double getCurrentMouseLocation()
+	{
+		return currentMouseLocation;
+	}
+	public static void setCurrentMouseLocation(Point2D.Double c)
+	{
+		currentMouseLocation = c;
+	}
+	
+	//				Getters and setters
+	///////////////////////////////////////////////////////
+	//				Model Communication
+	
 	private void submitShape()
 	{
 		if(getCurrentShape() != null)
@@ -675,124 +779,23 @@ public class StateMachine
 		}
 	}
 	
-	Circle rotationHandleClicked(MouseEvent e)
-	{
-		if(GUIModel.getSelectedShape() == null)
-		{
-			return null;
-		}
-
-	//create a point as the center of a new circle, then make circle
-		Circle handle = GUIModel.getSelectedShape().getHandle();
-	//create a click for the mouse event
-		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());		
-	//check if click is within handle
-		if(handle.pointInShape(clickLocation, 0))
-		{
-			return handle;	// TODO: clicking the rotation handle while an object is rotated no longer works.
-		}
-		
-		return null;
-	}
-	static void clearDrawingInfo()
-	{
-		clickLocations.clear();
-		printState = true;
-	}
-	
-	public static Color getCurrentColor()	
-	{
-		return currentColor;
-	}
-	public static int getButtonClicked()	
-	{
-		return buttonClicked;
-	}
-	public static Shape getCurrentShape()
-	{
-		return currentShape;
-	}
-
-
-	private double calculateAngleOfRotation(Point2D p1)
-	{
-		Line2D vectorToHandle = new Line2D.Double(GUIModel.getSelectedShape().getBoundingBox().getUpperLeft(), GUIModel.getSelectedCenter());
-		Line2D vectorToMouse  = new Line2D.Double(p1, GUIModel.getSelectedCenter());
-
-		
-	    double angle1 = Math.atan2(vectorToHandle.getY1() - vectorToHandle.getY2(),
-	                               vectorToHandle.getX1() - vectorToHandle.getX2());
-	    double angle2 = Math.atan2(vectorToMouse.getY1() - vectorToMouse.getY2(),
-	                               vectorToMouse.getX1() - vectorToMouse.getX2());
-	    
-	    return angle2-angle1;
-	}
-
-	public static void setButtonClicked(int buttonClicked)	
-	{
-		StateMachine.buttonClicked = buttonClicked;
-		buttonClickedFlag = true;
-	}
-	public static void setCurrentShape(Shape shape)			
-	{
-		if(shape != null)
-		{
-//			System.out.println("Current shape is " + shape.toString());
-		}
-		currentShape = shape;
-	}
-	public static void setCurrentColor(Color currentColor)	
-	{
-		StateMachine.currentColor = currentColor;
-		if(StateMachine.current == StateMachine.haveShape)
-		{
-			GUIModel.getSelectedShape().setColor(currentColor);
-		}
-	}
-
-	public static Point2D.Double getCurrentMouseLocation()
-	{
-		return currentMouseLocation;
-	}
-
-	public static void setCurrentMouseLocation(Point2D.Double c)
-	{
-		currentMouseLocation = c;
-	}
-	int registerClick(Point2D.Double p)
-	{
-		clickLocations.add(p);
-		clickLocation = p;
-
-		return clickLocations.size();
-	}
+	//				Model Communication
+	///////////////////////////////////////////////////////
+	//				Flags
 
 	public static boolean doRotation()
 	{
 		return rotationFlag;
 	}
-
 	public static void setRotationFlag(boolean val)
 	{
 		rotationFlag = val;
 	}
 
-	public void setRotationHandle(Circle handle)
-	{
-		rotationHandle = handle;
-	}
-
-	/**
-	 * @return the mouseClickedFlag
-	 */
 	public static boolean mouseClicked()
 	{
 		return mouseClickedFlag;
 	}
-
-	/**
-	 * @param mouseClickedFlag the mouseClickedFlag to set
-	 */
 	public static void setMouseClickedFlag(boolean mouseClickedFlag)
 	{
 		StateMachine.mouseClickedFlag = mouseClickedFlag;
@@ -801,5 +804,49 @@ public class StateMachine
 	public static void lowerFlags()
 	{
 		setRotationFlag(false);
+	}
+
+	//				Flags
+	///////////////////////////////////////////////////////
+
+	public static AffineTransform objectToView(Shape s) 	// Mi
+	{
+		AffineTransform Mi = new AffineTransform();
+		Mi.setToIdentity();
+		Mi.concatenate(worldToView(viewOrigin));
+		Mi.concatenate(objectToWorld(s));
+		return Mi;
+	}	
+	public static AffineTransform worldToView(Point2D.Double origin)	// V
+	{
+		AffineTransform V = new AffineTransform();
+		V.setToIdentity();
+		V.concatenate(scale(GUIController.getZoomLevel()));
+		V.concatenate(translate(new Point2D.Double(-origin.getX(), -origin.getY())));
+		
+		return V;
+	}
+	public static AffineTransform scale(double zoomLevel)	// S(f)
+	{
+		AffineTransform S = new AffineTransform(zoomLevel, 0, 0, zoomLevel, 0, 0);		
+		return S;
+	}
+	public static AffineTransform translate(Point2D.Double p)		// T(p)
+	{
+		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
+		return T;
+	}
+	public static AffineTransform objectToWorld(Shape s)	// Oi
+	{
+		AffineTransform Oi = new AffineTransform();
+		Oi.concatenate(translate(s.getCenter()));
+		Oi.concatenate(rotate(s.getRotation()));
+
+		return Oi;
+	}
+	public static AffineTransform rotate(double r)			// R(theta)
+	{
+		AffineTransform R = new AffineTransform(Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0);
+		return R;
 	}
 }

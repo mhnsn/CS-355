@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import cs355.controller.StateMachine;
+
 /**
  * Add your triangle code here. You can add fields, but you cannot
  * change the ones that already exist. This includes the names!
@@ -188,7 +190,7 @@ public class Triangle extends Shape {
 	@Override
 	public AffineTransform getBoundingBoxTransform()
 	{
-		AffineTransform bt = getObjectToWorld();
+		AffineTransform bt = StateMachine.objectToWorld(this);
 		bt.translate(boundingBox.center.x, boundingBox.center.y );
 		
 		return bt;

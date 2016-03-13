@@ -32,11 +32,13 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	static private StateMachine 	state;	
 	static private GUIViewRefresher viewRefresher;
 	static private GUIModel			model;
+	private static double zoomLevel;
 
 	public GUIController()
 	{
 		state = new StateMachine();
 		StateMachine.current	= StateMachine.init;
+		zoomLevel = 1.00;
 
 		StateMachine.setCurrentColor(new Color(255, 255, 0));
 	}
@@ -96,7 +98,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 				if(handle != null)	
 				{
 					StateMachine.setRotationFlag(true);
-					state.setRotationHandle(handle);
+//					state.setRotationHandle(handle);
 				}
 //				else //if(GUIModel.getSelectedShape() != null) <-- since this is in haveShape, should change nothing.
 //				{
@@ -372,5 +374,10 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		setModel(m);
 		viewRefresher = vr;
+	}
+	
+	public static double getZoomLevel()
+	{
+		return zoomLevel;
 	}
 }

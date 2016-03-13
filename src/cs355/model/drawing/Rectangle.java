@@ -5,6 +5,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
+import cs355.controller.StateMachine;
+
 /**
  * Add your rectangle code here. You can add fields, but you cannot
  * change the ones that already exist. This includes the names!
@@ -111,9 +113,12 @@ public class Rectangle extends Shape {
 										this.center.getY()-(this.height/2));
 		
 		// rotate the point as necessary 
-		AffineTransform t = new AffineTransform();
-		t.rotate(rotation);
+//		AffineTransform t = new AffineTransform();
+//		t.rotate(rotation);
+//		
+//		return (Double) t.transform(upperLeft, null);
 		
+		AffineTransform t = StateMachine.rotate(rotation);
 		return (Double) t.transform(upperLeft, null);
 	}
 
