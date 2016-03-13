@@ -53,8 +53,10 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		StateMachine.mouseMovedFlag = true;
 		StateMachine.e = e;
+
+//		System.out.println("Mouse location: " + e.getPoint().toString());
 		
-		if(StateMachine.isRotationFlag() && StateMachine.getCurrentShape() != null)
+		if(StateMachine.current == StateMachine.rotate)
 		{
 			state.handleRotation(e);
 		}
@@ -62,13 +64,16 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		{
 			state.handleMove(e);
 		}
+		else if(StateMachine.current == StateMachine.haveShape)
+		{
+		}
 		state.tick();
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		StateMachine.mouseClickedFlag = true;
+		StateMachine.setMouseClickedFlag(true);
 		StateMachine.e = e;
 		state.registerClick(new Point2D.Double(e.getX(), e.getY()));
 		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
@@ -82,29 +87,29 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 				if(state.shapeClicked(clickLocation))
 				{
 					StateMachine.clickLocations.clear();
-//					state.saveCenter(e);
 				}
 				// TODO: may need to flag a state change here
 				break;
 			case StateMachine.haveShape:
+				//rotation check
 				Circle handle = state.rotationHandleClicked(e);
-				if(handle != null)
+				if(handle != null)	
 				{
 					StateMachine.setRotationFlag(true);
 					state.setRotationHandle(handle);
 				}
-				else if(GUIModel.getSelectedShape() != null)
-				{
+//				else //if(GUIModel.getSelectedShape() != null) <-- since this is in haveShape, should change nothing.
+//				{
 //					TODO: this flag may not be neceessary
-					if(GUIModel.getSelectedShape().pointInShape(clickLocation, 4))
-					{
+//					if(GUIModel.getSelectedShape().pointInShape(clickLocation, 4))
+//					{
 //					StateMachine.setMoveFlag();
-					}
-					else
-					{
-						state.shapeClicked(clickLocation);
-					}
-				}
+//					}
+//					else
+//					{
+//						state.shapeClicked(clickLocation);
+//					}
+//				}
 				else
 				{
 					state.shapeClicked(clickLocation);

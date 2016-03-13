@@ -109,4 +109,10 @@ public class Ellipse extends Shape {
 	{
 		return new Rectangle(Color.WHITE, center, width*2, height*2);
 	}
+	
+	@Override
+	public Point2D.Double getHandleCenter()
+	{
+		return new Point2D.Double(-(this.boundWidth)*2, -(this.boundHeight)*2);
+	}
 }

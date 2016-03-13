@@ -1,7 +1,9 @@
 package cs355.model.drawing;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 
 /**
  * Add your rectangle code here. You can add fields, but you cannot
@@ -107,7 +109,12 @@ public class Rectangle extends Shape {
 		Point2D.Double upperLeft = new Point2D.Double(
 										this.center.getX()-(this.width/2),
 										this.center.getY()-(this.height/2));
-		return upperLeft;
+		
+		// rotate the point as necessary 
+		AffineTransform t = new AffineTransform();
+		t.rotate(rotation);
+		
+		return (Double) t.transform(upperLeft, null);
 	}
 
 	@Override

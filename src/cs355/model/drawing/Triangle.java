@@ -193,4 +193,10 @@ public class Triangle extends Shape {
 		
 		return bt;
 	}
+
+	@Override
+	public Point2D.Double getHandleCenter()
+	{
+		return new Point2D.Double(-(this.boundWidth)/2, -(this.boundHeight)/2);
+	}
 }

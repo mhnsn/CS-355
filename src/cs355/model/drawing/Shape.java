@@ -132,7 +132,7 @@ public abstract class Shape {
 	{
 		//TODO: this could be optimized into an AABB
 		Rectangle bounds = new Rectangle(Color.WHITE,this.center,boundWidth*2,boundHeight*2);
-		bounds.setBounds(boundWidth, boundHeight);
+		bounds.setBounds(boundWidth*2, boundHeight*2);
 		return bounds;
 	}
 
@@ -175,9 +175,14 @@ public abstract class Shape {
 	{
 		return getObjectToWorld();
 	}
+	
+	public Point2D.Double getHandleCenter()
+	{
+		return new Point2D.Double(-(this.boundWidth), -(this.boundHeight));
+	}
 
 	public Circle getHandle()
-	{
-		return new Circle(Color.WHITE,this.getBoundingBox().getUpperLeft(),10);
+	{		
+		return new Circle(Color.WHITE,(Double) getBoundingBoxTransform().transform(getHandleCenter(),null),10);
 	}
 }

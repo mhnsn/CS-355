@@ -121,20 +121,27 @@ public class GUIViewRefresher implements ViewRefresher {
 							(int) -(c.getHeight()/2),
 							(int) c.getWidth(),
 							(int) c.getHeight());
-			if(StateMachine.isRotationFlag())
+			if(s.getClass().equals(cs355.model.drawing.Circle.class))
 			{
-				g2d.fillOval(	(int) (-c.getWidth()/2)-5,
-								(int) (-c.getHeight()/2)-5,
-								(int) 10,
-								(int) 10);
+				// don't draw the handle for circles - rotation is useless.
 			}
 			else
 			{
-				g2d.drawOval(	(int) (-c.getWidth()/2)-5,
-						(int) (-c.getHeight()/2)-5,
-						(int) 10,
-						(int) 10);
-
+				if(StateMachine.doRotation())
+				{
+					g2d.fillOval(	(int) (c.getHandleCenter().getX())-5,
+									(int) (c.getHandleCenter().getY())-5,
+									(int) 10,
+									(int) 10);
+				}
+				else
+				{
+					g2d.drawOval(	(int) (c.getHandleCenter().getX())-5,
+									(int) (c.getHandleCenter().getY())-5,
+									(int) 10,
+									(int) 10);
+	
+				}
 			}
 		}
 		
