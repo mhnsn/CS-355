@@ -127,6 +127,8 @@ public class StateMachine
 
 		if(printState && debug)
 		{
+//			GUIFunctions.printf("Current state: " + StateMachine.current);
+//			System.out.println("Current state: " + StateMachine.current);
 			printState = false;
 		}
 		
