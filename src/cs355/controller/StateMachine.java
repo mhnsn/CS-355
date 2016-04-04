@@ -258,8 +258,7 @@ public class StateMachine
 				break;
 		}
 		
-		// TODO: this could be optimized into a general handler for lowering all necessary flags
-		if(mouseClickedFlag)
+		if(mouseClickedFlag)	// TODO: this could be optimized into a general handler for lowering all necessary flags
 		{
 			mouseClickedFlag = false;
 		}
@@ -789,6 +788,9 @@ public class StateMachine
 	//				Flags
 	///////////////////////////////////////////////////////
 	//				Transforms
+	//	all of the base transforms (scale, translate, rotate,
+	//	and their opposites) are implemented as required.
+	//	The rest are created using .concatenate().
 	
 	public static AffineTransform objectToView(Shape s) 				// Mi
 	{
@@ -807,7 +809,7 @@ public class StateMachine
 		
 		return V;
 	}
-	public static AffineTransform scale(int zoomLevel)				// S(f)
+	public static AffineTransform scale(int zoomLevel)					// S(f)
 	{
 		double zoomFactor = 1;
 		if(zoomLevel > 9)
@@ -862,7 +864,7 @@ public class StateMachine
 		AffineTransform V = new AffineTransform();
 		V.setToIdentity();
 		V.concatenate(unTranslate(new Point2D.Double(-origin.getX(), -origin.getY())));
-		V.concatenate( unScale( GUIController.getZoomLevel() ) );
+		V.concatenate(unScale(GUIController.getZoomLevel()));
 		
 		return V;
 	}
@@ -891,7 +893,8 @@ public class StateMachine
 	}
 	public static AffineTransform unTranslate(Point2D.Double p)
 	{
-//		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
+		// this function redirects to translate, since they really do the same thing.
+		// it just makes things a bit clearer for the code
 		return translate(p);
 	}
 	public static AffineTransform worldToObject(Shape s)
@@ -912,7 +915,6 @@ public class StateMachine
 	{
 		return viewOrigin;
 	}
-
 	public static void setViewOrigin(Double viewOrigin)
 	{
 		StateMachine.viewOrigin = viewOrigin;

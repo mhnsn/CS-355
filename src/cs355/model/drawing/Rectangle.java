@@ -111,13 +111,7 @@ public class Rectangle extends Shape {
 		Point2D.Double upperLeft = new Point2D.Double(
 										this.center.getX()-(this.width/2),
 										this.center.getY()-(this.height/2));
-		
-		// rotate the point as necessary 
-//		AffineTransform t = new AffineTransform();
-//		t.rotate(rotation);
-//		
-//		return (Double) t.transform(upperLeft, null);
-		
+
 		AffineTransform t = StateMachine.rotate(rotation);
 		return (Double) t.transform(upperLeft, null);
 	}

@@ -221,8 +221,9 @@ public class Line extends Shape {
 	@Override
 	public AffineTransform getBoundingBoxTransform()
 	{
+		// this is good
 		AffineTransform bt = getObjectToWorld();
-		bt.translate( endV.x/2, endV.y/2  );
+		bt.concatenate(StateMachine.translate(new Point2D.Double(endV.x/2, endV.y/2)));
 		bt.preConcatenate(StateMachine.worldToView(StateMachine.getViewOrigin()));
 
 		return bt;
