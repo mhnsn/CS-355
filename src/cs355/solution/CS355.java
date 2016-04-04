@@ -33,5 +33,6 @@ public class CS355 {
 		
 		GUIFunctions.createCS355Frame(c, vr);
 		GUIFunctions.changeSelectedColor(StateMachine.getCurrentColor());
+		GUIViewRefresher.initScrollBars();
 		GUIFunctions.refresh();	}
 }

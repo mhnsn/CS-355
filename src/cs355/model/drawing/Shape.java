@@ -145,10 +145,6 @@ public abstract class Shape {
 	 */
 	public AffineTransform getObjectToWorld()
 	{
-//		AffineTransform objToWorld = new AffineTransform();
-//		objToWorld.translate(this.getCenter().getX(), this.getCenter().getY());
-//		objToWorld.rotate(this.getRotation());
-//		return objToWorld;
 		return StateMachine.objectToWorld(this);
 	}
 
@@ -169,11 +165,6 @@ public abstract class Shape {
 	 */
 	public Point2D.Double worldToObject(Point2D.Double pointClicked)
 	{
-//		AffineTransform worldToObject	= new AffineTransform();
-//		worldToObject.rotate(-this.getRotation());
-//		worldToObject.translate(-this.getCenter().getX(), -this.getCenter().getY());
-//		return (Double) worldToObject.transform(pointClicked,new Point2D.Double());
-		
 		try
 		{
 			return (Double) StateMachine.objectToWorld(this).createInverse().transform(pointClicked, null);
@@ -187,7 +178,7 @@ public abstract class Shape {
 
 	public AffineTransform getBoundingBoxTransform()
 	{
-		return getObjectToWorld();
+		return StateMachine.objectToView(this);
 	}
 	
 	public Point2D.Double getHandleCenter()

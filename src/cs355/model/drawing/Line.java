@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import cs355.controller.StateMachine;
+
 /**
  * Add your line code here. You can add fields, but you cannot
  * change the ones that already exist. This includes the names!
@@ -221,7 +223,8 @@ public class Line extends Shape {
 	{
 		AffineTransform bt = getObjectToWorld();
 		bt.translate( endV.x/2, endV.y/2  );
-		
+		bt.preConcatenate(StateMachine.worldToView(StateMachine.getViewOrigin()));
+
 		return bt;
 	}
 }

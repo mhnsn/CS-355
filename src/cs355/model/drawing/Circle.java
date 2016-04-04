@@ -24,7 +24,8 @@ public class Circle extends Shape {
 		super(color, center);
 		setBounds(radius*2, radius*2);
 		
-
+		System.out.println(this.center.toString());
+		
 		// Set the field.
 		this.radius = radius;
 	}

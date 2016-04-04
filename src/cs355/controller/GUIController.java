@@ -6,13 +6,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.io.File;
 import java.util.Iterator;
 
 import cs355.GUIFunctions;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.GUIModel;
-import cs355.model.drawing.Shape;
 import cs355.view.GUIViewRefresher;
 
 public class GUIController implements CS355Controller, MouseListener, MouseMotionListener
@@ -32,13 +32,13 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	static private StateMachine 	state;	
 	static private GUIViewRefresher viewRefresher;
 	static private GUIModel			model;
-	private static double zoomLevel;
+	private static int zoomLevel;
 
 	public GUIController()
 	{
 		state = new StateMachine();
 		StateMachine.current	= StateMachine.init;
-		zoomLevel = 1.00;
+		zoomLevel = 9;
 
 		StateMachine.setCurrentColor(new Color(255, 255, 0));
 	}
@@ -54,31 +54,38 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	public void mouseMoved(MouseEvent e)
 	{
 		StateMachine.mouseMovedFlag = true;
+		
 		StateMachine.e = e;
 
-//		System.out.println("Mouse location: " + e.getPoint().toString());
+		Point2D.Double pt =	new Point2D.Double(e.getX(), e.getY());
+		
+		pt = (Point2D.Double) StateMachine.viewToWorld(StateMachine.getViewOrigin()).transform(pt, null);
 		
 		if(StateMachine.current == StateMachine.rotate)
 		{
-			state.handleRotation(e);
+			state.handleRotation(pt);
 		}
 		else if(StateMachine.current == StateMachine.move)
 		{
-			state.handleMove(e);
+			state.handleMove(pt);
 		}
 		else if(StateMachine.current == StateMachine.haveShape)
 		{
 		}
 		state.tick();
+		GUIFunctions.refresh();
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
 		StateMachine.setMouseClickedFlag(true);
-		StateMachine.e = e;
-		state.registerClick(new Point2D.Double(e.getX(), e.getY()));
-		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
+//		StateMachine.e = e;
+		Point2D.Double pt =	new Point2D.Double(e.getX(), e.getY());
+//		state.registerClick((Point2D.Double) clickLocation);
+//		Point2D.Double clickLocation = new Point2D.Double(e.getX(), e.getY());
+		Point2D.Double clickLocation = (Double) StateMachine.viewToWorld(StateMachine.getViewOrigin()).transform(pt, null);
+		state.registerClick((Point2D.Double) clickLocation);
 		
 		switch(StateMachine.current)
 		{
@@ -90,7 +97,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 				{
 					StateMachine.clickLocations.clear();
 				}
-				// TODO: may need to flag a state change here
 				break;
 			case StateMachine.haveShape:
 				//rotation check
@@ -98,20 +104,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 				if(handle != null)	
 				{
 					StateMachine.setRotationFlag(true);
-//					state.setRotationHandle(handle);
 				}
-//				else //if(GUIModel.getSelectedShape() != null) <-- since this is in haveShape, should change nothing.
-//				{
-//					TODO: this flag may not be neceessary
-//					if(GUIModel.getSelectedShape().pointInShape(clickLocation, 4))
-//					{
-//					StateMachine.setMoveFlag();
-//					}
-//					else
-//					{
-//						state.shapeClicked(clickLocation);
-//					}
-//				}
 				else
 				{
 					state.shapeClicked(clickLocation);
@@ -238,29 +231,76 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void zoomInButtonHit()		
 	{
-		StateMachine.setButtonClicked(zoomInButton); StateMachine.clearDrawingInfo();
+		StateMachine.setButtonClicked(zoomInButton);
+		zoomIn();
+		StateMachine.clearDrawingInfo();
 		state.tick();
 	}
 
 	@Override
 	public void zoomOutButtonHit()		
 	{
-		StateMachine.setButtonClicked(zoomOutButton); StateMachine.clearDrawingInfo();
+		StateMachine.setButtonClicked(zoomOutButton);
+		zoomOut();
+		StateMachine.clearDrawingInfo();
 		state.tick();
 	}
+	
+	private void zoomIn()
+	{
+		if(zoomLevel >= 8)
+		{
+			zoomLevel -= 1;
+		}
+				
+		GUIViewRefresher.setScrollBars(zoomLevel);
+	}
 
+	private void zoomOut()
+	{
+		if(zoomLevel <= 10)
+		{
+			zoomLevel += 1;
+		}
+
+		// TODO: handle case of zooming out enabling user to see outside of viewport
+//		if((int) Math.pow(2, zoomLevel) + (int) StateMachine.getViewOrigin().getX() > 2048)
+//		{
+//			StateMachine.setViewOrigin(new Point2D.Double( 2048 - Math.pow(2, zoomLevel), StateMachine.getViewOrigin().getY()));
+//		}
+//		if((int) Math.pow(2, zoomLevel) + (int) StateMachine.getViewOrigin().getY() > 2048)
+//		{
+//			StateMachine.setViewOrigin(new Point2D.Double( StateMachine.getViewOrigin().getX(), 2048 - Math.pow(2, zoomLevel)));			
+//		}
+		
+		GUIViewRefresher.setScrollBars(zoomLevel);
+	}
 
 	@Override
 	public void hScrollbarChanged(int value)
 	{
+		GUIFunctions.printf("New horizontal position: %d", value);
+		Double curOrigin = StateMachine.getViewOrigin();
+		
+		curOrigin.setLocation(-value, curOrigin.getY());
+		
+		StateMachine.setViewOrigin(curOrigin);
+		GUIFunctions.refresh();
 	}
-
+	
 	@Override
 	public void vScrollbarChanged(int value)
 	{
+		GUIFunctions.printf("New vertical position: %d", value);
+		
+		Double curOrigin = StateMachine.getViewOrigin();
+		
+		curOrigin.setLocation(curOrigin.getX(), -value);
+		
+		StateMachine.setViewOrigin(curOrigin);
+		GUIFunctions.refresh();
 	}
-
-
+	
 	@Override
 	public void openScene(File file)
 	{
@@ -376,7 +416,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		viewRefresher = vr;
 	}
 	
-	public static double getZoomLevel()
+	public static int getZoomLevel()
 	{
 		return zoomLevel;
 	}

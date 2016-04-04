@@ -96,7 +96,7 @@ public class StateMachine
 		
 		moveOffset				= new Vector<Object>();
 		rotationOffset			= null;
-		viewOrigin				= new Point2D.Double(0, 0);
+		setViewOrigin(new Point2D.Double(0, 0));
 	}
 
 	// initializer
@@ -115,17 +115,18 @@ public class StateMachine
 				}
 				else
 				{
-					clickLocation = new Point2D.Double(e.getX(), e.getY());
+//					clickLocation = new Point2D.Double(e.getX(), e.getY());
 				}
 			}
-			setCurrentMouseLocation(new Point2D.Double(e.getX(), e.getY()));
+			
+			Point2D.Double loc = new Point2D.Double(e.getX(), e.getY());
+			
+			loc = (Double) StateMachine.viewToWorld(StateMachine.getViewOrigin()).transform(loc, null);
+			setCurrentMouseLocation(loc);
 		}
 
 		if(printState && debug)
 		{
-//			GUIFunctions.printf("Current state: " + StateMachine.current);
-//			System.out.println("Current state: " + StateMachine.current);
-
 			printState = false;
 		}
 		
@@ -138,7 +139,6 @@ public class StateMachine
 				handleDrawing(getCurrentMouseLocation());
 				break;
 			case StateMachine.selectShape:
-//				handleShapeOperations(getCurrentMouseLocation());
 				break;
 			case StateMachine.haveShape:
 				if(buttonClickedFlag && (buttonClicked == GUIController.colorButton))
@@ -149,7 +149,6 @@ public class StateMachine
 			case StateMachine.move:
 				break;
 			case StateMachine.rotate:
-//				handleRotation(e);
 				break;
 			default:
 				break;
@@ -244,11 +243,6 @@ public class StateMachine
 				}
 				break;
 			case StateMachine.rotate:
-//				if(!rotationFlag)
-//				{
-//					StateMachine.current = StateMachine.haveShape;
-//					printState		= true;
-//				}
 				if(mouseClickedFlag)
 				{
 					StateMachine.current = StateMachine.haveShape;
@@ -326,7 +320,7 @@ public class StateMachine
 		return false;
 	}
 	
-	void handleMove(MouseEvent e)
+	void handleMove(Point2D.Double p)
 	{
 		if(GUIModel.getSelectedShape() == null)
 		{
@@ -336,14 +330,14 @@ public class StateMachine
 		// calculate offset if necessary. Store the initial position as well.
 		if(doInitMove())
 		{
-			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
+			clickLocation 	= p;
 			moveOffset		= new Vector<Object>();
 			moveOffset.addElement(clickLocation.getX()-GUIModel.getSelectedShape().getCenter().getX());
 			moveOffset.addElement(clickLocation.getY()-GUIModel.getSelectedShape().getCenter().getY());
 		}
 		// calculate dX and dY
-		double dX = (e.getX() - clickLocation.getX());
-		double dY = (e.getY() - clickLocation.getY());
+		double dX = (p.getX() - clickLocation.getX());
+		double dY = (p.getY() - clickLocation.getY());
 		
 		// new center = initial click + dY + dX - offset
 		Point2D.Double newCenter = (Double) new Point2D.Double(clickLocation.getX() + dX - (double) moveOffset.get(0),
@@ -352,7 +346,7 @@ public class StateMachine
 		GUIModel.getSelectedShape().setCenter(newCenter);
 		GUIFunctions.refresh();
 	}	
-	void handleRotation(MouseEvent e)
+	void handleRotation(Point2D.Double p)
 	{
 		if(GUIModel.getSelectedShape() == null)	// this shouldn't be necessary and could be optimized out.
 		{
@@ -362,16 +356,14 @@ public class StateMachine
 		// calculate offset if necessary. Store the initial position as well.
 		if(doInitRotate())
 		{
-			clickLocation 	= new Point2D.Double(e.getX(), e.getY());
+			clickLocation 	= new Point2D.Double(p.getX(), p.getY());
 			rotationOffset	= clickLocation;
 		}
 		// calculate dTheta
-		double dTheta 		= calculateAngleOfRotation(e.getPoint());
+		double dTheta 		= calculateAngleOfRotation(p);
 		
 		// assign new rotation value and refresh
 		GUIModel.getSelectedShape().setRotation(dTheta);
-//		System.out.println(GUIModel.getSelectedShape().getRotation());
-//		System.out.println("\t" + dTheta);
 		GUIFunctions.refresh();
 	}
 	
@@ -389,7 +381,7 @@ public class StateMachine
 	//check if click is within handle
 		if(handle.pointInShape(clickLocation, 0))
 		{
-			return handle;	// TODO: clicking the rotation handle while an object is rotated no longer works.
+			return handle;
 		}
 		
 		return null;
@@ -418,7 +410,6 @@ public class StateMachine
 		{
 			setCurrentShape((Shape) new Line(getCurrentColor() , (Point2D.Double) clickLocations.get(0), (Point2D.Double) clickLocations.get(1)));
 			drawingCompleteFlag = true;
-//			System.out.println("Line complete.");
 		}
 		else if(clickLocations.size() > 0)
 		{
@@ -740,10 +731,6 @@ public class StateMachine
 	}
 	public static void setCurrentShape(Shape shape)			
 	{
-		if(shape != null)
-		{
-//			System.out.println("Current shape is " + shape.toString());
-		}
 		currentShape = shape;
 	}
 
@@ -767,15 +754,6 @@ public class StateMachine
 			int modelSize 	= GUIController.getModel().getShapes().size();
 			int newSize 	= GUIController.getModel().addShape(getCurrentShape());
 			setCurrentShape(null);
-			
-			if(modelSize == newSize)
-			{
-//				System.out.println("Error: Model size did not change.");
-			}
-		}
-		else
-		{
-//			System.out.println("Error? There's no current shape.");
 		}
 	}
 	
@@ -808,12 +786,13 @@ public class StateMachine
 
 	//				Flags
 	///////////////////////////////////////////////////////
-
-	public static AffineTransform objectToView(Shape s) 	// Mi
+	//				Transforms
+	
+	public static AffineTransform objectToView(Shape s) 				// Mi
 	{
 		AffineTransform Mi = new AffineTransform();
 		Mi.setToIdentity();
-		Mi.concatenate(worldToView(viewOrigin));
+		Mi.concatenate(worldToView(getViewOrigin()));
 		Mi.concatenate(objectToWorld(s));
 		return Mi;
 	}	
@@ -821,32 +800,124 @@ public class StateMachine
 	{
 		AffineTransform V = new AffineTransform();
 		V.setToIdentity();
-		V.concatenate(scale(GUIController.getZoomLevel()));
-		V.concatenate(translate(new Point2D.Double(-origin.getX(), -origin.getY())));
+		V.concatenate(scale((GUIController.getZoomLevel())));
+		V.concatenate(translate(new Point2D.Double(origin.getX(), origin.getY())));
 		
 		return V;
 	}
-	public static AffineTransform scale(double zoomLevel)	// S(f)
+	public static AffineTransform scale(int zoomLevel)				// S(f)
 	{
-		AffineTransform S = new AffineTransform(zoomLevel, 0, 0, zoomLevel, 0, 0);		
+		double zoomFactor = 1;
+		if(zoomLevel > 9)
+		{
+			zoomFactor /= 2;
+			if(zoomLevel==11)
+			{
+				zoomFactor /= 2;				
+			}
+		}
+		else if(zoomLevel < 9)
+		{
+			zoomFactor *= 2;
+			if(zoomLevel==7)
+			{
+				zoomFactor *= 2;				
+			}
+		}
+		
+		AffineTransform S = new AffineTransform(zoomFactor, 0, 0, zoomFactor, 0, 0);		
 		return S;
 	}
-	public static AffineTransform translate(Point2D.Double p)		// T(p)
+	public static AffineTransform translate(Point2D.Double p)			// T(p)
 	{
 		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
 		return T;
 	}
-	public static AffineTransform objectToWorld(Shape s)	// Oi
+	public static AffineTransform objectToWorld(Shape s)				// Oi
 	{
 		AffineTransform Oi = new AffineTransform();
-		Oi.concatenate(translate(s.getCenter()));
+		Oi.concatenate(translate(new Point2D.Double(s.getCenter().getX(), s.getCenter().getY())));
 		Oi.concatenate(rotate(s.getRotation()));
 
 		return Oi;
 	}
-	public static AffineTransform rotate(double r)			// R(theta)
+	public static AffineTransform rotate(double r)						// R(theta)
 	{
 		AffineTransform R = new AffineTransform(Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0);
 		return R;
 	}
+
+	public static AffineTransform viewToObject(Shape s)
+	{
+		AffineTransform Mi = new AffineTransform();
+		Mi.setToIdentity();
+		Mi.concatenate(worldToObject(s));
+		Mi.concatenate(viewToWorld(getViewOrigin()));
+		return Mi;
+	}
+	public static AffineTransform viewToWorld(Point2D.Double origin)
+	{
+		AffineTransform V = new AffineTransform();
+		V.setToIdentity();
+		V.concatenate(unTranslate(new Point2D.Double(-origin.getX(), -origin.getY())));
+		V.concatenate( unScale( GUIController.getZoomLevel() ) );
+		
+		return V;
+	}
+	public static AffineTransform unScale(int zoomLevel)
+	{
+		double zoomFactor = 1;
+		if(zoomLevel > 9)
+		{
+			zoomFactor /= 2;
+			if(zoomLevel==11)
+			{
+				zoomFactor /= 2;				
+			}
+		}
+		else if(zoomLevel < 9)
+		{
+			zoomFactor *= 2;
+			if(zoomLevel==7)
+			{
+				zoomFactor *= 2;				
+			}
+		}
+		
+		AffineTransform S = new AffineTransform(1/zoomFactor, 0, 0, 1/zoomFactor, 0, 0);		
+		return S;
+	}
+	public static AffineTransform unTranslate(Point2D.Double p)
+	{
+//		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
+		return translate(p);
+	}
+	public static AffineTransform worldToObject(Shape s)
+	{
+		AffineTransform Oi = new AffineTransform();
+		Oi.concatenate(unRotate(s.getRotation()));
+		Oi.concatenate(unTranslate(new Point2D.Double(-s.getCenter().getX(), -s.getCenter().getY())));
+
+		return Oi;
+	}
+	public static AffineTransform unRotate(double r)
+	{
+		AffineTransform R = new AffineTransform(Math.cos(r), -Math.sin(r), Math.sin(r), Math.cos(r), 0, 0);
+		return R;
+	}
+	
+	public static Double getViewOrigin()
+	{
+		return viewOrigin;
+	}
+
+	public static void setViewOrigin(Double viewOrigin)
+	{
+		StateMachine.viewOrigin = viewOrigin;
+	}
+	
+	//				Transforms
+	///////////////////////////////////////////////////////
+
+
 }

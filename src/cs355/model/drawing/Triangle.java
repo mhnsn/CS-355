@@ -191,7 +191,8 @@ public class Triangle extends Shape {
 	public AffineTransform getBoundingBoxTransform()
 	{
 		AffineTransform bt = StateMachine.objectToWorld(this);
-		bt.translate(boundingBox.center.x, boundingBox.center.y );
+		bt.translate(boundingBox.center.x, boundingBox.center.y );	
+		bt.preConcatenate(StateMachine.worldToView(StateMachine.getViewOrigin()));
 		
 		return bt;
 	}

@@ -2,11 +2,13 @@ package cs355.view;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 import cs355.GUIFunctions;
+import cs355.controller.GUIController;
 import cs355.controller.StateMachine;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
@@ -26,6 +28,35 @@ public class GUIViewRefresher implements ViewRefresher {
 		modelShapes = new ArrayList<Shape>();
 	}
 
+	public static void initScrollBars()
+	{
+		GUIFunctions.setHScrollBarPosit(0);
+		GUIFunctions.setVScrollBarPosit(0);
+		
+		GUIFunctions.setHScrollBarKnob( (int) Math.pow(2, GUIController.getZoomLevel()) );
+		GUIFunctions.setVScrollBarKnob( (int) Math.pow(2, GUIController.getZoomLevel()) );
+		
+		GUIFunctions.setHScrollBarMin(0);
+		GUIFunctions.setVScrollBarMin(0);
+		
+		GUIFunctions.setHScrollBarMax( 2048 );
+		GUIFunctions.setVScrollBarMax( 2048 );
+	}
+	
+	public static void setScrollBars(int zoomLevel)
+	{
+		if(zoomLevel == 11)
+		{
+			GUIFunctions.setHScrollBarPosit(0);
+			GUIFunctions.setVScrollBarPosit(0);			
+		}		
+		
+		GUIFunctions.setHScrollBarKnob( (int) Math.pow(2, zoomLevel) );
+		GUIFunctions.setVScrollBarKnob( (int) Math.pow(2, zoomLevel) );
+		
+		System.out.println("Scroll bar size: " + (int) Math.pow(2, zoomLevel));
+					}
+	
 	@Override
 	public void update(Observable arg0, Object arg1)
 	{
