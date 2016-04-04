@@ -115,20 +115,14 @@ public class StateMachine
 				}
 				else
 				{
-//					clickLocation = new Point2D.Double(e.getX(), e.getY());
+					clickLocation = new Point2D.Double(e.getX(), e.getY());
 				}
 			}
-			
-			Point2D.Double loc = new Point2D.Double(e.getX(), e.getY());
-			
-			loc = (Double) StateMachine.viewToWorld(StateMachine.getViewOrigin()).transform(loc, null);
-			setCurrentMouseLocation(loc);
+			setCurrentMouseLocation(new Point2D.Double(e.getX(), e.getY()));
 		}
 
 		if(printState && debug)
 		{
-//			GUIFunctions.printf("Current state: " + StateMachine.current);
-//			System.out.println("Current state: " + StateMachine.current);
 			printState = false;
 		}
 		
@@ -838,7 +832,7 @@ public class StateMachine
 	public static AffineTransform objectToWorld(Shape s)				// Oi
 	{
 		AffineTransform Oi = new AffineTransform();
-		Oi.concatenate(translate(new Point2D.Double(s.getCenter().getX(), s.getCenter().getY())));
+		Oi.concatenate(translate(s.getCenter()));
 		Oi.concatenate(rotate(s.getRotation()));
 
 		return Oi;
@@ -851,6 +845,7 @@ public class StateMachine
 
 	public static AffineTransform viewToObject(Shape s)
 	{
+		System.out.println("View origin is at point (" + -getViewOrigin().getX() + ", " + -getViewOrigin().getY() + ").");
 		AffineTransform Mi = new AffineTransform();
 		Mi.setToIdentity();
 		Mi.concatenate(worldToObject(s));
@@ -891,8 +886,8 @@ public class StateMachine
 	}
 	public static AffineTransform unTranslate(Point2D.Double p)
 	{
-//		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
-		return translate(p);
+		AffineTransform T = new AffineTransform(1, 0, 0, 1, p.getX(), p.getY());
+		return T;
 	}
 	public static AffineTransform worldToObject(Shape s)
 	{

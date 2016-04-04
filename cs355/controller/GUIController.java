@@ -54,8 +54,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	public void mouseMoved(MouseEvent e)
 	{
 		StateMachine.mouseMovedFlag = true;
-		
-		StateMachine.e = e;
 
 		Point2D.Double pt =	new Point2D.Double(e.getX(), e.getY());
 		
