@@ -10,8 +10,8 @@ import java.io.File;
 import java.util.Iterator;
 
 import cs355.GUIFunctions;
+import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
-import cs355.model.drawing.GUIModel;
 import cs355.view.GUIViewRefresher;
 
 public class GUIController implements CS355Controller, MouseListener, MouseMotionListener
@@ -387,6 +387,11 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void openImage(File file)
 	{
+		if (GUIModel.getBackgroundImage().open(file))
+		{
+			GUIModel.getBackgroundImage().loadNewShellImage();
+			System.out.println("Image opened. Now display it.");
+		}
 	}
 
 	@Override
@@ -396,8 +401,18 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	}
 
 	@Override
+	public void saveDrawing(File file)
+	{
+		getModel().save(file);
+	}
+
+	@Override
 	public void saveImage(File file)
 	{
+		if (GUIModel.getBackgroundImage().save(file))
+		{
+			System.out.println("Image saved. Now display it.");
+		}
 	}
 
 	@Override
@@ -431,17 +446,17 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doGrayscale()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			System.out.println("doGrayscale");
+			GUIModel.getBackgroundImage().grayscale();
+		}
 	}
 
 	@Override
 	public void toggleBackgroundDisplay()
 	{
-	}
 
-	@Override
-	public void saveDrawing(File file)
-	{
-		getModel().save(file);
 	}
 
 	@Override
