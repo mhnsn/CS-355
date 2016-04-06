@@ -12,9 +12,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
-import cs355.model.drawing.GUIModel;
 import cs355.model.drawing.Line;
 import cs355.model.drawing.Rectangle;
 import cs355.model.drawing.Shape;
