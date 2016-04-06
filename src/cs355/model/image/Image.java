@@ -183,7 +183,71 @@ public class Image extends CS355Image
 	@Override
 	public void contrast(int amount)
 	{
-		// TODO Auto-generated method stub
+		// Rather than a straight linear operation, we will use a mapping
+		// similar to what Photoshop does. In particular, the contrast will be
+		// in the range [-100,100] where 0 denotes no change, -100 denotes
+		// complete loss of contrast, and 100 denotes maximum enhancement (8x
+		// multiplier). If c is the contrast parameter, then the level operation
+		// applied is
+		//
+		// > s = ((c+100)/100)^4)(r − 128)+128
+		//
+		// For this operation, you should also convert to HSB, apply the
+		// operation to the brightness channel, and convert back to RGB.
+
+		BufferedImage b = getShellImage();
+		WritableRaster wr = b.getRaster();
+		float contrast = (float) amount;
+
+		float[] hsb = { 0, 0, 0 };
+		int[] rgb = { 0, 0, 0 };
+		int x = 0;
+		int w = b.getWidth();
+		int y = 0;
+		int h = b.getHeight();
+		int rgbInt = 0;
+		float factor;
+
+		for (x = 0; x < w; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				rgb = wr.getPixel(x, y, rgb);
+				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+
+				// s = ((c+100)/100)^4 (r−128)+128
+				factor = contrast + 100;
+				factor /= 100;
+				factor *= factor * factor * factor;
+				factor *= (hsb[2] - .5);
+				factor += .5;
+
+				// hsb[2] = (float) (Math.pow(((contrast + 100) / 100), 4) *
+				// (factor)) + 128;
+				hsb[2] = factor;
+
+				if (hsb[2] > 1)
+				{
+					hsb[2] = 1;
+				}
+				else if (hsb[2] < 0)
+				{
+					hsb[2] = 0;
+				}
+
+				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
+																	// to RGB.
+
+				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
+				rgb[1] = (rgbInt & gMask) >> 8;
+				rgb[2] = (rgbInt & bMask);
+
+				wr.setPixel(x, y, rgb);
+			}
+		}
+
+		b.setData(wr);
+		setShellImage(b);
 
 	}
 
