@@ -173,10 +173,6 @@ public class Image extends CS355Image
 
 		b.setData(wr);
 		setShellImage(b);
-		// The averaging should happen
-		// on all three channels
-		// in the RGB color space.
-		// ^^I think this is for blur and such
 	}
 
 	/*
@@ -199,8 +195,59 @@ public class Image extends CS355Image
 	@Override
 	public void brightness(int amount)
 	{
-		// TODO Auto-generated method stub
+		// Convert the image to HSB
 
+		// Make sure to convert the adjustment parameter to the range
+		// [-1.0,1.0.].
+		//
+		// s = r + b
+		//
+		// where as used in class, r denotes the input brightness and s denotes
+		// the output brightness.
+		// Do the above operation solely on the brightness channel.
+
+		BufferedImage b = getShellImage();
+		WritableRaster wr = b.getRaster();
+		double brightness = ((double) amount) / ((double) 100);
+
+		float[] hsb = { 0, 0, 0 };
+		int[] rgb = { 0, 0, 0 };
+		int x = 0;
+		int w = b.getWidth();
+		int y = 0;
+		int h = b.getHeight();
+		int rgbInt = 0;
+
+		for (x = 0; x < w; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				rgb = wr.getPixel(x, y, rgb);
+				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+				hsb[2] += brightness; // add the brightness factor to output (s
+										// = r + b)
+				if (hsb[2] > 1)
+				{
+					hsb[2] = 1;
+				}
+				else if (hsb[2] < 0)
+				{
+					hsb[2] = 0;
+				}
+
+				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
+																	// to RGB.
+
+				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
+				rgb[1] = (rgbInt & gMask) >> 8;
+				rgb[2] = (rgbInt & bMask);
+
+				wr.setPixel(x, y, rgb);
+			}
+		}
+
+		b.setData(wr);
+		setShellImage(b);
 	}
 
 	/**

@@ -390,7 +390,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		if (GUIModel.getBackgroundImage().open(file))
 		{
 			GUIModel.getBackgroundImage().loadNewShellImage();
-			System.out.println("Image opened. Now display it.");
 		}
 	}
 
@@ -426,21 +425,41 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doEdgeDetection()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().edgeDetection();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doSharpen()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().sharpen();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doMedianBlur()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().medianBlur();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doUniformBlur()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().uniformBlur();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
@@ -448,9 +467,9 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		if (GUIModel.getBackgroundImage() != null)
 		{
-			System.out.println("doGrayscale");
 			GUIModel.getBackgroundImage().grayscale();
 		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
@@ -467,11 +486,21 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doChangeContrast(int contrastAmountNum)
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().contrast(contrastAmountNum);
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doChangeBrightness(int brightnessAmountNum)
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().brightness(brightnessAmountNum);
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
