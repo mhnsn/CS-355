@@ -1,9 +1,5 @@
 package cs355.model.drawing;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import cs355.JsonShape;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,14 +12,20 @@ import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
+import cs355.JsonShape;
+
 /**
- * This is the abstract base class for the model.
- * Make sure your model implements and extends
- * this. Also <b>MAKE SURE YOU STORE SHAPES IN
- * BACK-TO-FRONT ORDER!</b> That means that the
- * shape in the very back should be at index 0.
+ * This is the abstract base class for the model. Make sure your model
+ * implements and extends this. Also <b>MAKE SURE YOU STORE SHAPES IN
+ * BACK-TO-FRONT ORDER!</b> That means that the shape in the very back should be
+ * at index 0.
  */
-public abstract class CS355Drawing extends Observable {
+public abstract class CS355Drawing extends Observable
+{
 
 	// This is used to write out shapes to JSON.
 	// The call to registerTypeAdapter() is essential
@@ -34,7 +36,9 @@ public abstract class CS355Drawing extends Observable {
 
 	/**
 	 * Get a shape at a certain index.
-	 * @param index = the index of the desired shape.
+	 * 
+	 * @param index
+	 *            = the index of the desired shape.
 	 * @return the shape at the provided index.
 	 */
 	public abstract Shape getShape(int index);
@@ -43,14 +47,18 @@ public abstract class CS355Drawing extends Observable {
 
 	/**
 	 * Add a shape to the <b>FRONT</b> of the list.
-	 * @param s = the shape to add.
+	 * 
+	 * @param s
+	 *            = the shape to add.
 	 * @return the index of the shape.
 	 */
 	public abstract int addShape(Shape s);
 
 	/**
 	 * Delete the shape at a certain index.
-	 * @param index = the index of the shape to delete.
+	 * 
+	 * @param index
+	 *            = the index of the shape to delete.
 	 */
 	public abstract void deleteShape(int index);
 
@@ -58,25 +66,33 @@ public abstract class CS355Drawing extends Observable {
 
 	/**
 	 * Move the shape at a certain index to the front of the list.
-	 * @param index = the index of the shape to move to the front.
+	 * 
+	 * @param index
+	 *            = the index of the shape to move to the front.
 	 */
 	public abstract void moveToFront(int index);
 
 	/**
 	 * Move the shape at a certain index to the back of the list.
-	 * @param index = the index of the shape to move to the back.
+	 * 
+	 * @param index
+	 *            = the index of the shape to move to the back.
 	 */
 	public abstract void movetoBack(int index);
 
 	/**
 	 * Move the shape at a certain index forward one slot.
-	 * @param index = the index of the shape to move forward.
+	 * 
+	 * @param index
+	 *            = the index of the shape to move forward.
 	 */
 	public abstract void moveForward(int index);
 
 	/**
 	 * Move the shape at a certain index backward one slot.
-	 * @param index = the index of the shape to move backward.
+	 * 
+	 * @param index
+	 *            = the index of the shape to move backward.
 	 */
 	public abstract void moveBackward(int index);
 
@@ -84,36 +100,40 @@ public abstract class CS355Drawing extends Observable {
 
 	/**
 	 * Get the list of the shapes in this model.
+	 * 
 	 * @return the list of shapes.
 	 */
 	public abstract List<Shape> getShapes();
 
 	/**
-	 * Get the reversed list of the shapes in this model.
-	 * This is for doing click tests (front first).
+	 * Get the reversed list of the shapes in this model. This is for doing
+	 * click tests (front first).
+	 * 
 	 * @return the reversed list of shapes.
 	 */
 	public abstract List<Shape> getShapesReversed();
 
 	/**
-	 * Sets the list of shapes in this model.
-	 * This should overwrite the current list.
-	 * @param shapes = the new list of shapes
-	 *				   for the model.
+	 * Sets the list of shapes in this model. This should overwrite the current
+	 * list.
+	 * 
+	 * @param shapes
+	 *            = the new list of shapes for the model.
 	 */
 	public abstract void setShapes(List<Shape> shapes);
 
 	// Implemented methods.
 
 	/**
-	 * Opens a drawing from a Json file and populate
-	 * this drawing with the shapes in that file.
-	 * @param f = the handle of the file to open.
+	 * Opens a drawing from a Json file and populate this drawing with the
+	 * shapes in that file.
+	 * 
+	 * @param f
+	 *            = the handle of the file to open.
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean open(File f)
 	{
-
 		// Make a blank list.
 		List<Shape> shapes = null;
 
@@ -148,9 +168,10 @@ public abstract class CS355Drawing extends Observable {
 	}
 
 	/**
-	 * Save out this drawing's list of shapes to a
-	 * Json file.
-	 * @param f = the file to save to.
+	 * Save out this drawing's list of shapes to a Json file.
+	 * 
+	 * @param f
+	 *            = the file to save to.
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean save(File f)
