@@ -38,8 +38,6 @@ public class Filter
 	// public static Image medianFilter(int windowSize, Image source)
 	public static BufferedImage medianFilter(int windowSize, Image source)
 	{
-		System.out.println("medianFilter()");
-
 		/*
 		 * generic algorithm from Wikipedia:
 		 * 
@@ -62,10 +60,6 @@ public class Filter
 		int w = b.getWidth();
 		int h = b.getHeight();
 
-		int[][] channelR = new int[w][h];
-		int[][] channelG = new int[w][h];
-		int[][] channelB = new int[w][h];
-
 		int edgex = windowSize / 2; // automagically rounded down thanks to int
 									// division
 		int edgey = windowSize / 2;
@@ -77,6 +71,7 @@ public class Filter
 		// note that an array is allocated for each channel here.
 		int[][] window = new int[3][windowSize * windowSize];
 
+		int curPixelData = 0;
 		int[] windowR = new int[windowSize * windowSize];
 		int[] windowG = new int[windowSize * windowSize];
 		int[] windowB = new int[windowSize * windowSize];
@@ -87,40 +82,20 @@ public class Filter
 
 		int curDist = Integer.MAX_VALUE;
 		int minDist = Integer.MAX_VALUE;
-		int curPixelData = 0;
 
 		for (x = edgex; x < (w - edgex); x++)
 		{
-			// System.out.println("Row " + x);
 			for (y = edgey; y < (h - edgey); y++)
 			{
-				// System.out.println("\tCol " + y);
 				i = 0;
 				curDist = Integer.MAX_VALUE;
 				minDist = Integer.MAX_VALUE;
 
 				for (int fx = 0; fx < windowSize; fx++)
 				{
-					// System.out.println("\t--Read windowX " + fx);
 
 					for (int fy = 0; fy < windowSize; fy++)
 					{
-						// System.out.println("\t----Read windowY " + fy);
-
-						// TODO: verify behavior
-						// rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
-						// rgb[1] = (rgbInt & gMask) >> 8;
-						// rgb[2] = (rgbInt & bMask);
-
-						// window[0][i] = windowR[i] = (db.getElem(0, ((x + fx -
-						// edgex) * w) + (y + fy - edgey))
-						// & rMask) >> 16;
-						// window[1][i] = windowG[i] = (db.getElem(0, ((x + fx -
-						// edgex) * w) + (y + fy - edgey))
-						// & gMask) >> 8;
-						// window[2][i] = windowB[i] = (db.getElem(0, ((x + fx -
-						// edgex) * w) + (y + fy - edgey)) & bMask);
-
 						curPixelData = db.getElem(0, ((y + fy - edgey) * w) + (x + fx - edgex));
 						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
 						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
@@ -134,28 +109,19 @@ public class Filter
 				medRGB = Filter.sortAndSelectMedian(windowR, windowG, windowB);
 
 				/*
-				 * 1. Treat the colors as vectors.
+				 * 1. Treat the colors as vectors in 3-space.
 				 * 
 				 * 2. Compute the squared distance from the median color to all
 				 * nine colors from all nine pixels.
 				 * 
-				 * 3. The color you select should be the color with the least
-				 * squared distance from the median color.
+				 * 3. keep the one with smallest distance squared value
 				 */
-
-				// calculate XYZ distance for each pixel
-				// keep the one with smallest distance
-
 				i = 0;
 
 				for (int fx = 0; fx < windowSize; fx++)
 				{
-					// System.out.println("\t--Calculate distance windowX " +
-					// fx);
 					for (int fy = 0; fy < windowSize; fy++)
 					{
-						// System.out.println("\t--Calculate distance windowY "
-						// + fy);
 						curDist = Integer.MAX_VALUE;
 
 						curRGB[0] = window[0][i];
@@ -174,8 +140,6 @@ public class Filter
 					}
 				}
 
-				// System.out.println("\tAssigning pixel (" + x + ", " + y +
-				// ")");
 				wr.setPixel(x, y, minRGB);
 			}
 		}
@@ -183,7 +147,79 @@ public class Filter
 		b.setData(wr);
 		return b;
 	}
+
 	// mean filter (uniform blurring)
+	public static BufferedImage uniformBlur(int windowSize, Image source)
+	{
+		// This operation should blur the image using a 3 × 3 uniform averaging
+		// kernel.
+		// The averaging should happen on all three channels in the RGB color
+		// space.
+
+		BufferedImage b = source.getImage();
+		WritableRaster wr = b.getRaster();
+		DataBuffer db = wr.getDataBuffer();
+
+		int[] rgb = { 0, 0, 0 };
+		int w = b.getWidth();
+		int h = b.getHeight();
+
+		int edgex = windowSize / 2; // automagically rounded down thanks to int
+									// division
+		int edgey = windowSize / 2;
+
+		int x = edgex;
+		int y = edgey;
+		int i;
+		int meanR, meanG, meanB;
+
+		int curPixelData = 0;
+		int[] windowR = new int[windowSize * windowSize];
+		int[] windowG = new int[windowSize * windowSize];
+		int[] windowB = new int[windowSize * windowSize];
+		int[][] window = new int[3][windowSize * windowSize];
+
+		for (x = edgex; x < (w - edgex); x++)
+		{
+			for (y = edgey; y < (h - edgey); y++)
+			{
+				i = 0;
+				meanR = meanG = meanB = 0;
+				rgb = wr.getPixel(x, y, rgb);
+
+				for (int fx = 0; fx < windowSize; fx++)
+				{
+
+					for (int fy = 0; fy < windowSize; fy++)
+					{
+						curPixelData = db.getElem(0, ((y + fy - edgey) * w) + (x + fx - edgex));
+						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
+						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
+						window[2][i] = windowB[i] = (curPixelData & bMask);
+
+						meanR += windowR[i];
+						meanG += windowG[i];
+						meanB += windowB[i];
+
+						i += 1;
+					}
+				}
+
+				meanR /= 9; // takes the floor value for the mean
+				meanG /= 9;
+				meanB /= 9;
+
+				rgb[0] = meanR; // 1337 H4X0RZ
+				rgb[1] = meanG;
+				rgb[2] = meanB;
+
+				wr.setPixel(x, y, rgb);
+			}
+		}
+
+		b.setData(wr);
+		return b;
+	}
 	// sharpen
 	// edge detection
 

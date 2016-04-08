@@ -88,8 +88,6 @@ public class Image extends CS355Image
 	public void medianBlur()
 	{
 		checkShellImage();
-		System.out.println("medianBlur()");
-
 		setShellImage(Filter.medianFilter(3, this));
 	}
 
@@ -101,9 +99,8 @@ public class Image extends CS355Image
 	@Override
 	public void uniformBlur()
 	{
-		// TODO Auto-generated method stub
 		checkShellImage();
-
+		setShellImage(Filter.uniformBlur(3, this));
 	}
 
 	/*
