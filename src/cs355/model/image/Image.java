@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
+import cs355.model.Filter;
+
 /**
  * @author Mark
  *
@@ -18,7 +20,6 @@ public class Image extends CS355Image
 	private int rMask = 0x00FF0000;
 	private int gMask = 0x0000FF00;
 	private int bMask = 0x000000FF;
-	private int noChange = 255;
 
 	/**
 	 * 
@@ -46,6 +47,8 @@ public class Image extends CS355Image
 	@Override
 	public BufferedImage getImage()
 	{
+		// System.out.println("getImage()");
+
 		checkShellImage();
 		return getShellImage();
 	}
@@ -59,6 +62,7 @@ public class Image extends CS355Image
 	public void edgeDetection()
 	{
 		// TODO Auto-generated method stub
+		checkShellImage();
 
 	}
 
@@ -71,6 +75,7 @@ public class Image extends CS355Image
 	public void sharpen()
 	{
 		// TODO Auto-generated method stub
+		checkShellImage();
 
 	}
 
@@ -82,8 +87,10 @@ public class Image extends CS355Image
 	@Override
 	public void medianBlur()
 	{
-		// TODO Auto-generated method stub
+		checkShellImage();
+		System.out.println("medianBlur()");
 
+		setShellImage(Filter.medianFilter(3, this));
 	}
 
 	/*
@@ -95,6 +102,7 @@ public class Image extends CS355Image
 	public void uniformBlur()
 	{
 		// TODO Auto-generated method stub
+		checkShellImage();
 
 	}
 
@@ -183,6 +191,8 @@ public class Image extends CS355Image
 	@Override
 	public void contrast(int amount)
 	{
+		checkShellImage();
+
 		// Rather than a straight linear operation, we will use a mapping
 		// similar to what Photoshop does. In particular, the contrast will be
 		// in the range [-100,100] where 0 denotes no change, -100 denotes
@@ -248,7 +258,6 @@ public class Image extends CS355Image
 
 		b.setData(wr);
 		setShellImage(b);
-
 	}
 
 	/*
@@ -259,6 +268,8 @@ public class Image extends CS355Image
 	@Override
 	public void brightness(int amount)
 	{
+		checkShellImage();
+
 		// Convert the image to HSB
 
 		// Make sure to convert the adjustment parameter to the range
@@ -317,8 +328,10 @@ public class Image extends CS355Image
 	/**
 	 * @return the shellImage
 	 */
-	public BufferedImage getShellImage()
+	private BufferedImage getShellImage()
 	{
+		// System.out.println("\tgetShellImage()");
+
 		return shellImage;
 	}
 
@@ -328,22 +341,27 @@ public class Image extends CS355Image
 	 */
 	public void setShellImage(BufferedImage shellImage)
 	{
+		// System.out.println("Setting shell image.");
 		this.shellImage = shellImage;
 	}
 
 	private void checkShellImage()
 	{
+		// System.out.println("Checking shell image.");
+
+		if (loadNewImage && getWidth() != 0 && getHeight() != 0)
+		{
+			initializeShellImage();
+		}
 	}
 
-	public void loadNewShellImage()
+	public void initializeShellImage()
 	{
+		System.out.println("Initializing shell image.");
+		loadNewImage = false;
+
 		int w = super.getWidth();
 		int h = super.getHeight();
-
-		// if (w == h && h == 0)
-		// {
-		// return;
-		// }
 
 		BufferedImage b = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		WritableRaster wr = b.getRaster();

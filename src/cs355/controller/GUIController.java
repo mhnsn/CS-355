@@ -389,7 +389,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		if (GUIModel.getBackgroundImage().open(file))
 		{
-			GUIModel.getBackgroundImage().loadNewShellImage();
+			GUIModel.getBackgroundImage().initializeShellImage();
 		}
 	}
 
