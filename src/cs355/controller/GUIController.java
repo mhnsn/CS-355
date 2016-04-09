@@ -10,8 +10,8 @@ import java.io.File;
 import java.util.Iterator;
 
 import cs355.GUIFunctions;
+import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
-import cs355.model.drawing.GUIModel;
 import cs355.view.GUIViewRefresher;
 
 public class GUIController implements CS355Controller, MouseListener, MouseMotionListener
@@ -387,6 +387,10 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void openImage(File file)
 	{
+		if (GUIModel.getBackgroundImage().open(file))
+		{
+			GUIModel.getBackgroundImage().initializeShellImage();
+		}
 	}
 
 	@Override
@@ -396,8 +400,18 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	}
 
 	@Override
+	public void saveDrawing(File file)
+	{
+		getModel().save(file);
+	}
+
+	@Override
 	public void saveImage(File file)
 	{
+		if (GUIModel.getBackgroundImage().save(file))
+		{
+			System.out.println("Image saved. Now display it.");
+		}
 	}
 
 	@Override
@@ -411,37 +425,57 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doEdgeDetection()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().edgeDetection();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doSharpen()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().sharpen();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doMedianBlur()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().medianBlur();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doUniformBlur()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().uniformBlur();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doGrayscale()
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().grayscale();
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void toggleBackgroundDisplay()
 	{
-	}
 
-	@Override
-	public void saveDrawing(File file)
-	{
-		getModel().save(file);
 	}
 
 	@Override
@@ -452,11 +486,21 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void doChangeContrast(int contrastAmountNum)
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().contrast(contrastAmountNum);
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doChangeBrightness(int brightnessAmountNum)
 	{
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			GUIModel.getBackgroundImage().brightness(brightnessAmountNum);
+		}
+		GUIFunctions.refresh();
 	}
 
 	@Override

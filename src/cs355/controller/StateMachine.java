@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import cs355.GUIFunctions;
+import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
-import cs355.model.drawing.GUIModel;
 import cs355.model.drawing.Line;
 import cs355.model.drawing.Rectangle;
 import cs355.model.drawing.Shape;
@@ -1002,6 +1002,29 @@ public class StateMachine
 	}
 
 	// Transforms
+	///////////////////////////////////////////////////////
+	// Background image transforms
+
+	public static AffineTransform backgroundImageToView(int i, int j)
+	{
+		AffineTransform Mi = new AffineTransform();
+		Mi.setToIdentity();
+		Mi.concatenate(backgroundWorldToView(new Double(i / 2, j / 2)));
+		Mi.concatenate(objectToWorld(new Circle(Color.white, new Point2D.Double(0, 0), 1)));
+		return Mi;
+	}
+
+	private static AffineTransform backgroundWorldToView(Double origin)
+	{
+		AffineTransform V = new AffineTransform();
+		V.setToIdentity();
+		V.concatenate(scale((GUIController.getZoomLevel())));
+		V.concatenate(translate(new Point2D.Double(origin.getX(), origin.getY())));
+
+		return V;
+	}
+
+	// Background image transforms
 	///////////////////////////////////////////////////////
 
 }

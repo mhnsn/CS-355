@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cs355.model.drawing.GUIModel;
+import cs355.model.GUIModel;
 import cs355.model.drawing.Square;
 
 public class SquareTest {

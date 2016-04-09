@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -12,9 +13,9 @@ import cs355.GUIFunctions;
 import cs355.controller.GUIController;
 import cs355.controller.ShapeBound;
 import cs355.controller.StateMachine;
+import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
-import cs355.model.drawing.GUIModel;
 import cs355.model.drawing.Line;
 import cs355.model.drawing.Rectangle;
 import cs355.model.drawing.Shape;
@@ -113,17 +114,53 @@ public class GUIViewRefresher implements ViewRefresher
 			modelShapes.add(StateMachine.getCurrentShape());
 		}
 
+		AffineTransform objToView;
+
+		if (GUIModel.getBackgroundImage() != null)
+		{
+			BufferedImage bi = GUIModel.getBackgroundImage().getImage();
+			if (bi != null)
+			{
+				// get view origin
+				Point2D.Double viewOrigin = StateMachine.getViewOrigin();
+
+				// calculate center point of current view
+				double viewSize = Math.pow(2, GUIController.getZoomLevel());
+				Point2D.Double viewCenter = new Point2D.Double(viewOrigin.getX() - viewSize / 2,
+						viewOrigin.getY() - viewSize / 2);
+
+				// calculate the x and y offset to use
+				// in order to center the image
+				int offsetX = bi.getWidth() / 2;
+				int offsetY = bi.getHeight() / 2;
+
+				// set the image's x and y values
+				// to viewCenter-offsetX
+				// and viewcenter-offsetY
+				int imageTopLeftX = (int) viewCenter.getX() + offsetX;
+				int imageTopLeftY = (int) viewCenter.getY() + offsetY;
+
+				// objToView = StateMachine.objectToView(new Circle(Color.white,
+				// new Point2D.Double(0, 0), 1));
+				objToView = StateMachine.backgroundImageToView(bi.getWidth(), bi.getHeight());
+
+				g2d.setTransform(objToView);
+
+				g2d.drawImage(bi, -imageTopLeftX, -imageTopLeftY, null);
+			}
+		}
+
 		for (Shape s : modelShapes)
 		{
-			AffineTransform objToWorld = StateMachine.objectToView(s);
+			objToView = StateMachine.objectToView(s);
 			g2d.setColor(s.getColor());
-			g2d.setTransform(objToWorld);
+			g2d.setTransform(objToView);
 
 			if (s.getClass().equals(cs355.model.drawing.Line.class))
 			{
 				Line line = (Line) s;
 
-				g2d.setTransform(objToWorld);
+				// g2d.setTransform(objToWorld);
 
 				g2d.drawLine((int) 0, (int) 0, (int) (line.getEndV().getX()), (int) (line.getEndV().getY()));
 			}
