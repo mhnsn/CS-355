@@ -19,7 +19,7 @@ public class Filter
 	private static int rMask = 0x00FF0000;
 	private static int gMask = 0x0000FF00;
 	private static int bMask = 0x000000FF;
-	private static int[][] unsharpA2 = { { 0, -1, 0 }, { -1, 6, -1 }, { 0, -1, 0 } };
+	private static float[] unsharpA2 = { 0, -1, 0, -1, 6, -1, 0, -1, 0 };
 
 	// brightness
 	public static BufferedImage brightness(Image source, int amount)
@@ -199,7 +199,7 @@ public class Filter
 	 * median color.
 	 * 
 	 */
-	public static BufferedImage medianFilter(int windowSize, Image source)
+	public static BufferedImage medianFilter(Image source, int windowSize)
 	{
 		/*
 		 * generic algorithm from Wikipedia:
@@ -395,7 +395,7 @@ public class Filter
 	}
 
 	// mean filter (uniform blurring)
-	public static BufferedImage uniformBlur(int windowSize, Image source)
+	public static BufferedImage uniformBlur(Image source, int windowSize)
 	{
 		// This operation should blur the image using a 3 × 3 uniform averaging
 		// kernel.
@@ -468,7 +468,7 @@ public class Filter
 	}
 
 	// edge detection
-	public static BufferedImage edgeDetection(int windowSize, Image source)
+	public static BufferedImage edgeDetection(Image source, int windowSize)
 	{
 		/*
 		 * This operation computes the gradient magnitude for the image by first
@@ -487,11 +487,10 @@ public class Filter
 
 		BufferedImage b = source.getImage();
 		WritableRaster wr = b.getRaster();
-		DataBuffer db = wr.getDataBuffer();
 
-		int[] rgb = { 0, 0, 0 };
 		int w = b.getWidth();
 		int h = b.getHeight();
+		int[] rgbGradientVal = { 0, 0, 0 };
 
 		int edgex = windowSize / 2; // automagically rounded down thanks to int
 									// division
@@ -500,8 +499,6 @@ public class Filter
 		int x = edgex;
 		int y = edgey;
 		int i;
-
-		int curPixelData = 0;
 
 		float[] sobelX = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
 		float[] sobelY = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
@@ -513,6 +510,8 @@ public class Filter
 		float[][][] imageAsHSB = convertToHSB(wr);
 		float[][] brightnessChannel = imageAsHSB[2];
 		float[] windowB = new float[windowSize * windowSize];
+
+		int gradientVal;
 
 		for (x = edgex; x < (w - edgex); x++)
 		{
@@ -530,20 +529,23 @@ public class Filter
 					}
 				}
 
-				sobelXResult = convolve(windowB, sobelX, 8); // note
-																// that
-																// convolve
-																// is normalized
-				sobelYResult = convolve(windowB, sobelY, 8); // (see
-																// below)
+				sobelXResult = convolve(windowB, sobelX, (float) .125); // note
+				// that
+				// convolve
+				// is normalized
+				sobelYResult = convolve(windowB, sobelY, (float) .125); // (see
+				// below)
 
 				gradientMagnitude = Math.sqrt(Math.pow(sobelXResult, 2) + Math.pow(sobelYResult, 2));
+				// gradientMagnitude = sobelXResult + sobelYResult;
 
-				// rgb[0] = sobelXResult[0] + sobelYResult[0];
-				// rgb[1] = sobelXResult[1] + sobelYResult[1];
-				// rgb[2] = sobelXResult[2] + sobelYResult[2];
+				gradientVal = (int) (255 * gradientMagnitude);
 
-				wr.setPixel(x, y, rgb);
+				rgbGradientVal[0] = 128 + gradientVal;
+				rgbGradientVal[1] = 128 + gradientVal;
+				rgbGradientVal[2] = 128 + gradientVal;
+
+				wr.setPixel(x, y, rgbGradientVal);
 			}
 		}
 
@@ -577,70 +579,6 @@ public class Filter
 		return convertedImage;
 	}
 
-	// public static float[] multiChannelConvolve(float[][] window, float[][]
-	// kernel, float scale)
-	// {
-	// // if (kernel.length != window.length)
-	// // {
-	// // return null; // convolution not defined on this
-	// // }
-	// //
-	// float[] channels = { 0, 0, 0 };
-	// float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
-	// //
-	// // int dimension = kernel[0].length;
-	// // int i, j;
-	// //
-	// // for (i = 0; i < dimension; i++)
-	// // {
-	// // for (j = 0; j < dimension; j++)
-	// // {
-	// // // if(element position corresponding to pixel position then)
-	// // // {
-	// // // multiply element value corresponding* to pixel value
-	// // // add result to accumulator
-	// // // }
-	// // rSum += (window[i][j] * kernel[i][j]);
-	// // gSum += (window[i][j] * kernel[i][j]);
-	// // bSum += (window[i][j] * kernel[i][j]);
-	// // }
-	// // }
-	// //
-	// // // TODO: consider switching to float for the data type
-	// // rSum /= 9;
-	// // gSum /= 9;
-	// // bSum /= 9;
-	// //
-	// // rSum *= scale;
-	// // gSum *= scale;
-	// // bSum *= scale;
-	// //
-	// // rgb[0] = rSum;
-	// // rgb[1] = gSum;
-	// // rgb[2] = bSum;
-	// //
-	// // return rgb;
-	// channel0Sum = convolve(window[0], kernel[0], scale);
-	// channel1Sum = convolve(window[1], kernel[1], scale);
-	// channel2Sum = convolve(window[2], kernel[2], scale);
-	//
-	// if (channel0Sum == 0 || channel1Sum == 0 || channel2Sum == 0)
-	// {
-	// return null;
-	// }
-	// channels[0] = channel0Sum;
-	// channels[1] = channel1Sum;
-	// channels[2] = channel2Sum;
-	//
-	// return channels;
-	// }
-
-	// public static float[] multiChannelConvolve(float[][] window, float[][]
-	// kernel)
-	// {
-	// return multiChannelConvolve(window, kernel, 1);
-	// }
-
 	public static float convolve(float[] window, float[] kernel, float scale)
 	{
 		if (kernel.length != window.length)
@@ -649,10 +587,10 @@ public class Filter
 		}
 
 		float channelVal = 0;
-		int sum = 0;
+		float sum = 0;
 
 		int dimension = kernel.length;
-		int i, j;
+		int i;
 
 		for (i = 0; i < dimension; i++)
 		{
@@ -672,8 +610,105 @@ public class Filter
 
 	// sharpen
 
+	public static BufferedImage sharpen(Image source, int windowSize)
+	{
+		// This operation sharpens the image using an unsharp masking kernel
+		// with A = 2 (i.e., a 6 in the middle and -1s for the four-connected
+		// neighbors, then divide by 2).
+		// This operation should be done in the RGB color space.
+
+		// TODO: optimize this into a snake-scrawl of sorted lists.
+
+		BufferedImage b = source.getImage();
+		WritableRaster wr = b.getRaster();
+		DataBuffer db = wr.getDataBuffer();
+
+		int w = b.getWidth();
+		int h = b.getHeight();
+
+		int edgex = windowSize / 2; // automagically rounded down thanks to int
+									// division
+		int edgey = windowSize / 2;
+
+		int x = edgex;
+		int y = edgey;
+		int i;
+
+		// note that an array is allocated for each channel here.
+		float[][] window = new float[3][windowSize * windowSize];
+
+		int curPixelData = 0;
+		float[] windowR = new float[windowSize * windowSize];
+		float[] windowG = new float[windowSize * windowSize];
+		float[] windowB = new float[windowSize * windowSize];
+
+		int[] newRGB = { 0, 0, 0 };
+
+		int curPixelValR, curPixelValG, curPixelValB;
+
+		for (x = edgex; x < (w - edgex); x++)
+		{
+			for (y = edgey; y < (h - edgey); y++)
+			{
+				i = 0;
+
+				// populate window for this pixel
+				for (int fx = 0; fx < windowSize; fx++)
+				{
+					for (int fy = 0; fy < windowSize; fy++)
+					{
+						curPixelData = db.getElem(0, ((y + fy - edgey) * w) + (x + fx - edgex));
+						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
+						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
+						window[2][i] = windowB[i] = (curPixelData & bMask);
+
+						i += 1;
+					}
+				}
+
+				curPixelValR = (int) convolve(windowR, unsharpA2, (float) .5);
+				curPixelValG = (int) convolve(windowG, unsharpA2, (float) .5);
+				curPixelValB = (int) convolve(windowB, unsharpA2, (float) .5);
+
+				newRGB[0] = (int) (windowR[5] + curPixelValR);
+				newRGB[1] = (int) (windowG[5] + curPixelValG);
+				newRGB[2] = (int) (windowB[5] + curPixelValB);
+
+				wr.setPixel(x, y, newRGB);
+			}
+		}
+
+		b.setData(wr);
+		return b;
+	}
+
 	// mean filter (gaussian)
 	// grayscale (rgb)
+
+	// public static float[] multiChannelConvolve(float[][] window, float[][]
+	// kernel, float scale)
+	// {
+	// float[] channels = { 0, 0, 0 };
+	// float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
+	// channel0Sum = convolve(window[0], kernel[0], scale);
+	// channel1Sum = convolve(window[1], kernel[1], scale);
+	// channel2Sum = convolve(window[2], kernel[2], scale);
+	//
+	// if (channel0Sum == 0 || channel1Sum == 0 || channel2Sum == 0)
+	// {
+	// return null;
+	// }
+	// channels[0] = channel0Sum;
+	// channels[1] = channel1Sum;
+	// channels[2] = channel2Sum;
+	//
+	// return channels;
+	// }
+	// public static float[] multiChannelConvolve(float[][] window, float[][]
+	// kernel)
+	// {
+	// return multiChannelConvolve(window, kernel, 1);
+	// }
 
 	/*
 	 * Hilarious and interesting broken edge detection code. To look at later.
@@ -716,7 +751,7 @@ public class Filter
 	 * for (x = edgex; x < (w - edgex); x++) { for (y = edgey; y < (h - edgey);
 	 * y++) { i = 0; rgb = wr.getPixel(x, y, rgb);
 	 * 
-	 * // TODO: this is still in RGB, so that needs fixing
+	 * // this is still in RGB, so that needs fixing
 	 * 
 	 * for (int fx = 0; fx < windowSize; fx++) { for (int fy = 0; fy <
 	 * windowSize; fy++) { curPixelData = db.getElem(0, ((y + fy - edgey) * w) +
@@ -733,6 +768,56 @@ public class Filter
 	 * sobelYResult[1]; rgb[2] = sobelXResult[2] + sobelYResult[2];
 	 * 
 	 * wr.setPixel(x, y, rgb); } }
+	 * 
+	 * b.setData(wr); return b;
+	 */
+
+	/*
+	 * 
+	 * More broken code - this will generate television snow if used on a
+	 * grayscale image.
+	 * 
+	 * BufferedImage b = source.getImage(); WritableRaster wr = b.getRaster();
+	 * DataBuffer db = wr.getDataBuffer();
+	 * 
+	 * int w = b.getWidth(); int h = b.getHeight();
+	 * 
+	 * int edgex = windowSize / 2; // automagically rounded down thanks to int
+	 * // division int edgey = windowSize / 2;
+	 * 
+	 * int x = edgex; int y = edgey; int i;
+	 * 
+	 * // note that an array is allocated for each channel here. float[][]
+	 * window = new float[3][windowSize * windowSize];
+	 * 
+	 * int curPixelData = 0; float[] windowR = new float[windowSize *
+	 * windowSize]; float[] windowG = new float[windowSize * windowSize];
+	 * float[] windowB = new float[windowSize * windowSize];
+	 * 
+	 * int[] newRGB = { 0, 0, 0 };
+	 * 
+	 * int curPixelValR, curPixelValG, curPixelValB;
+	 * 
+	 * for (x = edgex; x < (w - edgex); x++) { for (y = edgey; y < (h - edgey);
+	 * y++) { i = 0;
+	 * 
+	 * // populate window for this pixel for (int fx = 0; fx < windowSize; fx++)
+	 * { for (int fy = 0; fy < windowSize; fy++) { curPixelData = db.getElem(0,
+	 * ((y + fy - edgey) * w) + (x + fx - edgex)); window[0][i] = windowR[i] =
+	 * (curPixelData & rMask) >> 16; window[1][i] = windowG[i] = (curPixelData &
+	 * gMask) >> 8; window[2][i] = windowB[i] = (curPixelData & bMask);
+	 * 
+	 * i += 1; } }
+	 * 
+	 * curPixelValR = (int) convolve(windowR, unsharpA2, (float) .5);
+	 * curPixelValG = (int) convolve(windowG, unsharpA2, (float) .5);
+	 * curPixelValB = (int) convolve(windowB, unsharpA2, (float) .5);
+	 * 
+	 * newRGB[0] = (int) (windowR[5] + curPixelValR); newRGB[1] = (int)
+	 * (windowG[5] + curPixelValG); newRGB[2] = (int) (windowB[5] +
+	 * curPixelValB);
+	 * 
+	 * wr.setPixel(x, y, newRGB); } }
 	 * 
 	 * b.setData(wr); return b;
 	 */

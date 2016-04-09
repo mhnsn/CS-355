@@ -59,7 +59,7 @@ public class Image extends CS355Image
 	public void edgeDetection()
 	{
 		checkShellImage();
-		setShellImage(Filter.edgeDetection(3, this));
+		setShellImage(Filter.edgeDetection(this, 3));
 	}
 
 	/*
@@ -70,9 +70,8 @@ public class Image extends CS355Image
 	@Override
 	public void sharpen()
 	{
-		// TODO Auto-generated method stub
 		checkShellImage();
-
+		setShellImage(Filter.sharpen(this, 3));
 	}
 
 	/*
@@ -84,7 +83,7 @@ public class Image extends CS355Image
 	public void medianBlur()
 	{
 		checkShellImage();
-		setShellImage(Filter.medianFilter(3, this));
+		setShellImage(Filter.medianFilter(this, 3));
 	}
 
 	/*
@@ -96,7 +95,7 @@ public class Image extends CS355Image
 	public void uniformBlur()
 	{
 		checkShellImage();
-		setShellImage(Filter.uniformBlur(3, this));
+		setShellImage(Filter.uniformBlur(this, 3));
 	}
 
 	/*
