@@ -32,6 +32,11 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  *
  * @author Brennan Smith
@@ -60,17 +65,114 @@ public class StudentLWJGLController implements CS355LWJGLController
         
     }
 
+    void doIt(String x)
+    {
+    	System.out.println("Key is pressed: " + x);
+    }
     //This is called every frame, and should be responsible for keyboard updates.
     //An example keyboard event is captured below.
     //The "Keyboard" static class should contain everything you need to finish
     // this up.
+    @SuppressWarnings("serial")
+	Map<Integer, Runnable> keyHandlers = new HashMap<Integer, Runnable>() {{
+    		put(new Integer(Keyboard.KEY_A), new Runnable()
+    			{
+    			public void run()
+    				{
+    				doIt("A");
+    				}
+    			});
+    		put(new Integer(Keyboard.KEY_D), new Runnable()
+				{
+				public void run()
+					{
+					doIt("D");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_W), new Runnable()
+				{
+				public void run()
+					{
+					doIt("W");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_S), new Runnable()
+				{
+				public void run()
+					{
+					doIt("S");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_Q), new Runnable()
+				{
+				public void run()
+					{
+					doIt("Q");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_E), new Runnable()
+				{
+				public void run()
+					{
+					doIt("E");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_R), new Runnable()
+				{
+				public void run()
+					{
+					doIt("R");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_F), new Runnable()
+				{
+				public void run()
+					{
+					doIt("F");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_H), new Runnable()
+				{
+				public void run()
+					{
+					doIt("H");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_O), new Runnable()
+				{
+				public void run()
+					{
+					doIt("O");
+					}
+				});
+    		put(new Integer(Keyboard.KEY_P), new Runnable()
+				{
+				public void run()
+					{
+					doIt("P");
+					}
+				});
+		    }};
+
+    void handleKey(int key)
+    {
+    	switch (key)
+    	{
+    	
+    	}
+    }
+
     @Override
     public void updateKeyboard() 
     {
-        if(Keyboard.isKeyDown(Keyboard.KEY_W)) 
-        {
-            System.out.println("You are pressing W!");
-        }
+    	for (Map.Entry<Integer, Runnable> k: keyHandlers.entrySet())
+    	{
+    		if (Keyboard.isKeyDown(k.getKey()))
+    		{
+    			k.getValue().run();
+    			break;
+    		}
+    	}
     }
 
     //This method is the one that actually draws to the screen.
