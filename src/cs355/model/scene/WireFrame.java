@@ -1,6 +1,7 @@
 package cs355.model.scene;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,7 +33,12 @@ public class WireFrame {
 	 * Get the list of lines.
 	 * @return the list of Line3D objects.
 	 */
-	public List<Line3D> getLines() {
-		return lines;
-	}
+//	public List<Line3D> getLines() {
+//		return lines;
+//	}
+	
+    public Iterator<Line3D> getLines()
+    {
+        return new ArrayList<Line3D>().iterator();
+    }
 }
