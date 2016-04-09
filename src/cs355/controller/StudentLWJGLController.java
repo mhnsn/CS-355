@@ -154,14 +154,6 @@ public class StudentLWJGLController implements CS355LWJGLController
 				});
 		    }};
 
-    void handleKey(int key)
-    {
-    	switch (key)
-    	{
-    	
-    	}
-    }
-
     @Override
     public void updateKeyboard() 
     {
