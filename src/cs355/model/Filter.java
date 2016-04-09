@@ -19,7 +19,7 @@ public class Filter
 	private static int rMask = 0x00FF0000;
 	private static int gMask = 0x0000FF00;
 	private static int bMask = 0x000000FF;
-	private static float[] unsharpA2 = { 0, -1, 0, -1, 6, -1, 0, -1, 0 };
+	private static float[] sharpenA2 = { 0, -1, 0, -1, 6, -1, 0, -1, 0 };
 
 	// brightness
 	public static BufferedImage brightness(Image source, int amount)
@@ -583,10 +583,9 @@ public class Filter
 	{
 		if (kernel.length != window.length)
 		{
-			return 0; // convolution not defined on this
+			return Float.MAX_VALUE; // convolution not defined on this
 		}
 
-		float channelVal = 0;
 		float sum = 0;
 
 		int dimension = kernel.length;
@@ -599,8 +598,7 @@ public class Filter
 
 		sum *= scale;
 
-		channelVal = sum;
-		return channelVal;
+		return sum;
 	}
 
 	public static float convolve(float[] window, float[] kernel)
@@ -609,13 +607,16 @@ public class Filter
 	}
 
 	// sharpen
-
 	public static BufferedImage sharpen(Image source, int windowSize)
 	{
-		// This operation sharpens the image using an unsharp masking kernel
-		// with A = 2 (i.e., a 6 in the middle and -1s for the four-connected
-		// neighbors, then divide by 2).
-		// This operation should be done in the RGB color space.
+		/*
+		 * This operation sharpens the image using an unsharp masking kernel
+		 * with A = 2 (i.e., a 6 in the middle and -1s for the four-connected
+		 * neighbors, then divide by 2).
+		 * 
+		 * This operation should be done in the RGB color space.
+		 * 
+		 */
 
 		// TODO: optimize this into a snake-scrawl of sorted lists.
 
@@ -637,7 +638,8 @@ public class Filter
 		// note that an array is allocated for each channel here.
 		float[][] window = new float[3][windowSize * windowSize];
 
-		int curPixelData = 0;
+		int curPixelData;
+		float[] convolutionVals = { 0, 0, 0 };
 		float[] windowR = new float[windowSize * windowSize];
 		float[] windowG = new float[windowSize * windowSize];
 		float[] windowB = new float[windowSize * windowSize];
@@ -645,6 +647,8 @@ public class Filter
 		int[] newRGB = { 0, 0, 0 };
 
 		int curPixelValR, curPixelValG, curPixelValB;
+
+		float k = (float) 1;
 
 		for (x = edgex; x < (w - edgex); x++)
 		{
@@ -666,13 +670,11 @@ public class Filter
 					}
 				}
 
-				curPixelValR = (int) convolve(windowR, unsharpA2, (float) .5);
-				curPixelValG = (int) convolve(windowG, unsharpA2, (float) .5);
-				curPixelValB = (int) convolve(windowB, unsharpA2, (float) .5);
+				convolutionVals = multiChannelConvolve(window, sharpenA2, (float) .5);
 
-				newRGB[0] = (int) (windowR[5] + curPixelValR);
-				newRGB[1] = (int) (windowG[5] + curPixelValG);
-				newRGB[2] = (int) (windowB[5] + curPixelValB);
+				newRGB[0] = (int) Math.max(0, Math.min(255, (convolutionVals[0])));
+				newRGB[1] = (int) Math.max(0, Math.min(255, (convolutionVals[1])));
+				newRGB[2] = (int) Math.max(0, Math.min(255, (convolutionVals[2])));
 
 				wr.setPixel(x, y, newRGB);
 			}
@@ -685,30 +687,29 @@ public class Filter
 	// mean filter (gaussian)
 	// grayscale (rgb)
 
-	// public static float[] multiChannelConvolve(float[][] window, float[][]
-	// kernel, float scale)
-	// {
-	// float[] channels = { 0, 0, 0 };
-	// float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
-	// channel0Sum = convolve(window[0], kernel[0], scale);
-	// channel1Sum = convolve(window[1], kernel[1], scale);
-	// channel2Sum = convolve(window[2], kernel[2], scale);
-	//
-	// if (channel0Sum == 0 || channel1Sum == 0 || channel2Sum == 0)
-	// {
-	// return null;
-	// }
-	// channels[0] = channel0Sum;
-	// channels[1] = channel1Sum;
-	// channels[2] = channel2Sum;
-	//
-	// return channels;
-	// }
-	// public static float[] multiChannelConvolve(float[][] window, float[][]
-	// kernel)
-	// {
-	// return multiChannelConvolve(window, kernel, 1);
-	// }
+	public static float[] multiChannelConvolve(float[][] window, float[] kernel, float scale)
+	{
+		float[] channels = { 0, 0, 0 };
+		float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
+		channel0Sum = convolve(window[0], kernel, scale);
+		channel1Sum = convolve(window[1], kernel, scale);
+		channel2Sum = convolve(window[2], kernel, scale);
+
+		if (channel0Sum == Float.MAX_VALUE || channel1Sum == Float.MAX_VALUE || channel2Sum == Float.MAX_VALUE)
+		{
+			return null;
+		}
+		channels[0] = channel0Sum;
+		channels[1] = channel1Sum;
+		channels[2] = channel2Sum;
+
+		return channels;
+	}
+
+	public static float[] multiChannelConvolve(float[][] window, float[] kernel)
+	{
+		return multiChannelConvolve(window, kernel, 1);
+	}
 
 	/*
 	 * Hilarious and interesting broken edge detection code. To look at later.

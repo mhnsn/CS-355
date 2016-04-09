@@ -142,12 +142,11 @@ public class GUIViewRefresher implements ViewRefresher
 
 				// objToView = StateMachine.objectToView(new Circle(Color.white,
 				// new Point2D.Double(0, 0), 1));
-				objToView = StateMachine.backgroundImageToView();
+				objToView = StateMachine.backgroundImageToView(bi.getWidth(), bi.getHeight());
 
 				g2d.setTransform(objToView);
 
 				g2d.drawImage(bi, -imageTopLeftX, -imageTopLeftY, null);
-
 			}
 		}
 

@@ -1005,11 +1005,11 @@ public class StateMachine
 	///////////////////////////////////////////////////////
 	// Background image transforms
 
-	public static AffineTransform backgroundImageToView()
+	public static AffineTransform backgroundImageToView(int i, int j)
 	{
 		AffineTransform Mi = new AffineTransform();
 		Mi.setToIdentity();
-		Mi.concatenate(backgroundWorldToView(getViewOrigin()));
+		Mi.concatenate(backgroundWorldToView(new Double(i / 2, j / 2)));
 		Mi.concatenate(objectToWorld(new Circle(Color.white, new Point2D.Double(0, 0), 1)));
 		return Mi;
 	}
