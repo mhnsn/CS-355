@@ -1,194 +1,117 @@
 [
   {
     "a": {
-      "x": 30.666666666666664,
-      "y": 15.0
+      "x": -100.66666666666666,
+      "y": -58.33333333333334
     },
     "b": {
-      "x": 0.6666666666666643,
-      "y": -33.0
+      "x": 103.33333333333334,
+      "y": -84.33333333333334
     },
     "c": {
-      "x": -31.333333333333336,
-      "y": 18.0
+      "x": -2.666666666666657,
+      "y": 142.66666666666666
     },
-    "boundingBox": {
-      "width": 62.0,
-      "height": 51.0,
-      "color": {
-        "value": -1,
-        "falpha": 0.0
-      },
-      "center": {
-        "x": -0.3333333333333357,
-        "y": -7.5
-      },
-      "rotation": 0.0,
-      "boundWidth": 31.0,
-      "boundHeight": 25.5
-    },
-    "Aab": 48.0,
-    "Bab": -30.0,
-    "Cab": -1022.0,
-    "Abc": -51.0,
-    "Bbc": -32.0,
-    "Cbc": -1022.0000000000001,
-    "Aca": 3.0,
-    "Bca": 62.0,
-    "Cca": -1022.0,
-    "minX": -31.333333333333336,
-    "minY": -33.0,
-    "maxX": 30.666666666666664,
-    "maxY": 18.0,
+    "Aab": 26.0,
+    "Bab": 204.0,
+    "Cab": 14517.333333333336,
+    "Abc": -227.0,
+    "Bbc": -106.0,
+    "Cbc": 14517.333333333334,
+    "Aca": 201.0,
+    "Bca": -98.0,
+    "Cca": 14517.33333333333,
+    "minX": 0.0,
+    "minY": 0.0,
+    "maxX": 0.0,
+    "maxY": 0.0,
     "color": {
-      "value": -1,
+      "value": -3355444,
       "falpha": 0.0
     },
     "center": {
-      "x": 43.333333333333336,
-      "y": 346.0
+      "x": 232.66666666666666,
+      "y": 239.33333333333334
     },
     "rotation": 0.0,
-    "boundWidth": 62.0,
-    "boundHeight": 51.0,
     "SHAPE_TYPE": "cs355.model.drawing.Triangle"
-  },
-  {
-    "a": {
-      "x": 59.333333333333314,
-      "y": 88.0
-    },
-    "b": {
-      "x": 88.33333333333331,
-      "y": -63.0
-    },
-    "c": {
-      "x": -147.66666666666669,
-      "y": -25.0
-    },
-    "boundingBox": {
-      "width": 236.0,
-      "height": 151.0,
-      "color": {
-        "value": -1,
-        "falpha": 0.0
-      },
-      "center": {
-        "x": -29.666666666666686,
-        "y": 12.5
-      },
-      "rotation": 0.0,
-      "boundWidth": 118.0,
-      "boundHeight": 75.5
-    },
-    "Aab": 151.0,
-    "Bab": 29.0,
-    "Cab": -11511.33333333333,
-    "Abc": -38.0,
-    "Bbc": -236.0,
-    "Cbc": -11511.333333333334,
-    "Aca": -113.0,
-    "Bca": 207.0,
-    "Cca": -11511.333333333336,
-    "minX": -147.66666666666669,
-    "minY": -63.0,
-    "maxX": 88.33333333333331,
-    "maxY": 88.0,
-    "color": {
-      "value": -1,
-      "falpha": 0.0
-    },
-    "center": {
-      "x": 355.6666666666667,
-      "y": 230.0
-    },
-    "rotation": 0.0,
-    "boundWidth": 236.0,
-    "boundHeight": 151.0,
-    "SHAPE_TYPE": "cs355.model.drawing.Triangle"
-  },
-  {
-    "width": 186.0,
-    "height": 33.0,
-    "color": {
-      "value": -39322,
-      "falpha": 0.0
-    },
-    "center": {
-      "x": 116.0,
-      "y": 182.5
-    },
-    "rotation": 0.0,
-    "boundWidth": 93.0,
-    "boundHeight": 16.5,
-    "SHAPE_TYPE": "cs355.model.drawing.Ellipse"
-  },
-  {
-    "radius": 111.4136436887332,
-    "color": {
-      "value": -13369345,
-      "falpha": 0.0
-    },
-    "center": {
-      "x": 261.4136436887332,
-      "y": 294.4136436887332
-    },
-    "rotation": 0.0,
-    "boundWidth": 111.4136436887332,
-    "boundHeight": 111.4136436887332,
-    "SHAPE_TYPE": "cs355.model.drawing.Circle"
-  },
-  {
-    "width": 67.0,
-    "height": 339.0,
-    "color": {
-      "value": -3394561,
-      "falpha": 0.0
-    },
-    "center": {
-      "x": 144.5,
-      "y": 266.5
-    },
-    "rotation": 0.0,
-    "boundWidth": 33.5,
-    "boundHeight": 169.5,
-    "SHAPE_TYPE": "cs355.model.drawing.Rectangle"
   },
   {
     "end": {
-      "x": 407.0,
-      "y": 121.0
+      "x": 370.0,
+      "y": 118.0
     },
     "endV": {
-      "x": 170.0,
-      "y": 84.0
+      "x": 105.0,
+      "y": -245.0
     },
     "color": {
-      "value": -6684775,
+      "value": -52225,
       "falpha": 0.0
     },
     "center": {
-      "x": 237.0,
-      "y": 37.0
+      "x": 265.0,
+      "y": 363.0
     },
     "rotation": 0.0,
-    "boundWidth": 85.0,
-    "boundHeight": 42.0,
     "SHAPE_TYPE": "cs355.model.drawing.Line"
   },
   {
-    "size": 121.0,
+    "xAxis": 134.0,
+    "yAxis": 56.0,
+    "color": {
+      "value": -10027162,
+      "falpha": 0.0
+    },
+    "center": {
+      "x": 262.0,
+      "y": 358.0
+    },
+    "rotation": 0.0,
+    "SHAPE_TYPE": "cs355.model.drawing.Ellipse"
+  },
+  {
+    "xAxis": 93.0,
+    "yAxis": 294.0,
+    "color": {
+      "value": -13408513,
+      "falpha": 0.0
+    },
+    "center": {
+      "x": 124.5,
+      "y": 284.0
+    },
+    "rotation": -6.061523731029084E-4,
+    "SHAPE_TYPE": "cs355.model.drawing.Rectangle"
+  },
+  {
+    "size": 158.0,
+    "xAxis": 158.0,
+    "yAxis": 158.0,
+    "color": {
+      "value": -26215,
+      "falpha": 0.0
+    },
+    "center": {
+      "x": 387.0,
+      "y": 137.0
+    },
+    "rotation": 0.0,
+    "SHAPE_TYPE": "cs355.model.drawing.Square"
+  },
+  {
+    "radius": 88.1943875765346,
+    "xAxis": 44.0971937882673,
+    "yAxis": 44.0971937882673,
     "color": {
       "value": -256,
       "falpha": 0.0
     },
     "center": {
-      "x": 151.5,
-      "y": 118.5
+      "x": 141.1943875765346,
+      "y": 132.1943875765346
     },
     "rotation": 0.0,
-    "boundWidth": 60.5,
-    "boundHeight": 60.5,
-    "SHAPE_TYPE": "cs355.model.drawing.Square"
+    "SHAPE_TYPE": "cs355.model.drawing.Circle"
   }
 ]

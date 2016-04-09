@@ -12,21 +12,6 @@
       "x": 478.0,
       "y": 394.0
     },
-    "boundingBox": {
-      "width": 246.0,
-      "height": 360.0,
-      "color": {
-        "value": -1,
-        "falpha": 0.0
-      },
-      "center": {
-        "x": 355.0,
-        "y": 214.0
-      },
-      "rotation": 0.0,
-      "boundWidth": 123.0,
-      "boundHeight": 180.0
-    },
     "Aab": -239.0,
     "Bab": -146.0,
     "Cab": 95306.0,
@@ -36,6 +21,10 @@
     "Aca": 360.0,
     "Bca": -100.0,
     "Cca": -132680.0,
+    "minX": 0.0,
+    "minY": 0.0,
+    "maxX": 0.0,
+    "maxY": 0.0,
     "color": {
       "value": -6710785,
       "falpha": 0.0
@@ -45,8 +34,6 @@
       "y": 394.0
     },
     "rotation": 0.0,
-    "boundWidth": 246.0,
-    "boundHeight": 360.0,
     "SHAPE_TYPE": "cs355.model.drawing.Triangle"
   },
   {
@@ -67,12 +54,12 @@
       "y": 52.0
     },
     "rotation": 0.0,
-    "boundWidth": 135.5,
-    "boundHeight": 26.0,
     "SHAPE_TYPE": "cs355.model.drawing.Line"
   },
   {
     "size": 200.0,
+    "xAxis": 0.0,
+    "yAxis": 0.0,
     "color": {
       "value": -10027162,
       "falpha": 0.0
@@ -82,13 +69,11 @@
       "y": 322.0
     },
     "rotation": 0.0,
-    "boundWidth": 100.0,
-    "boundHeight": 100.0,
     "SHAPE_TYPE": "cs355.model.drawing.Square"
   },
   {
-    "width": 34.0,
-    "height": 216.0,
+    "xAxis": 0.0,
+    "yAxis": 0.0,
     "color": {
       "value": -16777012,
       "falpha": 0.0
@@ -98,12 +83,12 @@
       "y": 232.0
     },
     "rotation": 0.0,
-    "boundWidth": 17.0,
-    "boundHeight": 108.0,
     "SHAPE_TYPE": "cs355.model.drawing.Ellipse"
   },
   {
     "radius": 118.56221995222593,
+    "xAxis": 0.0,
+    "yAxis": 0.0,
     "color": {
       "value": -26215,
       "falpha": 0.0
@@ -113,13 +98,11 @@
       "y": 244.56221995222592
     },
     "rotation": 0.0,
-    "boundWidth": 118.56221995222593,
-    "boundHeight": 118.56221995222593,
     "SHAPE_TYPE": "cs355.model.drawing.Circle"
   },
   {
-    "width": 188.0,
-    "height": 138.0,
+    "xAxis": 0.0,
+    "yAxis": 0.0,
     "color": {
       "value": -256,
       "falpha": 0.0
@@ -129,8 +112,6 @@
       "y": 106.0
     },
     "rotation": 0.0,
-    "boundWidth": 94.0,
-    "boundHeight": 69.0,
     "SHAPE_TYPE": "cs355.model.drawing.Rectangle"
   }
 ]

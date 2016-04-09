@@ -172,12 +172,28 @@ public class Image extends CS355Image
 
 		int x, y = 0;
 		int[] rgba = { 255, 255, 255 };
-
+		boolean oneChannel = false;
+		
 		for (x = 0; x < w; x++)
 		{
 			for (y = 0; y < h; y++)
 			{
-				wr.setPixel(x, y, super.getPixel(x, y, rgba));
+				super.getPixel(x, y, rgba);
+
+				if(!oneChannel)
+				{					
+					if((rgba[0] != 0) && (rgba[1] == 0) && (rgba[2] == 0) && ((x == 1) || y == 1))
+					{
+						oneChannel = true;
+					}
+					
+					wr.setPixel(x, y, rgba);
+				}
+				else
+				{
+					rgba[1] = rgba[2] = rgba[0];
+					wr.setPixel(x, y, rgba);
+				}
 			}
 		}
 

@@ -391,12 +391,14 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 		{
 			GUIModel.getBackgroundImage().initializeShellImage();
 		}
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void openDrawing(File file)
 	{
 		getModel().open(file);
+		GUIFunctions.refresh();
 	}
 
 	@Override

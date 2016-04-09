@@ -1,6 +1,7 @@
 package cs355.view;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -121,32 +122,22 @@ public class GUIViewRefresher implements ViewRefresher
 			BufferedImage bi = GUIModel.getBackgroundImage().getImage();
 			if (bi != null)
 			{
-				// get view origin
-				Point2D.Double viewOrigin = StateMachine.getViewOrigin();
-
-				// calculate center point of current view
-				double viewSize = Math.pow(2, GUIController.getZoomLevel());
-				Point2D.Double viewCenter = new Point2D.Double(viewOrigin.getX() - viewSize / 2,
-						viewOrigin.getY() - viewSize / 2);
-
 				// calculate the x and y offset to use
 				// in order to center the image
 				int offsetX = bi.getWidth() / 2;
 				int offsetY = bi.getHeight() / 2;
 
 				// set the image's x and y values
-				// to viewCenter-offsetX
-				// and viewcenter-offsetY
-				int imageTopLeftX = (int) viewCenter.getX() + offsetX;
-				int imageTopLeftY = (int) viewCenter.getY() + offsetY;
+				// to 1024-offsetX
+				// and 1024-offsetY
+				int imageTopLeftX = (int) 1024 - offsetX;
+				int imageTopLeftY = (int) 1024 - offsetY;
 
-				// objToView = StateMachine.objectToView(new Circle(Color.white,
-				// new Point2D.Double(0, 0), 1));
-				objToView = StateMachine.backgroundImageToView(bi.getWidth(), bi.getHeight());
+				objToView = StateMachine.objectToView(new Rectangle(Color.WHITE, new Point2D.Double(imageTopLeftX, imageTopLeftY), bi.getWidth(), bi.getHeight()));
 
 				g2d.setTransform(objToView);
 
-				g2d.drawImage(bi, -imageTopLeftX, -imageTopLeftY, null);
+				g2d.drawImage(bi, 0, 0, null);
 			}
 		}
 

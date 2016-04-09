@@ -14,9 +14,14 @@
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl_util_applet.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl_util.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl-debug.jar"/>
-	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="CS-355/lwjgl-2.9.3/native/windows"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lzma.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/substance-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/trident-7.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mark/Documents/2. GitHub/CS-355/lwjgl-2.9.3/native/windows"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
