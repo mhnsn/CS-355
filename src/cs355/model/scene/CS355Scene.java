@@ -140,4 +140,9 @@ public class CS355Scene extends Observable
 		
 		return rot;
 	}
+	
+	public boolean addInstance(Instance i)
+	{
+		return insts.add(i);
+	}
 }
