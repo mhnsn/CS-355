@@ -3,20 +3,34 @@ package cs355.controller;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 
+//import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+//import static org.lwjgl.opengl.GL11.GL_LINES;
+//import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+//import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+//import static org.lwjgl.opengl.GL11.glBegin;
+//import static org.lwjgl.opengl.GL11.glClear;
+//import static org.lwjgl.opengl.GL11.glColor3f;
+//import static org.lwjgl.opengl.GL11.glEnd;
+//import static org.lwjgl.opengl.GL11.glLoadIdentity;
+//import static org.lwjgl.opengl.GL11.glMatrixMode;
+//import static org.lwjgl.opengl.GL11.glPushMatrix;
+//import static org.lwjgl.opengl.GL11.glRotatef;
+//import static org.lwjgl.opengl.GL11.glTranslatef;
+//import static org.lwjgl.opengl.GL11.glVertex3d;
+//import static org.lwjgl.opengl.GL11.glViewport;
+//import static org.lwjgl.opengl.GL11.glOrtho;
+//import static org.lwjgl.util.glu.GLU.gluPerspective;
+
 import java.util.HashMap;
 import java.util.Map;
 
-//You might notice a lot of imports here.
-//You are probably wondering why I didn't just import org.lwjgl.opengl.GL11.*
-//Well, I did it as a hint to you.
-//OpenGL has a lot of commands, and it can be kind of intimidating.
-//This is a list of all the commands I used when I implemented my project.
-//Therefore, if a command appears in this list, you probably need it.
-//If it doesn't appear in this list, you probably don't.
-//Of course, your milage may vary. Don't feel restricted by this list of imports.
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
+import cs355.model.scene.CS355Scene;
 import cs355.model.scene.HouseModel;
+import cs355.model.scene.Point3D;
 import cs355.model.scene.WireFrame;
 
 /**
@@ -31,14 +45,36 @@ public class StudentLWJGLController implements CS355LWJGLController
 	// A "Line3D" is a wrapper class around two Point2Ds.
 	// It should all be fairly intuitive if you look at those classes.
 	// If not, I apologize.
-	private WireFrame model = new HouseModel();
+	private WireFrame				model			= new HouseModel();
+	private static final int		DISPLAY_WIDTH	= 640;
+	private static final int		DISPLAY_HEIGHT	= 480;
+	private static CS355Scene		scene			= new CS355Scene();
+	
+	private static final Point3D	WHERE_HOME_IS	= new Point3D(0, 0, 0);
+	private static final double		NO_ROTATION		= 0;
+	
+	private static final int		PERSPECTIVE		= 0;
+	private static final int		ORTHOGRAPHIC	= 1;
 	
 	// This method is called to "resize" the viewport to match the screen.
 	// When you first start, have it be in perspective mode.
 	@Override
 	public void resizeGL()
 	{
+		scene.setCameraPosition(new Point3D(0, 0, 0));
+		scene.setCameraRotation(0);
 		
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		GL11.glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+		GL11.glLoadIdentity();
+		
+		runHome();
+	}
+	
+	private void runHome()
+	{
+		scene.setCameraPosition(WHERE_HOME_IS);
+		scene.setCameraRotation(NO_ROTATION);
 	}
 	
 	@Override
@@ -162,5 +198,8 @@ public class StudentLWJGLController implements CS355LWJGLController
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		// Do your drawing here.
+		
+		Display.update();
+		
 	}
 }
