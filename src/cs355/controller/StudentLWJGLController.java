@@ -1,6 +1,6 @@
 package cs355.controller;
 
-//import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.*;
 
 //import static org.lwjgl.opengl.GL11.*;
 
@@ -67,21 +67,37 @@ public class StudentLWJGLController implements CS355LWJGLController
 	 * Point2Ds. It should all be fairly intuitive if you look at those classes.
 	 * If not, I apologize.
 	 */
-	private WireFrame				model			= new HouseModel();
-	private Instance				home			= new Instance(Color.white, WHERE_HOME_IS, 0, 1, model);
+	private WireFrame				model					= new HouseModel();
+	private Instance				home					= new Instance(Color.white, WHERE_HOME_IS, 0, 1, model);
 	
-	private static final int		DISPLAY_WIDTH	= 640;
-	private static final int		DISPLAY_HEIGHT	= 480;
-	private static CS355Scene		scene			= new CS355Scene();
+	private static final Point3D	WHERE_HOME_IS			= new Point3D(0, 0, 0);
+	Point3D							jonesHome				= new Point3D(-15, 0, 0);
+	Instance						theJones				= new Instance(Color.yellow, jonesHome, 0, 1, model);
+	Point3D							thePigsty				= new Point3D(15, 0, 0);
+	Instance						timonAndPumbaa			= new Instance(Color.green, thePigsty, 0, 1, model);
 	
-	private static final Point3D	WHERE_HOME_IS	= new Point3D(0, 0, 0);
-	private static final Point3D	BY_MY_MAILBOX	= new Point3D(0, 2, 30);
-	private static final Point3D	UP				= new Point3D(0, 1, 0);
+	Point3D							smithHome				= new Point3D(0, 0, -100);
+	Instance						theSmiths				= new Instance(Color.CYAN, smithHome, 180, 1, model);
+	Point3D							theMayorsHouse			= new Point3D(-15, 0, -100);
+	Instance						mayorMayor				= new Instance(Color.orange, theMayorsHouse, 180, 1, model);
+	Point3D							doNotVisit				= new Point3D(15, 0, -100);
+	Instance						crazyOldManMarley		= new Instance(Color.gray, doNotVisit, 180, 1, model);
 	
-	private static final double		NO_ROTATION		= 0;
-	private static final int		PERSPECTIVE		= 0;
-	private static final int		ORTHOGRAPHIC	= 1;
-	private int						mode			= PERSPECTIVE;
+	Point3D							highSecurityLocation	= new Point3D(-50, 5, -50);
+	Instance						misterPresident			= new Instance(Color.white, highSecurityLocation, 90, 5,
+			model);
+	
+	private static final int		DISPLAY_WIDTH			= 640;
+	private static final int		DISPLAY_HEIGHT			= 480;
+	private static CS355Scene		scene					= new CS355Scene();
+	
+	private static final Point3D	BY_MY_MAILBOX			= new Point3D(0, 2, 30);
+	private static final Point3D	UP						= new Point3D(0, 1, 0);
+	
+	private static final double		NO_ROTATION				= 0;
+	private static final int		PERSPECTIVE				= 0;
+	private static final int		ORTHOGRAPHIC			= 1;
+	private int						mode					= PERSPECTIVE;
 	
 	private static Point3D			where_i_am;
 	private CurrentState			curState;
@@ -95,9 +111,13 @@ public class StudentLWJGLController implements CS355LWJGLController
 	{
 		scene.setCameraPosition(new Point3D(0, 0, 0));
 		scene.setCameraRotation(0);
-		scene.addInstance(home);
 		
+		scene.addInstance(home);
 		thereGoesTheNeighborhood();
+		
+		// System.out.println("There are " + scene.instances().size()
+		// + " people in this house, and you're the only one who has to make
+		// trouble.");
 		
 		glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		glMatrixMode(GL_PROJECTION);
@@ -109,25 +129,10 @@ public class StudentLWJGLController implements CS355LWJGLController
 		}
 		
 		takeMeHome();
-		
 	}
 	
 	private void thereGoesTheNeighborhood()
 	{
-		Point3D jonesHome = new Point3D(-20, 0, 0);
-		Point3D thePigsty = new Point3D(20, 0, 0);
-		Point3D smithHome = new Point3D(0, 0, -100);
-		Point3D theMayorsHouse = new Point3D(-20, 0, -100);
-		Point3D doNotVisit = new Point3D(20, 0, -100);
-		Point3D highSecurityLocation = new Point3D(-80, 0, -50);
-		
-		Instance theJones = new Instance(Color.yellow, jonesHome, 0, 1, model);
-		Instance theSmiths = new Instance(Color.CYAN, smithHome, 0, 1, model);
-		Instance timonAndPumbaa = new Instance(Color.green, thePigsty, 0, 1, model);
-		Instance mayorMayor = new Instance(Color.orange, theMayorsHouse, 0, 1, model);
-		Instance crazyOldManMarley = new Instance(Color.gray, doNotVisit, 0, 1, model);
-		Instance misterPresident = new Instance(Color.white, highSecurityLocation, 0, 5, model);
-		
 		scene.addInstance(theJones);
 		scene.addInstance(theSmiths);
 		scene.addInstance(timonAndPumbaa);
@@ -149,12 +154,10 @@ public class StudentLWJGLController implements CS355LWJGLController
 		
 		glMatrixMode(GL_MODELVIEW);
 		gluLookAt((float) where_i_am.x, (float) where_i_am.y, (float) where_i_am.z, (float) WHERE_HOME_IS.x,
-				(float) WHERE_HOME_IS.y, (float) WHERE_HOME_IS.z, (float) UP.x, (float) UP.y, (float) UP.z); // I
-																												// recommend
-																												// you
-																												// NOT
-																												// float
-																												// up.
+				(float) WHERE_HOME_IS.y, (float) WHERE_HOME_IS.z, (float) UP.x, (float) UP.y, (float) UP.z);
+		/**
+		 * I // recommend // you // NOT // float // up.
+		 */
 		curState.setLocation(where_i_am);
 		curState.setDirection(0);
 	}
@@ -204,8 +207,8 @@ public class StudentLWJGLController implements CS355LWJGLController
 		
 		// Do your drawing here.
 		glMatrixMode(GL_PROJECTION);
+		
 		glLoadIdentity();
-		// glRotatef((float) scene.getCameraRotation(), 0f, 0f, 0f);
 		
 		// handle different viewing modes here.
 		switch (mode)
@@ -214,7 +217,7 @@ public class StudentLWJGLController implements CS355LWJGLController
 				gluPerspective(45f, 1f, 0.01f, 1000f);
 				break;
 			case ORTHOGRAPHIC:
-				// glOrtho();
+				glOrtho(-25f, 25f, -25f, 25f, 0.01f, 1000f);
 				break;
 		}
 		
@@ -233,44 +236,42 @@ public class StudentLWJGLController implements CS355LWJGLController
 	{
 		for (Instance i : scene.instances())
 		{
-			glPushMatrix();
 			drawInstance(i);
-			glPopMatrix();
 		}
 	}
 	
 	private void drawInstance(Instance i)
 	{
 		/**
-		 * this may not be necessary, but is useful for pipelining.
-		 * 
 		 * push the instance transformation
 		 * 
 		 * draw instance
 		 * 
 		 * pop the instance transformation
 		 */
-		glBegin(GL_LINES);
-		
 		Iterator<Line3D> it = i.getModel().getLines();
 		Color c = i.getColor();
 		Point3D p = i.getPosition();
 		float r = (float) i.getRotAngle();
 		double s = i.getScale();
 		
+		glPushMatrix();
+		
 		glColor3d(c.getRed(), c.getBlue(), c.getGreen());
 		glTranslatef((float) -p.x, (float) -p.y, (float) -p.z);
-		glRotatef(r, -0f, -0f, -0f);
+		glRotatef(-r, 0f, 1f, 0f);
 		glScaled(s, s, s);
 		
+		glBegin(GL_LINES);
 		while (it.hasNext())
 		{
 			Line3D cur = it.next();
 			glVertex3d(cur.start.x, cur.start.y, cur.start.z);
 			glVertex3d(cur.end.x, cur.end.y, cur.end.z);
 		}
-		
 		glEnd();
+		
+		glPopMatrix();
 	}
 	
 	class CurrentState
@@ -438,11 +439,13 @@ public class StudentLWJGLController implements CS355LWJGLController
 		
 		public void orthographic()
 		{
+			mode = ORTHOGRAPHIC;
 			dump();
 		}
 		
 		public void perspective()
 		{
+			mode = PERSPECTIVE;
 			dump();
 		}
 		
@@ -467,16 +470,17 @@ public class StudentLWJGLController implements CS355LWJGLController
 		
 		public void dump()
 		{
-			System.out.println("Key pressed:   " + lastKey);
-			System.out.println("Location:      " + location.toString());
-			System.out.println("Direction:     " + direction);
+			System.out.println("Key pressed: " + lastKey);
+			System.out.println("Location: " + location.toString());
+			System.out.println("Direction: " + direction);
 			System.out.println("Travel Vector: " + travelVec.toString());
-			System.out.println("Perp Vector:   " + perpVec.toString());
+			System.out.println("Perp Vector: " + perpVec.toString());
 			System.out.println("====================");
 		}
 	};
 	
 	@SuppressWarnings("serial")
+	
 	Map<Integer, Runnable> keyHandlers = new HashMap<Integer, Runnable>()
 	{
 		{
