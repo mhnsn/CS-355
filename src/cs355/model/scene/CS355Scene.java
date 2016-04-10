@@ -40,7 +40,6 @@ public class CS355Scene extends Observable
 	 */
 	public boolean open(File f)
 	{
-		
 		try
 		{
 			// Pass it to the SceneParser.
