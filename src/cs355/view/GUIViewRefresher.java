@@ -288,7 +288,7 @@ public class GUIViewRefresher implements ViewRefresher
 		 * Apply the clipping tests described in class and in your textbook.
 		 * Reject a line if both points fail the same view frustum test OR if
 		 * either endpoint fails the near-plane test. For this lab, we'll let
-		 * Java’s 2D line-drawing handing any other clipping.
+		 * Java's 2D line-drawing handing any other clipping.
 		 */
 		
 		/**
