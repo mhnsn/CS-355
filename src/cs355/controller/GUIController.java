@@ -144,24 +144,6 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		StateMachine.mousePressedFlag = true;
 		StateMachine.e = e;
-		// Point2D.Double clickLocation = new Point2D.Double(e.getX(),
-		// e.getY());
-		// if(StateMachine.current == StateMachine.selectShape)
-		// {
-		// Circle handle = state.rotationHandleClicked(e);
-		// if(handle != null)
-		// {
-		// state.setRotationFlag(true);
-		// state.setRotationHandle(handle);
-		// }
-		//
-		// if(state.shapeClicked(clickLocation))
-		// {
-		// StateMachine.clickLocations.clear();
-		// StateMachine.clickLocations.add(clickLocation);
-		// state.saveCenter(e);
-		// }
-		// }
 		state.tick();
 	}
 	

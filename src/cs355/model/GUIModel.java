@@ -11,25 +11,31 @@ import cs355.model.drawing.CS355Drawing;
 import cs355.model.drawing.Line;
 import cs355.model.drawing.Shape;
 import cs355.model.image.Image;
+import cs355.model.scene.CS355Scene;
 
 public class GUIModel extends CS355Drawing
 {
-	static ArrayList<Shape> shapeList;
-	static Shape selectedShape;
-	private static Image backgroundImage;
-
+	static ArrayList<Shape>		shapeList;
+	static Shape				selectedShape;
+	private static Image		backgroundImage;
+	
+	private static CS355Scene	foregroundScene;
+	private static boolean		draw3D;
+	
 	public GUIModel()
 	{
 		shapeList = new ArrayList<Shape>();
 		setBackgroundImage(new Image());
+		setForegroundScene(new CS355Scene());
+		draw3D = false;
 	}
-
+	
 	@Override
 	public Shape getShape(int index)
 	{
 		return shapeList.get(index);
 	}
-
+	
 	@Override
 	public int addShape(Shape s)
 	{
@@ -38,7 +44,7 @@ public class GUIModel extends CS355Drawing
 		notifyObservers();
 		return 0;
 	}
-
+	
 	@Override
 	public void deleteShape(int index)
 	{
@@ -50,7 +56,7 @@ public class GUIModel extends CS355Drawing
 			notifyObservers();
 		}
 	}
-
+	
 	@Override
 	public void moveToFront(int index)
 	{
@@ -62,9 +68,9 @@ public class GUIModel extends CS355Drawing
 			this.setChanged();
 			notifyObservers();
 		}
-
+		
 	}
-
+	
 	@Override
 	public void movetoBack(int index)
 	{
@@ -77,7 +83,7 @@ public class GUIModel extends CS355Drawing
 			notifyObservers();
 		}
 	}
-
+	
 	@Override
 	public void moveForward(int index)
 	{
@@ -97,7 +103,7 @@ public class GUIModel extends CS355Drawing
 			notifyObservers();
 		}
 	}
-
+	
 	@Override
 	public void moveBackward(int index)
 	{
@@ -117,26 +123,26 @@ public class GUIModel extends CS355Drawing
 			notifyObservers();
 		}
 	}
-
+	
 	@Override
 	public List<Shape> getShapes()
 	{
 		return shapeList;
 	}
-
+	
 	@Override
 	public List<Shape> getShapesReversed()
 	{
 		ArrayList<Shape> reverseList = new ArrayList<Shape>();
-
+		
 		for (Shape s : shapeList)
 		{
 			reverseList.add(0, s);
 		}
-
+		
 		return reverseList;
 	}
-
+	
 	@Override
 	public void setShapes(List<Shape> shapes)
 	{
@@ -144,7 +150,7 @@ public class GUIModel extends CS355Drawing
 		this.setChanged();
 		notifyObservers();
 	}
-
+	
 	public Shape getClickedShape(Point2D.Double pointClicked, double tolerance)
 	{
 		Double objectPointClicked = pointClicked;
@@ -160,7 +166,7 @@ public class GUIModel extends CS355Drawing
 			{
 				// tolerance *= scaleFactor;
 			}
-
+			
 			if (sb.inBounds(objectPointClicked, tolerance))
 			{
 				if (s.pointInShape(objectPointClicked, tolerance))
@@ -171,7 +177,7 @@ public class GUIModel extends CS355Drawing
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @return the selectedShape
 	 */
@@ -179,7 +185,7 @@ public class GUIModel extends CS355Drawing
 	{
 		return selectedShape;
 	}
-
+	
 	/**
 	 * @param selectedShape
 	 *            the selectedShape to set
@@ -193,12 +199,12 @@ public class GUIModel extends CS355Drawing
 			return;
 		}
 	}
-
+	
 	public static Double getSelectedCenter()
 	{
 		return selectedShape.getCenter();
 	}
-
+	
 	public int getSelectedShapeIndex()
 	{
 		for (int i = 0; i < shapeList.size(); i++)
@@ -208,18 +214,51 @@ public class GUIModel extends CS355Drawing
 				return i;
 			}
 		}
-
+		
 		return -1;
 	}
-
+	
 	public static Image getBackgroundImage()
 	{
 		return backgroundImage;
 	}
-
+	
 	public static void setBackgroundImage(Image backgroundImage)
 	{
 		GUIModel.backgroundImage = backgroundImage;
 	}
-
+	
+	/**
+	 * @return the draw3D
+	 */
+	public static boolean draw3D()
+	{
+		return draw3D;
+	}
+	
+	/**
+	 * @param draw3d
+	 *            - whether or not to draw the scene data
+	 */
+	public static void setDraw3D(boolean draw3d)
+	{
+		draw3D = draw3d;
+	}
+	
+	/**
+	 * @return the foregroundScene
+	 */
+	public static CS355Scene getForegroundScene()
+	{
+		return foregroundScene;
+	}
+	
+	/**
+	 * @param foregroundScene
+	 *            the foregroundScene to set
+	 */
+	public static void setForegroundScene(CS355Scene foregroundScene)
+	{
+		GUIModel.foregroundScene = foregroundScene;
+	}
 }
