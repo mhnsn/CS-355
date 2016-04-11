@@ -487,7 +487,7 @@ public class StudentLWJGLController implements CS355LWJGLController
 			/*
 			 * a Move left d Move right w Move forward s Move backward q Turn
 			 * left e Turn right r Move up f Move down h Return to the original
-			 * “home” position and orientation o Switch to orthographic
+			 * "home" position and orientation o Switch to orthographic
 			 * projection p Switch to perspective projection
 			 */
 			put(new Integer(Keyboard.KEY_A), new Runnable()

@@ -263,8 +263,8 @@ public class GUIViewRefresher implements ViewRefresher
 		 */
 		
 		/**
-		 * You will need to implement storing the 4 × 4 matrix yourself,
-		 * including routines for multiply 4-element vectors by them.
+		 * You will need to implement storing the 4*4 matrix yourself, including
+		 * routines for multiply 4-element vectors by them.
 		 */
 		
 		/**
@@ -287,7 +287,7 @@ public class GUIViewRefresher implements ViewRefresher
 		/**
 		 * Apply the clipping tests described in class and in your textbook.
 		 * Reject a line if both points fail the same view frustum test OR if
-		 * either endpoint fails the near-plane test. For this lab, we’ll let
+		 * either endpoint fails the near-plane test. For this lab, we'll let
 		 * Java’s 2D line-drawing handing any other clipping.
 		 */
 		
@@ -299,19 +299,19 @@ public class GUIViewRefresher implements ViewRefresher
 		
 		/**
 		 * Apply a viewport transformation to map the canonical screen space to
-		 * the actual drawing space (2048 × 2048, with the origin in the upper
+		 * the actual drawing space (2048*2048, with the origin in the upper
 		 * left).
 		 */
 		
 		/**
 		 * Apply the same viewing transformation you use to implement zooming
 		 * and scrolling of the 2D graphic objects to map from a portion of the
-		 * 2048 × 2048 to the 512 × 512 screen area.
+		 * 2048*2048 to the 512*512 screen area.
 		 */
 		
 		/**
 		 * Draw the line on the screen. (This is where rasterization of the
-		 * primitive would take place, but we’ll just use the familiar 2D
+		 * primitive would take place, but we'll just use the familiar 2D
 		 * drawing commands to do this.)
 		 */
 	}
