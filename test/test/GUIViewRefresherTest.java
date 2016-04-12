@@ -203,9 +203,12 @@ public class GUIViewRefresherTest
 
 		// LineVector3D cameraLoc = GUIModel.getCameraLocation();
 		Point3D cameraLoc = StateMachine.where_i_am;
-		double[] cameraOr = GUIModel.getCameraOrientation();
+		double[] cameraDir = GUIModel.getCameraOrientation();
 		
-		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), cameraOr[0], cameraOr[1], cameraOr[2], false);
+		// Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0),
+		// cameraOr[0], cameraOr[1], cameraOr[2], false);
+		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), cameraDir[0], cameraDir[1], cameraDir[2],
+				false);
 		Transform3D.translate(Transform3D.IDENTITY_V, cameraLoc);
 
 		Transform3D.setWorldToCamera();
@@ -273,10 +276,22 @@ public class GUIViewRefresherTest
 		 * immediately returns false if the line doesn't pass. It then
 		 * transforms the line, storing the values in the LineVector3D arg
 		 ******************************************************************/
-		
-		clippedLines = Transform3D.clip(homogeneousLines, frustum);
 
-		assertTrue(Transform3D.passesClipTests(IDENTITY_V.toArray()));
+		// clippedLines = Transform3D.clip(homogeneousLines, frustum);
+		int i = 0;
+		double[] cameraSpaceV, clipSpaceV;
+
+		for (LineVector3D v : homogeneousLines)
+		{
+			cameraSpaceV = v.getVArray();
+			clipSpaceV = Transform3D.leftMultiply(frustum, cameraSpaceV);
+			if (Transform3D.passesClipTests(clipSpaceV))
+			{
+				clippedLines.add(v);
+			}
+		}
+		
+		// assertTrue(Transform3D.passesClipTests(IDENTITY_V.getVArray()));
 		assertEquals(homogeneousLines.size(), clippedLines.size());
 		
 		System.out.println(clippedLines.size() + " lines after clipping.");
