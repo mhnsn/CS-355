@@ -3,6 +3,7 @@
  */
 package cs355.model;
 
+import cs355.model.scene.Line3D;
 import cs355.model.scene.Point3D;
 
 /**
@@ -17,7 +18,12 @@ public class LineVector3D
 	double							y;
 	double							z;
 	double							w;
+	
+	// where to start the line
 	private Point3D					origin;
+	
+	// vector representation of line from origin
+	private Point3D					end;
 	
 	private boolean					isVector;
 	
@@ -35,13 +41,13 @@ public class LineVector3D
 	 * @param isVector
 	 *            whether or not this is to be a unit vector
 	 */
-	public LineVector3D(double xVal, double yVal, double zVal, Point3D A, boolean isVector)
+	public LineVector3D(double xVal, double yVal, double zVal, Point3D A, boolean v)
 	{
 		x = xVal;
 		y = yVal;
 		z = zVal;
 		
-		if (isVector)
+		if (v)
 		{
 			normalize();
 			if (A.x != 0 || A.y != 0 || A.z != 0)
@@ -51,12 +57,29 @@ public class LineVector3D
 			
 			origin = new Point3D(0, 0, 0);
 			w = 0;
+			isVector = true;
 		}
 		else
 		{
 			origin = A;
 			w = 1;
+			isVector = false;
 		}
+		
+		setEnd(new Point3D(x, y, z));
+	}
+	
+	public LineVector3D(Line3D l)
+	{
+		x = l.end.x;
+		y = l.end.y;
+		z = l.end.z;
+		
+		origin = l.start;
+		
+		w = 1;
+		
+		isVector = false;
 	}
 	
 	/**
@@ -133,8 +156,8 @@ public class LineVector3D
 	}
 	
 	/**
-	 * Normalize this LineVector3D. This operation will only do anything if
-	 * isVector is true - that is, only vectors will be normalized.
+	 * Normalize this LineVector3D. This operation will work independent of
+	 * whether the given lineVector3D is a vector or line representation
 	 * 
 	 * @return
 	 */
@@ -142,7 +165,7 @@ public class LineVector3D
 	{
 		if (!isVector)
 		{
-			return false;
+			// return false;
 		}
 		
 		// calculate magnitude of vector
@@ -221,4 +244,33 @@ public class LineVector3D
 	{
 		return "[X: " + x + ", Y: " + y + ", Z:" + z + ']';
 	}
+	
+	public Point3D getOrigin()
+	{
+		return origin;
+	}
+	
+	public void setOrigin(Point3D newOrigin)
+	{
+		origin = newOrigin;
+		return;
+	}
+	
+	/**
+	 * @return the end
+	 */
+	public Point3D getEnd()
+	{
+		return end;
+	}
+	
+	/**
+	 * @param end
+	 *            the end to set
+	 */
+	public void setEnd(Point3D end)
+	{
+		this.end = end;
+	}
+	
 }

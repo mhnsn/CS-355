@@ -14,12 +14,12 @@ import cs355.model.Filter;
  */
 public class Image extends CS355Image
 {
-	private BufferedImage shellImage;
-	private static boolean loadNewImage;
+	private BufferedImage	shellImage;
+	private static boolean	loadNewImage;
 	// private int rMask = 0x00FF0000;
 	// private int gMask = 0x0000FF00;
 	// private int bMask = 0x000000FF;
-
+	
 	/**
 	 * 
 	 */
@@ -28,7 +28,7 @@ public class Image extends CS355Image
 		super();
 		loadNewImage = true;
 	}
-
+	
 	/**
 	 * @param width
 	 * @param height
@@ -37,7 +37,7 @@ public class Image extends CS355Image
 	{
 		super(width, height);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -49,7 +49,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		return getShellImage();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -61,7 +61,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.edgeDetection(this, 3));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -73,7 +73,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.sharpen(this, 3));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -85,7 +85,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.medianFilter(this, 3));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -97,7 +97,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.uniformBlur(this, 3));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,7 +109,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.grayscaleSaturation(this));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -121,7 +121,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.contrast(this, amount));
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -133,7 +133,7 @@ public class Image extends CS355Image
 		checkShellImage();
 		setShellImage(Filter.brightness(this, amount));
 	}
-
+	
 	/**
 	 * @return the shellImage
 	 */
@@ -141,7 +141,7 @@ public class Image extends CS355Image
 	{
 		return shellImage;
 	}
-
+	
 	/**
 	 * @param shellImage
 	 *            the shellImage to set
@@ -150,7 +150,7 @@ public class Image extends CS355Image
 	{
 		this.shellImage = shellImage;
 	}
-
+	
 	private void checkShellImage()
 	{
 		if (loadNewImage && getWidth() != 0 && getHeight() != 0)
@@ -158,18 +158,17 @@ public class Image extends CS355Image
 			initializeShellImage();
 		}
 	}
-
+	
 	public void initializeShellImage()
 	{
-		System.out.println("Initializing shell image.");
 		loadNewImage = false;
-
+		
 		int w = super.getWidth();
 		int h = super.getHeight();
-
+		
 		BufferedImage b = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		WritableRaster wr = b.getRaster();
-
+		
 		int x, y = 0;
 		int[] rgba = { 255, 255, 255 };
 		boolean oneChannel = false;
@@ -179,10 +178,10 @@ public class Image extends CS355Image
 			for (y = 0; y < h; y++)
 			{
 				super.getPixel(x, y, rgba);
-
-				if(!oneChannel)
-				{					
-					if((rgba[0] != 0) && (rgba[1] == 0) && (rgba[2] == 0) && ((x == 1) || y == 1))
+				
+				if (!oneChannel)
+				{
+					if ((rgba[0] != 0) && (rgba[1] == 0) && (rgba[2] == 0) && ((x == 1) || y == 1))
 					{
 						oneChannel = true;
 					}
@@ -196,7 +195,7 @@ public class Image extends CS355Image
 				}
 			}
 		}
-
+		
 		b.setData(wr);
 		setShellImage(b);
 	}

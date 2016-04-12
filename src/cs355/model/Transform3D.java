@@ -5,6 +5,7 @@ package cs355.model;
 
 import java.util.ArrayList;
 
+import cs355.model.scene.Line3D;
 import cs355.model.scene.Point3D;
 
 /**
@@ -13,10 +14,15 @@ import cs355.model.scene.Point3D;
  */
 public class Transform3D
 {
-	public static ArrayList<double[][]>	pipeline	= new ArrayList<double[][]>();
-	private static boolean				push		= false;
-	private static final double[][]		I			= new double[][] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 },
-			{ 0, 0, 0, 1 } };
+	private static ArrayList<double[][]>	worldToCamera	= new ArrayList<double[][]>();
+	
+	public static ArrayList<double[][]>		pipeline		= new ArrayList<double[][]>();
+	private static boolean					push			= false;
+	public static final double[][]			IDENTITY		= new double[][] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 },
+			{ 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
+	// public static final double[] IDENTITY_V = new double[] { 1, 1, 1, 1 };
+	public static final LineVector3D		IDENTITY_V		= new LineVector3D(
+			new Line3D(new Point3D(0, 0, 0), new Point3D(1, 1, 1)));
 	
 	//////////////////////////////////////////////////////////////////////
 	// Transformation functions
@@ -31,12 +37,22 @@ public class Transform3D
 	 */
 	public static double[] transform(LineVector3D v)
 	{
+		// TODO: verify that this is properly storing and updating
+		// transformations in the passed objects.
 		double[] x = LVToArray(v);
 		
 		for (double[][] d : pipeline)
 		{
 			x = leftMultiply(d, x);
 		}
+		
+		v.x = x[0];
+		v.y = x[1];
+		v.z = x[2];
+		v.w = x[3];
+		
+		// v.setOrigin(newOrigin);
+		v.setEnd(new Point3D(v.x, v.y, v.z));
 		
 		return x;
 	}
@@ -227,7 +243,7 @@ public class Transform3D
 	private static void setIdentityTransform()
 	{
 		pipeline.clear();
-		pipeline.add(I);
+		pipeline.add(IDENTITY);
 	}
 	
 	public static int popTransform(int i)
@@ -250,4 +266,70 @@ public class Transform3D
 	{
 		pipeline.clear();
 	}
+	
+	/**
+	 * Set the worldToCamera transform to be a copy of the current pipeline.
+	 * Until unsetWorldToCamera() is called, all further transforms added to the
+	 * pipeline will (should) be popped immediately after execution.
+	 */
+	public static void setWorldToCamera()
+	{
+		worldToCamera = fullCopy(pipeline);
+		
+		push = false;
+	}
+	
+	public static void unSetWorldToCamera()
+	{
+		ArrayList<double[][]> temp =
+				
+				worldToCamera = new ArrayList<double[][]>();
+		
+		push = true;
+	}
+	
+	private static ArrayList<double[][]> fullCopy(ArrayList<double[][]> pipeline2)
+	{
+		ArrayList<double[][]> copy = new ArrayList<double[][]>();
+		double[][] t, tc;
+		double[] v, vc;
+		
+		for (int i = 0; i < pipeline.size(); i++)
+		{
+			t = pipeline.get(i);
+			tc = new double[t.length][];
+			
+			for (int j = 0; j < t.length; j++)
+			{
+				v = t[j];
+				vc = new double[v.length];
+				System.arraycopy(v, 0, vc, 0, v.length);
+				
+				tc[i] = vc;
+			}
+			
+			copy.add(tc);
+		}
+		
+		return copy;
+	}
+	
+	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static boolean clip(LineVector3D h, double[][] frustum)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public static void mapToCanonicalScreenSpace(LineVector3D vt)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

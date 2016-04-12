@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
@@ -15,6 +16,8 @@ import cs355.controller.GUIController;
 import cs355.controller.ShapeBound;
 import cs355.controller.StateMachine;
 import cs355.model.GUIModel;
+import cs355.model.LineVector3D;
+import cs355.model.Transform3D;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
 import cs355.model.drawing.Line;
@@ -22,6 +25,10 @@ import cs355.model.drawing.Rectangle;
 import cs355.model.drawing.Shape;
 import cs355.model.drawing.Square;
 import cs355.model.drawing.Triangle;
+import cs355.model.scene.Instance;
+import cs355.model.scene.Line3D;
+import cs355.model.scene.Point3D;
+import cs355.model.scene.WireFrame;
 
 public class GUIViewRefresher implements ViewRefresher
 {
@@ -54,7 +61,6 @@ public class GUIViewRefresher implements ViewRefresher
 		
 		if (StateMachine.getZoomFlag())
 		{
-			System.out.println(zoomLevel);
 			zooming = true;
 			
 			if (zoomLevel == 11)
@@ -242,77 +248,144 @@ public class GUIViewRefresher implements ViewRefresher
 		
 		if (GUIModel.draw3D())
 		{
-			render();
+			render(g2d);
 		}
 	}
 	
-	private void render()
+	private void render(Graphics2D g2d)
 	{
+		/***********************************************************************
+		 * get all lines and convert to homogeneous coordinates
+		 **********************************************************************/
 		
-		/**
-		 * get all lines
-		 */
+		ArrayList<LineVector3D> lines = new ArrayList<LineVector3D>();
+		LineVector3D lv;
+		WireFrame wf;
+		Iterator<Line3D> it;
 		
-		/**
-		 * convert to homogeneous coordinates
-		 */
+		// TODO: verify that this render process isn't destructive to original
+		// data
+		for (Instance i : GUIModel.getForegroundScene().instances())
+		{
+			wf = i.getModel();
+			it = wf.getLines();
+			
+			while (it.hasNext())
+			{
+				lv = new LineVector3D(it.next());
+				lines.add(lv);
+			}
+		}
 		
-		/**
+		/***********************************************************************
 		 * generate world-to-camera transform (result of concatenating a
 		 * translation matrix and a rotation matrix).
-		 */
+		 **********************************************************************/
 		
-		/**
-		 * You will need to implement storing the 4*4 matrix yourself, including
-		 * routines for multiply 4-element vectors by them.
-		 */
+		LineVector3D cameraLoc = GUIModel.getCameraLocation();
+		double[] cameraOr = GUIModel.getCameraOrientation();
 		
-		/**
+		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), cameraOr[0], 0, 0, true);
+		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), 0, cameraOr[1], 0, true);
+		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), 0, 0, cameraOr[2], true);
+		
+		Transform3D.translate(Transform3D.IDENTITY_V, cameraLoc.getOrigin());
+		Transform3D.setWorldToCamera();
+		
+		/***********************************************************************
 		 * Apply this matrix to the 3D homogeneous world-space point to get a 3D
 		 * homogeneous camera-space point.
-		 * 
-		 */
+		 **********************************************************************/
+		ArrayList<LineVector3D> homogeneousLines = new ArrayList<LineVector3D>();
 		
-		/**
+		for (LineVector3D l : lines)
+		{
+			Transform3D.transform(l);
+			
+			// to make clear what is held, they're moved.
+			// I know this isn't optimum, but I don't have to optimize this. =)
+			homogeneousLines.add(l);
+		}
+		
+		/***********************************************************************
 		 * Build a clip matrix as discussed in class and in your textbook. Pick
 		 * appropriate parameters for the zoom x , zoom y , near plane distance
 		 * n, and far-plane distance f.
-		 */
+		 **********************************************************************/
 		
-		/**
-		 * Apply this clip matrix to the 3D homogeneous camera-space point to
-		 * get 3D homogeneous points in clip space.
-		 */
+		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
 		
-		/**
-		 * Apply the clipping tests described in class and in your textbook.
-		 * Reject a line if both points fail the same view frustum test OR if
-		 * either endpoint fails the near-plane test. For this lab, we'll let
-		 * Java's 2D line-drawing handing any other clipping.
-		 */
+		double zX = .1, zY = .1; // a 10cm*10cm window
+		double n = .05; // please don't show me anything less than 5cm from my
+						// face.
+		double f = 100; // I can see about 100m away.
 		
-		/**
-		 * Apply perspective by normalizing the 3D homogeneous clip-space
-		 * coordinate to get the (x/w,y/w) location of the point in canonical
-		 * screen space.
-		 */
+		double[][] frustum = Transform3D.generateClipMatrix(zX, zY, n, f);
 		
-		/**
-		 * Apply a viewport transformation to map the canonical screen space to
-		 * the actual drawing space (2048*2048, with the origin in the upper
-		 * left).
-		 */
+		for (LineVector3D h : homogeneousLines)
+		{
+			/*******************************************************************
+			 * Apply this clip matrix to the 3D homogeneous camera-space point
+			 * to get 3D homogeneous points in clip space.
+			 *******************************************************************
+			 * Apply the clipping tests described in class and in your textbook.
+			 * Reject a line if both points fail the same view frustum test OR
+			 * if either endpoint fails the near-plane test. For this lab, we'll
+			 * let Java's 2D line-drawing handing any other clipping.
+			 *******************************************************************
+			 * n.b. The clip tests and the result of clip application are all
+			 * handled within Transform3D.clip(), which runs through clip tests
+			 * and immediately returns false if the line doesn't pass. It then
+			 * transforms the line, storing the values in the LineVector3D arg
+			 ******************************************************************/
+			if (!Transform3D.clip(h, frustum))
+			{
+				clippedLines.add(h);
+			}
+		}
 		
-		/**
-		 * Apply the same viewing transformation you use to implement zooming
-		 * and scrolling of the 2D graphic objects to map from a portion of the
-		 * 2048*2048 to the 512*512 screen area.
-		 */
+		for (LineVector3D vt : clippedLines)
+		{
+			/*******************************************************************
+			 * Apply perspective by normalizing the 3D homogeneous clip-space
+			 * coordinate to get the (x/w,y/w) location of the point in
+			 * canonical screen space.
+			 ******************************************************************/
+			vt.normalize();
+			
+			/*******************************************************************
+			 * Apply a viewport transformation to map the canonical screen space
+			 * to the actual drawing space (2048*2048, with the origin in the
+			 * upper left).
+			 *******************************************************************/
+			
+			Transform3D.mapToCanonicalScreenSpace(vt);
+			
+			/*******************************************************************
+			 * Apply the same viewing transformation you use to implement
+			 * zooming and scrolling of the 2D graphic objects to map from a
+			 * portion of the 2048*2048 to the 512*512 screen area.
+			 ******************************************************************/
+			
+			Point3D o = vt.getOrigin();
+			Point3D e3D = vt.getEnd();
+			
+			Line l = new Line(Color.WHITE, new Point2D.Double(o.x, o.y), new Point2D.Double(e3D.x, e3D.y));
+			
+			AffineTransform worldToView = StateMachine.worldToView(StateMachine.getViewOrigin());
+			
+			/*******************************************************************
+			 * Draw the line on the screen. (This is where rasterization of the
+			 * primitive would take place, but we'll just use the familiar 2D
+			 * drawing commands to do this.)
+			 ******************************************************************/
+			g2d.setTransform(worldToView);
+			
+			Point2D.Double e2D = l.getEndV();
+			
+			g2d.drawLine((int) 0, (int) 0, (int) (e2D.getX()), (int) (e2D.getY()));
+			
+		}
 		
-		/**
-		 * Draw the line on the screen. (This is where rasterization of the
-		 * primitive would take place, but we'll just use the familiar 2D
-		 * drawing commands to do this.)
-		 */
 	}
 }

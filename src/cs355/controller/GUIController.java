@@ -36,7 +36,7 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	{
 		state = new StateMachine();
 		StateMachine.current = StateMachine.init;
-		zoomLevel = 9;
+		zoomLevel = 11;
 		
 		StateMachine.setCurrentColor(new Color(255, 255, 0));
 	}
@@ -358,6 +358,10 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void openScene(File file)
 	{
+		if (GUIModel.getForegroundScene().open(file))
+		{
+			System.out.println("File successfully opened. Now render it.");
+		}
 	}
 	
 	@Override
@@ -458,12 +462,13 @@ public class GUIController implements CS355Controller, MouseListener, MouseMotio
 	@Override
 	public void toggleBackgroundDisplay()
 	{
-		
+		GUIModel.setDrawBackground(!GUIModel.drawBackground());
 	}
 	
 	@Override
 	public void toggle3DModelDisplay()
 	{
+		GUIModel.setDraw3D(!GUIModel.draw3D());
 	}
 	
 	@Override

@@ -12,22 +12,30 @@ import cs355.model.drawing.Line;
 import cs355.model.drawing.Shape;
 import cs355.model.image.Image;
 import cs355.model.scene.CS355Scene;
+import cs355.model.scene.Point3D;
 
 public class GUIModel extends CS355Drawing
 {
 	static ArrayList<Shape>		shapeList;
 	static Shape				selectedShape;
+	
 	private static Image		backgroundImage;
+	private static boolean		drawBackground;
 	
 	private static CS355Scene	foregroundScene;
 	private static boolean		draw3D;
+	
+	private static LineVector3D	cameraLocation;
+	private static double[]		cameraOrientation;
 	
 	public GUIModel()
 	{
 		shapeList = new ArrayList<Shape>();
 		setBackgroundImage(new Image());
 		setForegroundScene(new CS355Scene());
-		draw3D = false;
+		draw3D = setDrawBackground(true);
+		setCameraLocation(new LineVector3D(0, 0, 0, new Point3D(0, 0, 0), false));
+		setCameraOrientation(new double[] { 0, 0, 0 });
 	}
 	
 	@Override
@@ -260,5 +268,56 @@ public class GUIModel extends CS355Drawing
 	public static void setForegroundScene(CS355Scene foregroundScene)
 	{
 		GUIModel.foregroundScene = foregroundScene;
+	}
+	
+	public static boolean drawBackground()
+	{
+		return drawBackground;
+	}
+	
+	public static boolean setDrawBackground(boolean drawBackground)
+	{
+		GUIModel.drawBackground = drawBackground;
+		return drawBackground;
+	}
+	
+	/**
+	 * @return the cameraLocation
+	 */
+	public static LineVector3D getCameraLocation()
+	{
+		return cameraLocation;
+	}
+	
+	/**
+	 * @param cameraLocation
+	 *            the cameraLocation to set
+	 */
+	public static void setCameraLocation(LineVector3D cameraLocation)
+	{
+		GUIModel.cameraLocation = cameraLocation;
+	}
+	
+	/**
+	 * @return the cameraOrientation
+	 */
+	public static double[] getCameraOrientation()
+	{
+		return cameraOrientation;
+	}
+	
+	/**
+	 * @param c
+	 *            the cameraOrientation to set
+	 */
+	public static void setCameraOrientation(double[] c)
+	{
+		if (c.length != 3)
+		{
+			System.out.println("Error. Attempting to assign invalid rotation values.");
+			return;
+		}
+		
+		GUIModel.cameraOrientation = c;
 	}
 }

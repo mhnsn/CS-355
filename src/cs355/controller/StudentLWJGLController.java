@@ -1,7 +1,5 @@
 package cs355.controller;
 
-import static org.lwjgl.opengl.GL11.*;
-
 //import static org.lwjgl.opengl.GL11.*;
 
 //import static org.lwjgl.opengl.GL11.glViewport;
@@ -31,6 +29,7 @@ import static org.lwjgl.opengl.GL11.glColor3d;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
@@ -38,8 +37,8 @@ import static org.lwjgl.opengl.GL11.glScaled;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3d;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.util.glu.GLU.gluLookAt;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
-import static org.lwjgl.util.glu.GLU.*;
 
 import java.awt.Color;
 import java.util.HashMap;
