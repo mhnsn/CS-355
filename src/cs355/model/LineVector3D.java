@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package cs355.model;
 
@@ -14,10 +14,10 @@ public class LineVector3D
 {
 	private static final Point3D	viewSpaceOrigin	= new Point3D(0, 0, 0);
 	
-	double							x;
-	double							y;
-	double							z;
-	double							w;
+	public double					x;
+	public double					y;
+	public double					z;
+	public double					w;
 	
 	// where to start the line
 	private Point3D					origin;
@@ -31,7 +31,7 @@ public class LineVector3D
 	 * A new LineVector3D. This class consists of lines and unit vectors only -
 	 * when isVector is true, the resulting LineVector3D will be normalized and
 	 * cannot be scaled or translated.
-	 * 
+	 *
 	 * @param x
 	 *            the x magnitude of the LineVector3D
 	 * @param y
@@ -69,49 +69,134 @@ public class LineVector3D
 		setEnd(new Point3D(x, y, z));
 	}
 	
+	/**
+	 *
+	 * @param l
+	 */
 	public LineVector3D(Line3D l)
 	{
 		x = l.end.x;
 		y = l.end.y;
 		z = l.end.z;
-		
-		origin = l.start;
-		
 		w = 1;
+
+		end = l.end;
+		origin = l.start;
 		
 		isVector = false;
 	}
 	
 	/**
-	 * Translate this vector. This will overwrite the xyz values for this
-	 * vector.
-	 * 
-	 * @param xVal
-	 * @param yVal
-	 * @param zVal
+	 *
+	 * @param b
+	 *            a line or vector to cross this LineVector with
+	 * @return the cross product of the two, normalized.
+	 */
+	public LineVector3D crossProduct(LineVector3D b)
+	{
+		/**
+		 * Cross product:
+		 *
+		 * |i j k |
+		 *
+		 * |aX aY aZ|
+		 *
+		 * |bX bY bZ|
+		 *
+		 * = i(aY*bZ - aZ*bY) - j(aX*bZ - aZ*bX) + k(aX*bY - aY*bX)
+		 *
+		 * = (aY*bZ - aZ*bY, aZ*bX - aX*bZ, aX*bY - aY*bX)
+		 */
+		
+		double crossX = y * b.z - z * b.y;
+		double crossY = z * b.x - x * b.z;
+		double crossZ = x * b.y - y * b.x;
+		
+		LineVector3D product = new LineVector3D(crossX, crossY, crossZ, viewSpaceOrigin, true);
+		
+		return product;
+	}
+	
+	/**
+	 *
+	 * @param v
+	 *            the vector or line to project onto
+	 * @return the value of the dot product
+	 */
+	public double dotProduct(LineVector3D v)
+	{
+		double d = x * v.x + y * v.y + z * v.z;
+		
+		return d;
+	}
+	
+	/**
+	 * @return the end
+	 */
+	public Point3D getEnd()
+	{
+		return end;
+	}
+	
+	/**
+	 *
 	 * @return
 	 */
-	public boolean translate(double xVal, double yVal, double zVal)
+	public LineVector3D getNormalizedVector()
 	{
 		if (isVector)
 		{
-			return false;
+			return this;
 		}
-		
-		// but only because this is easier than the matrix approach
-		
-		// TODO: use matrix multiplication just 'cuz
-		
-		origin.x += xVal;
-		origin.y += yVal;
-		origin.z += zVal;
-		
-		return true;
+		else
+		{
+			return new LineVector3D(x, y, z, viewSpaceOrigin, true);
+		}
+	}
+	
+	/**
+	 *
+	 * @return
+	 */
+	public Point3D getOrigin()
+	{
+		return origin;
+	}
+	
+	/**
+	 * @return the value of isVector
+	 */
+	public boolean isVector()
+	{
+		return isVector;
+	}
+	
+	/**
+	 * Normalize this LineVector3D. This operation will work independent of
+	 * whether the given lineVector3D is a vector or line representation
+	 *
+	 * @return
+	 */
+	public void normalize()
+	{
+		// // calculate magnitude of vector
+		// double magnitude = Math.sqrt((x * x) + (y * y) + (z * z));
+		//
+		//
+		// // divide all distances by magnitude
+		// x /= magnitude;
+		// y /= magnitude;
+		// z /= magnitude;
+		x /= w;
+		y /= w;
+		z /= w;
+
+		return;
 	}
 	
 	/**
 	 * Rotate this vector. This will overwrite the current values for xyz.
-	 * 
+	 *
 	 * @param xAxis
 	 * @param yAxis
 	 * @param zAxis
@@ -132,7 +217,7 @@ public class LineVector3D
 	
 	/**
 	 * Scale this vector. This will overwrite the xyzw values.
-	 * 
+	 *
 	 * @param c
 	 * @return true if this is a line and was scaled; false if this is a vector
 	 */
@@ -156,99 +241,21 @@ public class LineVector3D
 	}
 	
 	/**
-	 * Normalize this LineVector3D. This operation will work independent of
-	 * whether the given lineVector3D is a vector or line representation
-	 * 
-	 * @return
+	 * @param end
+	 *            the end to set
 	 */
-	public void normalize()
+	public void setEnd(Point3D e)
 	{
-		// // calculate magnitude of vector
-		// double magnitude = Math.sqrt((x * x) + (y * y) + (z * z));
-		//
-		//
-		// // divide all distances by magnitude
-		// x /= magnitude;
-		// y /= magnitude;
-		// z /= magnitude;
-		x /= w;
-		y /= w;
-		z /= w;
-		
-		return;
+		end = e;
+		x = e.x - origin.x;
+		y = e.y - origin.y;
+		z = e.z - origin.z;
 	}
 	
 	/**
-	 * 
-	 * @param v
-	 *            the vector or line to project onto
-	 * @return the value of the dot product
+	 *
+	 * @param newOrigin
 	 */
-	public double dotProduct(LineVector3D v)
-	{
-		double d = (this.x * v.x) + (this.y * v.y) + (this.z * v.z);
-		
-		return d;
-	}
-	
-	/**
-	 * 
-	 * @param b
-	 *            a line or vector to cross this LineVector with
-	 * @return the cross product of the two, normalized.
-	 */
-	public LineVector3D crossProduct(LineVector3D b)
-	{
-		/**
-		 * Cross product:
-		 * 
-		 * |i j k |
-		 * 
-		 * |aX aY aZ|
-		 * 
-		 * |bX bY bZ|
-		 * 
-		 * = i(aY*bZ - aZ*bY) - j(aX*bZ - aZ*bX) + k(aX*bY - aY*bX)
-		 * 
-		 * = (aY*bZ - aZ*bY, aZ*bX - aX*bZ, aX*bY - aY*bX)
-		 */
-		
-		double crossX = (this.y * b.z) - (this.z * b.y);
-		double crossY = (this.z * b.x) - (this.x * b.z);
-		double crossZ = (this.x * b.y) - (this.y * b.x);
-		
-		LineVector3D product = new LineVector3D(crossX, crossY, crossZ, viewSpaceOrigin, true);
-		
-		return product;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public LineVector3D getNormalizedVector()
-	{
-		if (isVector)
-		{
-			return this;
-		}
-		else
-		{
-			return new LineVector3D(x, y, z, viewSpaceOrigin, true);
-		}
-	}
-	
-	@Override
-	public String toString()
-	{
-		return "[X: " + x + ", Y: " + y + ", Z:" + z + ']';
-	}
-	
-	public Point3D getOrigin()
-	{
-		return origin;
-	}
-	
 	public void setOrigin(Point3D newOrigin)
 	{
 		origin = newOrigin;
@@ -256,24 +263,56 @@ public class LineVector3D
 	}
 	
 	/**
-	 * @return the end
+	 * @param isVector
+	 *            what to set isVector to
 	 */
-	public Point3D getEnd()
+	public void setVector(boolean isVector)
 	{
-		return end;
+		this.isVector = isVector;
 	}
 	
 	/**
-	 * @param end
-	 *            the end to set
+	 *
+	 * @return
 	 */
-	public void setEnd(Point3D end)
-	{
-		this.end = end;
-	}
-	
 	public double[] toArray()
 	{
 		return new double[] { x, y, z, w };
+	}
+	
+	/**
+	 *
+	 */
+	@Override
+	public String toString()
+	{
+		return "[X: " + x + ", Y: " + y + ", Z:" + z + ']';
+	}
+	
+	/**
+	 * Translate this vector. This will overwrite the xyz values for this
+	 * vector.
+	 *
+	 * @param xVal
+	 * @param yVal
+	 * @param zVal
+	 * @return
+	 */
+	public boolean translate(double xVal, double yVal, double zVal)
+	{
+		if (isVector)
+		{
+			return false;
+		}
+		
+		// but only because this is easier than the matrix approach
+		
+		// TODO: use matrix multiplication just 'cuz
+		
+		origin.x += xVal;
+		origin.y += yVal;
+		origin.z += zVal;
+		
+		return true;
 	}
 }

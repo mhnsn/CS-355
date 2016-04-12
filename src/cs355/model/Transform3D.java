@@ -15,14 +15,13 @@ import cs355.model.scene.Point3D;
  */
 public class Transform3D
 {
-	private static ArrayList<double[][]>	worldToCamera	= new ArrayList<double[][]>();
+	private static boolean				push			= false;
+	public static ArrayList<double[][]>	worldToCamera	= new ArrayList<double[][]>();
+	public static ArrayList<double[][]>	pipeline		= new ArrayList<double[][]>();
 	
-	public static ArrayList<double[][]>		pipeline		= new ArrayList<double[][]>();
-	private static boolean					push			= false;
-	public static final double[][]			IDENTITY		= new double[][] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 },
+	public static final double[][]		IDENTITY		= new double[][] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 },
 			{ 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-	// public static final double[] IDENTITY_V = new double[] { 1, 1, 1, 1 };
-	public static final LineVector3D		IDENTITY_V		= new LineVector3D(
+	public static final LineVector3D	IDENTITY_V		= new LineVector3D(
 			new Line3D(new Point3D(0, 0, 0), new Point3D(1, 1, 1)));
 	
 	//////////////////////////////////////////////////////////////////////
@@ -71,6 +70,16 @@ public class Transform3D
 		return x;
 	}
 	
+	/**
+	 * 
+	 * @param v
+	 * @param rotationOrigin
+	 * @param xAxis
+	 * @param yAxis
+	 * @param zAxis
+	 * @param useRadians
+	 * @return
+	 */
 	public static double[] rotate(LineVector3D v, Point3D rotationOrigin, double xAxis, double yAxis, double zAxis,
 			boolean useRadians)
 	{
@@ -95,6 +104,12 @@ public class Transform3D
 		return r;
 	}
 	
+	/**
+	 * 
+	 * @param v
+	 * @param amountToTranslate
+	 * @return
+	 */
 	public static double[] translate(LineVector3D v, Point3D amountToTranslate)
 	{
 		addTranslateToPipeline(amountToTranslate);
@@ -103,6 +118,12 @@ public class Transform3D
 		return t;
 	}
 	
+	/**
+	 * 
+	 * @param v
+	 * @param c
+	 * @return
+	 */
 	public static double[] scale(LineVector3D v, double c)
 	{
 		double[][] scaleV = { { c, c, c, c } };
@@ -136,6 +157,12 @@ public class Transform3D
 		return A;
 	}
 	
+	/**
+	 * 
+	 * @param d
+	 * @param v
+	 * @return
+	 */
 	private static double[] leftMultiply(double[][] d, double[] v)
 	{
 		if (!canMultiply(d, v))
@@ -186,6 +213,12 @@ public class Transform3D
 		}
 	}
 	
+	/**
+	 * 
+	 * @param d
+	 * @param v
+	 * @return
+	 */
 	private static boolean canMultiply(double[][] d, double[] v)
 	{
 		if (d[0].length != v.length)
@@ -196,11 +229,20 @@ public class Transform3D
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param d
+	 * @return
+	 */
 	private static double degreesToRadians(float d)
 	{
 		return (d * Math.PI) / 180;
 	}
 	
+	/**
+	 * 
+	 * @param p
+	 */
 	private static void addTranslateToPipeline(Point3D p)
 	{
 		if (outOfToleranceRange(p.x, 0, .01) || outOfToleranceRange(p.y, 0, .01) || outOfToleranceRange(p.z, 0, .01))
@@ -210,6 +252,12 @@ public class Transform3D
 		}
 	}
 	
+	/**
+	 * 
+	 * @param xAxis
+	 * @param yAxis
+	 * @param zAxis
+	 */
 	private static void addRotateToPipeline(double xAxis, double yAxis, double zAxis)
 	{
 		if (outOfToleranceRange(xAxis, 0, .00001))
@@ -269,6 +317,10 @@ public class Transform3D
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @param p
+	 */
 	private static void addUntranslateToPipeline(Point3D p)
 	{
 		double[][] tInv = new double[][] { { 1, 0, 0, -p.x }, { 0, 1, 0, -p.y }, { 0, 0, 1, -p.z }, { 0, 0, 0, 1 } };
@@ -276,12 +328,20 @@ public class Transform3D
 		pipeline.add(tInv);
 	}
 	
+	/**
+	 * 
+	 */
 	private static void setIdentityTransform()
 	{
 		pipeline.clear();
 		pipeline.add(IDENTITY);
 	}
 	
+	/**
+	 * 
+	 * @param i
+	 * @return
+	 */
 	public static int popTransform(int i)
 	{
 		for (int n = 0; n < i; n++)
@@ -292,12 +352,20 @@ public class Transform3D
 		return pipeline.size();
 	}
 	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
 	public static int setPush(boolean p)
 	{
 		push = p;
 		return pipeline.size();
 	}
 	
+	/**
+	 * 
+	 */
 	public static void clearPipeline()
 	{
 		pipeline.clear();
@@ -315,6 +383,9 @@ public class Transform3D
 		push = false;
 	}
 	
+	/**
+	 * 
+	 */
 	public static void unSetWorldToCamera()
 	{
 		ArrayList<double[][]> temp =
@@ -324,6 +395,11 @@ public class Transform3D
 		push = true;
 	}
 	
+	/**
+	 * 
+	 * @param pipeline2
+	 * @return
+	 */
 	private static ArrayList<double[][]> fullCopy(ArrayList<double[][]> pipeline2)
 	{
 		ArrayList<double[][]> copy = new ArrayList<double[][]>();
@@ -350,6 +426,14 @@ public class Transform3D
 		return copy;
 	}
 	
+	/**
+	 * 
+	 * @param zX
+	 * @param zY
+	 * @param n
+	 * @param f
+	 * @return
+	 */
 	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
 	{
 		// TODO: verify I didn't just break the clip matrix with this change.
@@ -360,6 +444,12 @@ public class Transform3D
 		return clipMatrix;
 	}
 	
+	/**
+	 * 
+	 * @param h
+	 * @param frustum
+	 * @return
+	 */
 	public static ArrayList<LineVector3D> clip(ArrayList<LineVector3D> h, double[][] frustum)
 	{
 		/*******************************************************************
@@ -392,6 +482,11 @@ public class Transform3D
 		return clippedLines;
 	}
 	
+	/**
+	 * 
+	 * @param clipSpaceV
+	 * @return
+	 */
 	private static boolean passedClipTests(double[] clipSpaceV)
 	{
 		double w = clipSpaceV[3];
@@ -430,4 +525,12 @@ public class Transform3D
 		// about it anyway at this point.
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public static boolean getPush()
+	{
+		return push;
+	}
 }
