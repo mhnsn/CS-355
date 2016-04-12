@@ -1,6 +1,6 @@
 package cs355.solution;
 
-import cs355.controller.StudentLWJGLController;
+import cs355.StudentLWJGLController;
 import cs355.view.LWJGLSandbox;
 
 /**
