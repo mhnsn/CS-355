@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Rectangle;
 
@@ -24,6 +25,7 @@ public class RectangleTest
 	public static void setUpBeforeClass() throws Exception
 	{
 		R = new Rectangle(Color.WHITE, new Point2D.Double(0, 0), 50, 100);
+		new KeyboardInterface();
 		model = new GUIModel();
 		model.addShape(R);
 	}
@@ -44,6 +46,42 @@ public class RectangleTest
 	}
 	
 	@Test
+	public final void testGetBoundingBox()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testGetHeight()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testGetUpperLeft()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testGetWidth()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testInBounds()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testObjectToWorld()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
 	public final void testPointInShape()
 	{
 		// fail("Not yet implemented"); // TODO
@@ -56,7 +94,7 @@ public class RectangleTest
 	}
 	
 	@Test
-	public final void testGetWidth()
+	public final void testSetHeight()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
@@ -68,43 +106,7 @@ public class RectangleTest
 	}
 	
 	@Test
-	public final void testGetHeight()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testSetHeight()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testGetUpperLeft()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
 	public final void testToString()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testInBounds()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testGetBoundingBox()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testObjectToWorld()
 	{
 		// fail("Not yet implemented"); // TODO
 	}

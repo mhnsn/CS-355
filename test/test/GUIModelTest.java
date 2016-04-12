@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 import cs355.model.drawing.Ellipse;
@@ -23,14 +24,14 @@ import cs355.model.drawing.Triangle;
 
 public class GUIModelTest
 {
-
-	static Circle C;
-	static Line L;
-	static Ellipse E;
-	static Rectangle R;
-	static Triangle T;
-	static Square S;
-	static GUIModel model;
+	
+	static Circle		C;
+	static Line			L;
+	static Ellipse		E;
+	static Rectangle	R;
+	static Triangle		T;
+	static Square		S;
+	static GUIModel		model;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
@@ -46,6 +47,8 @@ public class GUIModelTest
 
 		S = new Square(Color.WHITE, new Point2D.Double(0, 0), 75);
 
+		new KeyboardInterface();
+		
 		model = new GUIModel();
 
 		// model.addShape(C);
@@ -59,13 +62,7 @@ public class GUIModelTest
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception
 	{
-
-	}
-
-	@Before
-	public void before()
-	{
-		model.addShape(L);
+		
 	}
 
 	@After
@@ -74,15 +71,10 @@ public class GUIModelTest
 		model.setShapes(new ArrayList<Shape>());
 	}
 
-	@Test
-	public final void testGetShape()
+	@Before
+	public void before()
 	{
-		// assertEquals(model.getShape(0), S);
-		// assertEquals(model.getShape(1), T);
-		// assertEquals(model.getShape(2), R);
-		// assertEquals(model.getShape(3), E);
-		assertEquals(model.getShape(0), L);
-		// assertEquals(model.getShape(5), C);
+		model.addShape(L);
 	}
 
 	@Test
@@ -97,5 +89,16 @@ public class GUIModelTest
 		Point2D.Double testPoint = new Point2D.Double(25, 50);
 		assertEquals(L, model.getClickedShape(testPoint, 4));
 		assertEquals(L.getClass(), model.getClickedShape(testPoint, 4).getClass());
+	}
+
+	@Test
+	public final void testGetShape()
+	{
+		// assertEquals(model.getShape(0), S);
+		// assertEquals(model.getShape(1), T);
+		// assertEquals(model.getShape(2), R);
+		// assertEquals(model.getShape(3), E);
+		assertEquals(model.getShape(0), L);
+		// assertEquals(model.getShape(5), C);
 	}
 }

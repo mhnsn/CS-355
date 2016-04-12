@@ -9,107 +9,108 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Triangle;
 
-public class TriangleTest {
+public class TriangleTest
+{
 	
-	static Triangle 	T;
-	static GUIModel		model;
+	static Triangle	T;
+	static GUIModel	model;
 
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception 
+	public static void setUpBeforeClass() throws Exception
 	{
-		T = new Triangle	(Color.WHITE,	new Point2D.Double(0, 0),
-											new Point2D.Double(0, 50),
-											new Point2D.Double(-50, -25),
-											new Point2D.Double(50, -25));
+		T = new Triangle(Color.WHITE, new Point2D.Double(0, 0), new Point2D.Double(0, 50), new Point2D.Double(-50, -25),
+				new Point2D.Double(50, -25));
+		new KeyboardInterface();
 		model = new GUIModel();
 		model.addShape(T);
 	}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception 
+	public static void tearDownAfterClass() throws Exception
 	{
 	}
 
 	@Before
-	public void setUp() throws Exception 
+	public void setUp() throws Exception
 	{
 	}
 
 	@After
-	public void tearDown() throws Exception 
+	public void tearDown() throws Exception
 	{
 	}
 
 	@Test
-	public final void testSetCenter() 
+	public final void testGetA()
 	{
 	}
 
 	@Test
-	public final void testPointInShape() 
+	public final void testGetB()
 	{
 	}
 
 	@Test
-	public final void testInBounds() 
+	public final void testGetBoundingBox()
 	{
 	}
 
 	@Test
-	public final void testGetBoundingBox() 
+	public final void testGetC()
 	{
 	}
 
 	@Test
-	public final void testLineAB() 
+	public final void testInBounds()
 	{
 	}
 
 	@Test
-	public final void testLineBC() 
+	public final void testLineAB()
 	{
 	}
 
 	@Test
-	public final void testLineCA() 
+	public final void testLineBC()
 	{
 	}
 
 	@Test
-	public final void testGetA() 
+	public final void testLineCA()
 	{
 	}
 
 	@Test
-	public final void testSetA() 
+	public final void testObjectToWorld()
 	{
 	}
 
 	@Test
-	public final void testGetB() 
+	public final void testPointInShape()
 	{
 	}
 
 	@Test
-	public final void testSetB() 
+	public final void testSetA()
 	{
 	}
 
 	@Test
-	public final void testGetC() 
+	public final void testSetB()
 	{
 	}
 
 	@Test
-	public final void testSetC() 
+	public final void testSetC()
 	{
 	}
 
 	@Test
-	public final void testObjectToWorld() 
+	public final void testSetCenter()
 	{
 	}
 }

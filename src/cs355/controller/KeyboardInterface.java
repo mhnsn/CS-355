@@ -8,6 +8,7 @@ import java.util.Map;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.util.glu.*;
 
 import cs355.StudentLWJGLController;
 import cs355.model.scene.Point3D;
@@ -15,41 +16,6 @@ import cs355.model.scene.Point3D;
 public class KeyboardInterface
 {
 	private static CurrentCameraState curState;
-	
-	/**
-	 * @return the curState
-	 */
-	public static CurrentCameraState getCurState()
-	{
-		return curState;
-	}
-
-	public static void handleInput(Iterator<Integer> it)
-	{
-		int curKey;
-		while(it.hasNext())
-		{
-			curKey = it.next();
-		
-			for (Map.Entry<Integer, Runnable> k : keyHandlers.entrySet())
-			{
-				if (k.getKey() == curKey)
-				{
-					k.getValue().run();
-					break;
-				}
-			}
-		}
-	}
-	
-	/**
-	 * @param curState
-	 *            the curState to set
-	 */
-	public static void setCurState(CurrentCameraState curState)
-	{
-		KeyboardInterface.curState = curState;
-	}
 
 	/**
 	 * a Move left d Move right w Move forward s Move backward q Turn left e
@@ -115,7 +81,7 @@ public class KeyboardInterface
 					getCurState().moveForward(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_S), new Runnable()
 			{
 				@Override
@@ -134,7 +100,7 @@ public class KeyboardInterface
 					getCurState().moveBackward(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_Q), new Runnable()
 			{
 				@Override
@@ -144,7 +110,7 @@ public class KeyboardInterface
 					getCurState().turnLeft(1.0);
 				}
 			});
-			
+
 			put(new Integer(KeyEvent.VK_Q), new Runnable()
 			{
 				@Override
@@ -154,7 +120,7 @@ public class KeyboardInterface
 					getCurState().turnLeft(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_E), new Runnable()
 			{
 				@Override
@@ -173,7 +139,7 @@ public class KeyboardInterface
 					getCurState().turnRight(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_R), new Runnable()
 			{
 				@Override
@@ -192,7 +158,7 @@ public class KeyboardInterface
 					getCurState().moveUp(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_F), new Runnable()
 			{
 				@Override
@@ -211,14 +177,14 @@ public class KeyboardInterface
 					getCurState().moveDown(1.0);
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_H), new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					getCurState().setLastKey("H");
-//					getCurState().home();
+					// getCurState().home();
 					StudentLWJGLController.takeMeHome();
 				}
 			});
@@ -231,7 +197,7 @@ public class KeyboardInterface
 					getCurState().home();
 				}
 			});
-
+			
 			put(new Integer(Keyboard.KEY_O), new Runnable()
 			{
 				@Override
@@ -252,12 +218,47 @@ public class KeyboardInterface
 			});
 		}
 	};
-
-	public KeyboardInterface()
+	
+	/**
+	 * @return the curState
+	 */
+	public static CurrentCameraState getCurState()
 	{
-		curState = new CurrentCameraState(new Point3D(0,0,0));
+		return curState;
 	}
 
+	public static void handleInput(Iterator<Integer> it)
+	{
+		int curKey;
+		while (it.hasNext())
+		{
+			curKey = it.next();
+			
+			for (Map.Entry<Integer, Runnable> k : keyHandlers.entrySet())
+			{
+				if (k.getKey() == curKey && !curState.getLastKey().equals(k))
+				{
+					k.getValue().run();
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * @param curState
+	 *            the curState to set
+	 */
+	public static void setCurState(CurrentCameraState curState)
+	{
+		KeyboardInterface.curState = curState;
+	}
+	
+	public KeyboardInterface()
+	{
+		curState = new CurrentCameraState(new Point3D(0, 0, 0));
+	}
+	
 	/**
 	 * This is called every frame, and should be responsible for keyboard //
 	 * updates. // An example keyboard event is captured below. // The
@@ -268,7 +269,7 @@ public class KeyboardInterface
 	 *            controller to update
 	 *
 	 */
-
+	
 	public void handleInput(StudentLWJGLController lwjgl)
 	{
 		for (Map.Entry<Integer, Runnable> k : keyHandlers.entrySet())

@@ -70,6 +70,16 @@ public class LineVector3D
 	}
 	
 	/**
+	 * It's not elegant, but it sure works nice for debugging the pipeline.
+	 *
+	 * @param v
+	 */
+	public LineVector3D(double[] v)
+	{
+		this(new Line3D(viewSpaceOrigin, new Point3D(v[0], v[1], v[2])));
+	}
+	
+	/**
 	 *
 	 * @param l
 	 */

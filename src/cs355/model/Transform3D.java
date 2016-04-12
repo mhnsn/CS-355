@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package cs355.model;
 
@@ -29,118 +29,188 @@ public class Transform3D
 	//
 	
 	/**
-	 * Execute all transformations in the pipeline on this vector, then give
-	 * back the new values in an array.
-	 * 
-	 * @param v
-	 * @return
-	 */
-	public static double[] transform(LineVector3D v)
-	{
-		// TODO: verify that this is properly storing and updating
-		// transformations in the passed objects.
-		if (pipeline.size() == 0)
-		{
-			setIdentityTransform();
-		}
-		
-		double[] x = v.toArray();
-		
-		for (double[][] d : pipeline)
-		{
-			try
-			{
-				x = leftMultiply(d, x);
-			}
-			catch (ConcurrentModificationException e)
-			{
-				// fail silently - we WANT this concurrent modification here.
-				// e.printStackTrace();
-			}
-		}
-		
-		v.x = x[0];
-		v.y = x[1];
-		v.z = x[2];
-		v.w = x[3];
-		
-		// v.setOrigin(newOrigin);
-		v.setEnd(new Point3D(v.x, v.y, v.z));
-		
-		return x;
-	}
-	
-	/**
-	 * 
-	 * @param v
-	 * @param rotationOrigin
+	 *
 	 * @param xAxis
 	 * @param yAxis
 	 * @param zAxis
-	 * @param useRadians
-	 * @return
 	 */
-	public static double[] rotate(LineVector3D v, Point3D rotationOrigin, double xAxis, double yAxis, double zAxis,
-			boolean useRadians)
+	private static void addRotateToPipeline(double xAxis, double yAxis, double zAxis)
 	{
-		if (!useRadians)
-		{
-			xAxis = (double) degreesToRadians((float) xAxis);
-			yAxis = (double) degreesToRadians((float) yAxis);
-			zAxis = (double) degreesToRadians((float) zAxis);
-		}
-		
-		// addTranslateToPipeline(rotationOrigin);
-		addRotateToPipeline(xAxis, yAxis, zAxis);
-		// addUntranslateToPipeline(rotationOrigin);
-		
-		double[] r = transform(v);
-		
-		// if (!push)
+		// if (outOfToleranceRange(xAxis, 0, .00001))
 		// {
-		// popTransform(5);
+		// double[][] rX = new double[][] { { 1, 0, 0, 0 }, { 0,
+		// Math.cos(xAxis), Math.sin(xAxis), 0 },
+		// { 0, -Math.sin(xAxis), Math.cos(xAxis), 0 }, { 0, 0, 0, 1 } };
+		// pipeline.add(rX);
+		// }
+		if (outOfToleranceRange(yAxis, 0, .01))
+		{
+			
+			double[][] rY = new double[][] { { Math.cos(yAxis), 0, -Math.sin(yAxis), 0 }, { 0, 1, 0, 0 },
+					{ Math.sin(yAxis), 0, Math.cos(yAxis), 0 }, { 0, 0, 0, 1 } };
+			// double[][] rY = new double[][]
+			//
+			// { { Math.cos(yAxis), 0, -Math.sin(yAxis), 0 },
+			// { 0, 1, 0, 0 },
+			// { Math.sin(yAxis), 0, Math.cos(yAxis), 0 },
+			// { 0, 0, 0, 1 } };
+			
+			pipeline.add(rY);
+			
+		}
+		// if (outOfToleranceRange(zAxis, 0, .00001))
+		// {
+		// double[][] rZ = new double[][] { { Math.cos(zAxis), Math.sin(zAxis),
+		// 0, 0 },
+		// { -Math.sin(zAxis), Math.cos(zAxis), 0, 0 }, { 0, 0, 1, 0 }, { 0, 0,
+		// 0, 1 } };
+		// pipeline.add(rZ);
 		// }
 		
-		return r;
+		// int i;
+		// for (i = 0; i < 3; i++)
+		// {
+		// leftMultiply(rY, rX[i]);
+		// }
+		// for (i = 0; i < 3; i++)
+		// {
+		// leftMultiply(rZ, rX[i]);
+		// }
 	}
 	
 	/**
-	 * 
-	 * @param v
-	 * @param amountToTranslate
-	 * @return
+	 *
+	 * @param p
 	 */
-	public static double[] translate(LineVector3D v, Point3D amountToTranslate)
+	private static void addTranslateToPipeline(Point3D p)
 	{
-		addTranslateToPipeline(amountToTranslate);
-		double[] t = transform(v);
-		
-		return t;
+		if (outOfToleranceRange(p.x, 0, .01) || outOfToleranceRange(p.y, 0, .01) || outOfToleranceRange(p.z, 0, .01))
+		{
+			double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
+			pipeline.add(t);
+		}
 	}
 	
 	/**
-	 * 
+	 *
+	 * @param p
+	 */
+	private static void addUntranslateToPipeline(Point3D p)
+	{
+		double[][] tInv = new double[][] { { 1, 0, 0, -p.x }, { 0, 1, 0, -p.y }, { 0, 0, 1, -p.z }, { 0, 0, 0, 1 } };
+		
+		pipeline.add(tInv);
+	}
+	
+	/**
+	 *
+	 * @param d
 	 * @param v
-	 * @param c
 	 * @return
 	 */
-	public static double[] scale(LineVector3D v, double c)
+	private static boolean canMultiply(double[][] d, double[] v)
 	{
-		double[][] scaleV = { { c, c, c, c } };
-		double[] scaleVals = v.toArray();
+		if (d[0].length != v.length)
+		{
+			return false;
+		}
 		
-		leftMultiply(scaleV, scaleVals);
-		
-		// return scaleVals;
-		return leftMultiply(scaleV, scaleVals);
+		return true;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// Sundry helper functions for this class
 	
 	/**
+	 *
+	 */
+	public static void clearPipeline()
+	{
+		pipeline.clear();
+	}
+	
+	/**
+	 *
+	 * @param h
+	 * @param frustum
+	 * @return
+	 */
+	public static ArrayList<LineVector3D> clip(ArrayList<LineVector3D> h, double[][] frustum)
+	{
+		/*******************************************************************
+		 * Apply this clip matrix to the 3D homogeneous camera-space point to
+		 * get 3D homogeneous points in clip space.
+		 *******************************************************************
+		 * Apply the clipping tests described in class and in your textbook.
+		 * Reject a line if both points fail the same view frustum test OR if
+		 * either endpoint fails the near-plane test. For this lab, we'll let
+		 * Java's 2D line-drawing handing any other clipping.
+		 *******************************************************************
+		 * n.b. The clip tests and the result of clip application are all
+		 * handled within Transform3D.clip(), storing the values in the returned
+		 * array
+		 ******************************************************************/
+		
+		double[] cameraSpaceV, clipSpaceV;
+		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
+		
+		for (LineVector3D v : h)
+		{
+			cameraSpaceV = v.toArray();
+			clipSpaceV = Transform3D.leftMultiply(frustum, cameraSpaceV);
+			if (passesClipTests(clipSpaceV))
+			{
+				clippedLines.add(v);
+			}
+		}
+		
+		return clippedLines;
+	}
+	
+	/**
+	 *
+	 * @param d
+	 * @return
+	 */
+	private static double degreesToRadians(float d)
+	{
+		return d * Math.PI / 180;
+	}
+	
+	/**
+	 *
+	 * @param pipeline2
+	 * @return
+	 */
+	private static ArrayList<double[][]> fullCopy(ArrayList<double[][]> pipeline2)
+	{
+		ArrayList<double[][]> copy = new ArrayList<double[][]>();
+		double[][] t, tc;
+		double[] v, vc;
+		
+		for (int i = 0; i < pipeline.size(); i++)
+		{
+			t = pipeline.get(i);
+			tc = new double[t.length][t[0].length];
+			
+			for (int j = 0; j < t.length; j++)
+			{
+				v = t[j];
+				vc = new double[v.length];
+				System.arraycopy(v, 0, vc, 0, v.length);
+				
+				tc[j] = vc;
+			}
+			
+			copy.add(tc);
+		}
+		
+		return copy;
+	}
+	
+	/**
 	 * will handle case of 1 column in A
-	 * 
+	 *
 	 * @param L
 	 * @param A
 	 * @return
@@ -158,7 +228,34 @@ public class Transform3D
 	}
 	
 	/**
-	 * 
+	 *
+	 * @param zX
+	 * @param zY
+	 * @param n
+	 * @param f
+	 * @return
+	 */
+	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
+	{
+		// TODO: verify I didn't just break the clip matrix with this change.
+		double[][] clipMatrix = { { Math.atan(degreesToRadians((float) zX)), 0, 0, 0 },
+				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 }, { 0, 0, (f + n) / (f - n), 1 },
+				{ 0, 0, 2 * (n * f / (f - n)), 0 } };
+		
+		return clipMatrix;
+	}
+	
+	/**
+	 *
+	 * @return
+	 */
+	public static boolean getPush()
+	{
+		return push;
+	}
+	
+	/**
+	 *
 	 * @param d
 	 * @param v
 	 * @return
@@ -214,89 +311,27 @@ public class Transform3D
 	}
 	
 	/**
-	 * 
-	 * @param d
-	 * @param v
-	 * @return
+	 * Scales a normalized clip-space vector based on given screen dimension.
+	 * This assumes viewport width and height to be equal. A separate method to
+	 * handle varying screen sizes would not be too difficult. (TODO: implement
+	 * this)
+	 *
+	 * @param vt
+	 * @param dimensions
 	 */
-	private static boolean canMultiply(double[][] d, double[] v)
+	public static void mapToDrawingSpace(LineVector3D vt, int dimensions)
 	{
-		if (d[0].length != v.length)
-		{
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
-	 * @param d
-	 * @return
-	 */
-	private static double degreesToRadians(float d)
-	{
-		return (d * Math.PI) / 180;
-	}
-	
-	/**
-	 * 
-	 * @param p
-	 */
-	private static void addTranslateToPipeline(Point3D p)
-	{
-		if (outOfToleranceRange(p.x, 0, .01) || outOfToleranceRange(p.y, 0, .01) || outOfToleranceRange(p.z, 0, .01))
-		{
-			double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
-			pipeline.add(t);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param xAxis
-	 * @param yAxis
-	 * @param zAxis
-	 */
-	private static void addRotateToPipeline(double xAxis, double yAxis, double zAxis)
-	{
-		if (outOfToleranceRange(xAxis, 0, .00001))
-		{
-			double[][] rX = new double[][] { { 1, 0, 0, 0 }, { 0, Math.cos(xAxis), Math.sin(xAxis), 0 },
-					{ 0, -Math.sin(xAxis), Math.cos(xAxis), 0 }, { 0, 0, 0, 1 } };
-			pipeline.add(rX);
-		}
-		if (outOfToleranceRange(yAxis, 0, .00001))
-		{
-			
-			double[][] rY = new double[][] { { Math.cos(yAxis), 0, -Math.sin(yAxis), 0 }, { 0, 1, 0, 0 },
-					{ Math.sin(yAxis), 0, Math.cos(yAxis), 0 }, { 0, 0, 0, 1 } };
-			pipeline.add(rY);
-			
-		}
-		if (outOfToleranceRange(zAxis, 0, .00001))
-		{
-			double[][] rZ = new double[][] { { Math.cos(zAxis), Math.sin(zAxis), 0, 0 },
-					{ -Math.sin(zAxis), Math.cos(zAxis), 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-			pipeline.add(rZ);
-		}
-		
-		// int i;
-		// for (i = 0; i < 3; i++)
-		// {
-		// leftMultiply(rY, rX[i]);
-		// }
-		// for (i = 0; i < 3; i++)
-		// {
-		// leftMultiply(rZ, rX[i]);
-		// }
+		vt.x *= dimensions;
+		vt.y *= dimensions;
+		// ignore w and z outright = since z is depth, we really don't care
+		// about it anyway at this point.
 	}
 	
 	/**
 	 * Check if this double falls in the given bounds. Give an expected (mean)
 	 * value, a tolerance (can be either positive or negative) band, and the
 	 * value to check.
-	 * 
+	 *
 	 * @param check
 	 * @param expected
 	 * @param tolerance
@@ -318,27 +353,38 @@ public class Transform3D
 	}
 	
 	/**
-	 * 
-	 * @param p
+	 *
+	 * @param clipSpaceV
+	 * @return
 	 */
-	private static void addUntranslateToPipeline(Point3D p)
+	public static boolean passesClipTests(double[] clipSpaceV)
 	{
-		double[][] tInv = new double[][] { { 1, 0, 0, -p.x }, { 0, 1, 0, -p.y }, { 0, 0, 1, -p.z }, { 0, 0, 0, 1 } };
+		System.out.println("======================");
+		double w = clipSpaceV[3];
+		System.out.println("w = " + w);
 		
-		pipeline.add(tInv);
+		if (outOfToleranceRange(clipSpaceV[0], 0, w)) // test left and right
+		
+		{
+			System.out.println("1. Failed left-right test. (clipSpaceV[0] = " + clipSpaceV[0] + ").");
+			return false;
+		}
+		else if (outOfToleranceRange(clipSpaceV[1], 0, w)) // top and bottom
+		{
+			System.out.println("2. Failed top-bottom test. (clipSpaceV[1] = " + clipSpaceV[1] + ").");
+			return false;
+		}
+		else if (outOfToleranceRange(clipSpaceV[2], 0, w)) // front and back
+		{
+			System.out.println("3. Failed front-back test. (clipSpaceV[2] = " + clipSpaceV[2] + ").");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
-	 * 
-	 */
-	private static void setIdentityTransform()
-	{
-		pipeline.clear();
-		pipeline.add(IDENTITY);
-	}
-	
-	/**
-	 * 
+	 *
 	 * @param i
 	 * @return
 	 */
@@ -353,7 +399,67 @@ public class Transform3D
 	}
 	
 	/**
-	 * 
+	 *
+	 * @param v
+	 * @param rotationOrigin
+	 * @param xAxis
+	 * @param yAxis
+	 * @param zAxis
+	 * @param valuesPassedInRadians
+	 * @return
+	 */
+	public static double[] rotate(LineVector3D v, Point3D rotationOrigin, double xAxis, double yAxis, double zAxis,
+			boolean valuesPassedInRadians)
+	{
+		if (!valuesPassedInRadians)
+		{
+			xAxis = degreesToRadians((float) xAxis);
+			yAxis = degreesToRadians((float) yAxis);
+			zAxis = degreesToRadians((float) zAxis);
+		}
+		
+		// addTranslateToPipeline(rotationOrigin);
+		addRotateToPipeline(xAxis, yAxis, zAxis);
+		// addUntranslateToPipeline(rotationOrigin);
+		
+		double[] r = transform(v);
+		
+		// if (!push)
+		// {
+		// popTransform(5);
+		// }
+		
+		return r;
+	}
+	
+	/**
+	 *
+	 * @param v
+	 * @param c
+	 * @return
+	 */
+	public static double[] scale(LineVector3D v, double c)
+	{
+		double[][] scaleV = { { c, c, c, c } };
+		double[] scaleVals = v.toArray();
+		
+		leftMultiply(scaleV, scaleVals);
+		
+		// return scaleVals;
+		return leftMultiply(scaleV, scaleVals);
+	}
+	
+	/**
+	 *
+	 */
+	private static void setIdentityTransform()
+	{
+		pipeline.clear();
+		pipeline.add(IDENTITY);
+	}
+	
+	/**
+	 *
 	 * @param p
 	 * @return
 	 */
@@ -361,14 +467,6 @@ public class Transform3D
 	{
 		push = p;
 		return pipeline.size();
-	}
-	
-	/**
-	 * 
-	 */
-	public static void clearPipeline()
-	{
-		pipeline.clear();
 	}
 	
 	/**
@@ -384,7 +482,63 @@ public class Transform3D
 	}
 	
 	/**
-	 * 
+	 * Execute all transformations in the pipeline on this vector, then give
+	 * back the new values in an array.
+	 *
+	 * @param v
+	 * @return
+	 */
+	public static double[] transform(LineVector3D v)
+	{
+		// TODO: verify that this is properly storing and updating
+		// transformations in the passed objects.
+		if (pipeline.size() == 0)
+		{
+			setIdentityTransform();
+		}
+		
+		double[] x = v.toArray();
+		
+		for (double[][] d : pipeline)
+		{
+			try
+			{
+				x = leftMultiply(d, x);
+			}
+			catch (ConcurrentModificationException e)
+			{
+				// fail silently - we WANT this concurrent modification here.
+				// e.printStackTrace();
+			}
+		}
+		
+		v.x = x[0];
+		v.y = x[1];
+		v.z = x[2];
+		v.w = x[3];
+		
+		// v.setOrigin(newOrigin);
+		v.setEnd(new Point3D(v.x, v.y, v.z));
+		
+		return x;
+	}
+	
+	/**
+	 *
+	 * @param v
+	 * @param amountToTranslate
+	 * @return
+	 */
+	public static double[] translate(LineVector3D v, Point3D amountToTranslate)
+	{
+		addTranslateToPipeline(amountToTranslate);
+		double[] t = transform(v);
+		
+		return t;
+	}
+	
+	/**
+	 *
 	 */
 	public static void unSetWorldToCamera()
 	{
@@ -393,144 +547,5 @@ public class Transform3D
 				worldToCamera = new ArrayList<double[][]>();
 		
 		push = true;
-	}
-	
-	/**
-	 * 
-	 * @param pipeline2
-	 * @return
-	 */
-	private static ArrayList<double[][]> fullCopy(ArrayList<double[][]> pipeline2)
-	{
-		ArrayList<double[][]> copy = new ArrayList<double[][]>();
-		double[][] t, tc;
-		double[] v, vc;
-		
-		for (int i = 0; i < pipeline.size(); i++)
-		{
-			t = pipeline.get(i);
-			tc = new double[t.length][t[0].length];
-			
-			for (int j = 0; j < t.length; j++)
-			{
-				v = t[j];
-				vc = new double[v.length];
-				System.arraycopy(v, 0, vc, 0, v.length);
-				
-				tc[j] = vc;
-			}
-			
-			copy.add(tc);
-		}
-		
-		return copy;
-	}
-	
-	/**
-	 * 
-	 * @param zX
-	 * @param zY
-	 * @param n
-	 * @param f
-	 * @return
-	 */
-	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
-	{
-		// TODO: verify I didn't just break the clip matrix with this change.
-		double[][] clipMatrix = { { Math.atan(degreesToRadians((float) zX)), 0, 0, 0 },
-				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 }, { 0, 0, ((f + n) / (f - n)), 1 },
-				{ 0, 0, 2 * ((n * f) / (f - n)), 0 } };
-		
-		return clipMatrix;
-	}
-	
-	/**
-	 * 
-	 * @param h
-	 * @param frustum
-	 * @return
-	 */
-	public static ArrayList<LineVector3D> clip(ArrayList<LineVector3D> h, double[][] frustum)
-	{
-		/*******************************************************************
-		 * Apply this clip matrix to the 3D homogeneous camera-space point to
-		 * get 3D homogeneous points in clip space.
-		 *******************************************************************
-		 * Apply the clipping tests described in class and in your textbook.
-		 * Reject a line if both points fail the same view frustum test OR if
-		 * either endpoint fails the near-plane test. For this lab, we'll let
-		 * Java's 2D line-drawing handing any other clipping.
-		 *******************************************************************
-		 * n.b. The clip tests and the result of clip application are all
-		 * handled within Transform3D.clip(), storing the values in the returned
-		 * array
-		 ******************************************************************/
-		
-		double[] cameraSpaceV, clipSpaceV;
-		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
-		
-		for (LineVector3D v : h)
-		{
-			cameraSpaceV = v.toArray();
-			clipSpaceV = Transform3D.leftMultiply(frustum, cameraSpaceV);
-			if (passedClipTests(clipSpaceV))
-			{
-				clippedLines.add(v);
-			}
-		}
-		
-		return clippedLines;
-	}
-	
-	/**
-	 * 
-	 * @param clipSpaceV
-	 * @return
-	 */
-	private static boolean passedClipTests(double[] clipSpaceV)
-	{
-		double w = clipSpaceV[3];
-		
-		if (outOfToleranceRange(clipSpaceV[0], 0, w)) // test left and right
-		
-		{
-			return false;
-		}
-		else if (outOfToleranceRange(clipSpaceV[1], 0, w)) // top and bottom
-		{
-			return false;
-		}
-		else if (outOfToleranceRange(clipSpaceV[2], 0, w)) // front and back
-		{
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Scales a normalized clip-space vector based on given screen dimension.
-	 * This assumes viewport width and height to be equal. A separate method to
-	 * handle varying screen sizes would not be too difficult. (TODO: implement
-	 * this)
-	 * 
-	 * @param vt
-	 * @param dimensions
-	 */
-	public static void mapToDrawingSpace(LineVector3D vt, int dimensions)
-	{
-		vt.x *= dimensions;
-		vt.y *= dimensions;
-		// ignore w and z outright = since z is depth, we really don't care
-		// about it anyway at this point.
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static boolean getPush()
-	{
-		return push;
 	}
 }

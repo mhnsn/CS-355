@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Square;
 
@@ -24,6 +25,7 @@ public class SquareTest
 	public static void setUpBeforeClass() throws Exception
 	{
 		S = new Square(Color.WHITE, new Point2D.Double(0, 0), 75);
+		new KeyboardInterface();
 		model = new GUIModel();
 		model.addShape(S);
 		
@@ -45,25 +47,13 @@ public class SquareTest
 	}
 	
 	@Test
-	public final void testPointInShape()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testSquare()
+	public final void testGetBoundingBox()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
 	
 	@Test
 	public final void testGetSize()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testSetSize()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
@@ -81,13 +71,25 @@ public class SquareTest
 	}
 	
 	@Test
-	public final void testGetBoundingBox()
+	public final void testObjectToWorld()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
 	
 	@Test
-	public final void testObjectToWorld()
+	public final void testPointInShape()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testSetSize()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testSquare()
 	{
 		// fail("Not yet implemented"); // TODO
 	}

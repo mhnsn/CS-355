@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Ellipse;
 
@@ -24,6 +25,7 @@ public class EllipseTest
 	public static void setUpBeforeClass() throws Exception
 	{
 		E = new Ellipse(Color.WHITE, new Point2D.Double(0, 0), 50, 100);
+		new KeyboardInterface();
 		model = new GUIModel();
 		model.addShape(E);
 	}
@@ -44,7 +46,7 @@ public class EllipseTest
 	}
 	
 	@Test
-	public final void testPointInShape()
+	public final void testEllipse()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
@@ -56,31 +58,13 @@ public class EllipseTest
 	}
 	
 	@Test
-	public final void testEllipse()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testGetWidth()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
-	public final void testSetWidth()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
 	public final void testGetHeight()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
 	
 	@Test
-	public final void testSetHeight()
+	public final void testGetWidth()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
@@ -93,6 +77,24 @@ public class EllipseTest
 	
 	@Test
 	public final void testObjectToWorld()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testPointInShape()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testSetHeight()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testSetWidth()
 	{
 		// fail("Not yet implemented"); // TODO
 	}

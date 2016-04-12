@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cs355.controller.KeyboardInterface;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 
@@ -24,6 +25,7 @@ public class CircleTest
 	public static void setUpBeforeClass() throws Exception
 	{
 		C = new Circle(Color.WHITE, new Point2D.Double(30, 30), 60);
+		new KeyboardInterface();
 		model = new GUIModel();
 		model.addShape(C);
 	}
@@ -44,7 +46,7 @@ public class CircleTest
 	}
 	
 	@Test
-	public final void testPointInShape()
+	public final void testGetBoundingBox()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
@@ -56,25 +58,25 @@ public class CircleTest
 	}
 	
 	@Test
-	public final void testSetRadius()
-	{
-		// fail("Not yet implemented"); // TODO
-	}
-	
-	@Test
 	public final void testInBounds()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
 	
 	@Test
-	public final void testGetBoundingBox()
+	public final void testObjectToWorld()
 	{
 		// fail("Not yet implemented"); // TODO
 	}
 	
 	@Test
-	public final void testObjectToWorld()
+	public final void testPointInShape()
+	{
+		// fail("Not yet implemented"); // TODO
+	}
+	
+	@Test
+	public final void testSetRadius()
 	{
 		// fail("Not yet implemented"); // TODO
 	}

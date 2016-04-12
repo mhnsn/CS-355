@@ -46,12 +46,12 @@ public class CurrentCameraState
 	
 	public void dump()
 	{
-		System.out.println("Key pressed: " + lastKey);
-		System.out.println("Location: " + location.toString());
-		System.out.println("Direction: " + direction);
-		System.out.println("Travel Vector: " + travelVec.toString());
-		System.out.println("Perp Vector: " + perpVec.toString());
-		System.out.println("====================");
+		// System.out.println("Key pressed: " + lastKey);
+		// System.out.println("Location: " + location.toString());
+		// System.out.println("Direction: " + direction);
+		// System.out.println("Travel Vector: " + travelVec.toString());
+		// System.out.println("Perp Vector: " + perpVec.toString());
+		// System.out.println("====================");
 	}
 	
 	public double getDirection()

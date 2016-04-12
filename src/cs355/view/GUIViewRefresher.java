@@ -246,7 +246,7 @@ public class GUIViewRefresher implements ViewRefresher
 		}
 	}
 
-	private void render(Graphics2D g2d)
+	public void render(Graphics2D g2d)
 	{
 		/***********************************************************************
 		 * get all lines and convert to homogeneous coordinates
@@ -272,6 +272,8 @@ public class GUIViewRefresher implements ViewRefresher
 				lines.add(lv);
 			}
 		}
+		
+		System.out.println(lines.size() + " initial lines.");
 
 		/***********************************************************************
 		 * generate world-to-camera transform (result of concatenating a
@@ -334,6 +336,8 @@ public class GUIViewRefresher implements ViewRefresher
 		 ******************************************************************/
 
 		clippedLines = Transform3D.clip(homogeneousLines, frustum);
+		
+		System.out.println(clippedLines.size() + " lines after clipping.");
 
 		for (LineVector3D vt : clippedLines)
 		{
