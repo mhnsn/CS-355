@@ -32,7 +32,8 @@ import cs355.model.scene.WireFrame;
 
 public class GUIViewRefresher implements ViewRefresher
 {
-	static List<Shape> modelShapes;
+	static List<Shape>	modelShapes;
+	static final int	dimensions	= 2048;
 	
 	public GUIViewRefresher()
 	{
@@ -324,27 +325,22 @@ public class GUIViewRefresher implements ViewRefresher
 		
 		double[][] frustum = Transform3D.generateClipMatrix(zX, zY, n, f);
 		
-		for (LineVector3D h : homogeneousLines)
-		{
-			/*******************************************************************
-			 * Apply this clip matrix to the 3D homogeneous camera-space point
-			 * to get 3D homogeneous points in clip space.
-			 *******************************************************************
-			 * Apply the clipping tests described in class and in your textbook.
-			 * Reject a line if both points fail the same view frustum test OR
-			 * if either endpoint fails the near-plane test. For this lab, we'll
-			 * let Java's 2D line-drawing handing any other clipping.
-			 *******************************************************************
-			 * n.b. The clip tests and the result of clip application are all
-			 * handled within Transform3D.clip(), which runs through clip tests
-			 * and immediately returns false if the line doesn't pass. It then
-			 * transforms the line, storing the values in the LineVector3D arg
-			 ******************************************************************/
-			if (!Transform3D.clip(h, frustum))
-			{
-				clippedLines.add(h);
-			}
-		}
+		/*******************************************************************
+		 * Apply this clip matrix to the 3D homogeneous camera-space point to
+		 * get 3D homogeneous points in clip space.
+		 *******************************************************************
+		 * Apply the clipping tests described in class and in your textbook.
+		 * Reject a line if both points fail the same view frustum test OR if
+		 * either endpoint fails the near-plane test. For this lab, we'll let
+		 * Java's 2D line-drawing handing any other clipping.
+		 *******************************************************************
+		 * n.b. The clip tests and the result of clip application are all
+		 * handled within Transform3D.clip(), which runs through clip tests and
+		 * immediately returns false if the line doesn't pass. It then
+		 * transforms the line, storing the values in the LineVector3D arg
+		 ******************************************************************/
+		
+		clippedLines = Transform3D.clip(homogeneousLines, frustum);
 		
 		for (LineVector3D vt : clippedLines)
 		{
@@ -361,7 +357,7 @@ public class GUIViewRefresher implements ViewRefresher
 			 * upper left).
 			 *******************************************************************/
 			
-			Transform3D.mapToCanonicalScreenSpace(vt);
+			Transform3D.mapToDrawingSpace(vt, dimensions);
 			
 			/*******************************************************************
 			 * Apply the same viewing transformation you use to implement
@@ -386,7 +382,6 @@ public class GUIViewRefresher implements ViewRefresher
 			Point2D.Double e2D = l.getEndV();
 			
 			g2d.drawLine((int) 0, (int) 0, (int) (e2D.getX()), (int) (e2D.getY()));
-			
 		}
 		
 	}

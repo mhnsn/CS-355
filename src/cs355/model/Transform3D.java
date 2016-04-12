@@ -42,10 +42,10 @@ public class Transform3D
 		// transformations in the passed objects.
 		if (pipeline.size() == 0)
 		{
-			pipeline.add(IDENTITY);
+			setIdentityTransform();
 		}
 		
-		double[] x = LVToArray(v);
+		double[] x = v.toArray();
 		
 		for (double[][] d : pipeline)
 		{
@@ -106,7 +106,7 @@ public class Transform3D
 	public static double[] scale(LineVector3D v, double c)
 	{
 		double[][] scaleV = { { c, c, c, c } };
-		double[] scaleVals = LVToArray(v);
+		double[] scaleVals = v.toArray();
 		
 		leftMultiply(scaleV, scaleVals);
 		
@@ -116,11 +116,6 @@ public class Transform3D
 	
 	//////////////////////////////////////////////////////////////////////
 	// Sundry helper functions for this class
-	
-	private static double[] LVToArray(LineVector3D v)
-	{
-		return new double[] { v.x, v.y, v.z, v.w };
-	}
 	
 	/**
 	 * will handle case of 1 column in A
@@ -249,6 +244,16 @@ public class Transform3D
 		// }
 	}
 	
+	/**
+	 * Check if this double falls in the given bounds. Give an expected (mean)
+	 * value, a tolerance (can be either positive or negative) band, and the
+	 * value to check.
+	 * 
+	 * @param check
+	 * @param expected
+	 * @param tolerance
+	 * @return
+	 */
 	private static boolean outOfToleranceRange(double check, double expected, double tolerance)
 	{
 		double a = expected - tolerance;
@@ -347,14 +352,15 @@ public class Transform3D
 	
 	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
 	{
+		// TODO: verify I didn't just break the clip matrix with this change.
 		double[][] clipMatrix = { { Math.atan(degreesToRadians((float) zX)), 0, 0, 0 },
-				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 },
-				{ 0, 0, -((f + n) / (f - n)), -2 * ((n * f) / (f - n)) }, { 0, 0, -1, 0 } };
+				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 }, { 0, 0, ((f + n) / (f - n)), 1 },
+				{ 0, 0, 2 * ((n * f) / (f - n)), 0 } };
 		
 		return clipMatrix;
 	}
 	
-	public static boolean clip(LineVector3D h, double[][] frustum)
+	public static ArrayList<LineVector3D> clip(ArrayList<LineVector3D> h, double[][] frustum)
 	{
 		/*******************************************************************
 		 * Apply this clip matrix to the 3D homogeneous camera-space point to
@@ -366,18 +372,62 @@ public class Transform3D
 		 * Java's 2D line-drawing handing any other clipping.
 		 *******************************************************************
 		 * n.b. The clip tests and the result of clip application are all
-		 * handled within Transform3D.clip(), which runs through clip tests and
-		 * immediately returns false if the line doesn't pass. It then
-		 * transforms the line, storing the values in the LineVector3D arg
+		 * handled within Transform3D.clip(), storing the values in the returned
+		 * array
 		 ******************************************************************/
 		
-		return false;
+		double[] cameraSpaceV, clipSpaceV;
+		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
+		
+		for (LineVector3D v : h)
+		{
+			cameraSpaceV = v.toArray();
+			clipSpaceV = Transform3D.leftMultiply(frustum, cameraSpaceV);
+			if (passedClipTests(clipSpaceV))
+			{
+				clippedLines.add(v);
+			}
+		}
+		
+		return clippedLines;
 	}
 	
-	public static void mapToCanonicalScreenSpace(LineVector3D vt)
+	private static boolean passedClipTests(double[] clipSpaceV)
 	{
-		// TODO Auto-generated method stub
+		double w = clipSpaceV[3];
 		
+		if (outOfToleranceRange(clipSpaceV[0], 0, w)) // test left and right
+		
+		{
+			return false;
+		}
+		else if (outOfToleranceRange(clipSpaceV[1], 0, w)) // top and bottom
+		{
+			return false;
+		}
+		else if (outOfToleranceRange(clipSpaceV[2], 0, w)) // front and back
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Scales a normalized clip-space vector based on given screen dimension.
+	 * This assumes viewport width and height to be equal. A separate method to
+	 * handle varying screen sizes would not be too difficult. (TODO: implement
+	 * this)
+	 * 
+	 * @param vt
+	 * @param dimensions
+	 */
+	public static void mapToDrawingSpace(LineVector3D vt, int dimensions)
+	{
+		vt.x *= dimensions;
+		vt.y *= dimensions;
+		// ignore w and z outright = since z is depth, we really don't care
+		// about it anyway at this point.
 	}
 	
 }

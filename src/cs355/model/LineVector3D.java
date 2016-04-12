@@ -161,22 +161,21 @@ public class LineVector3D
 	 * 
 	 * @return
 	 */
-	public boolean normalize()
+	public void normalize()
 	{
-		if (!isVector)
-		{
-			// return false;
-		}
+		// // calculate magnitude of vector
+		// double magnitude = Math.sqrt((x * x) + (y * y) + (z * z));
+		//
+		//
+		// // divide all distances by magnitude
+		// x /= magnitude;
+		// y /= magnitude;
+		// z /= magnitude;
+		x /= w;
+		y /= w;
+		z /= w;
 		
-		// calculate magnitude of vector
-		double magnitude = Math.sqrt((x * x) + (y * y) + (z * z));
-		
-		// divide all distances by magnitude
-		x /= magnitude;
-		y /= magnitude;
-		z /= magnitude;
-		
-		return true;
+		return;
 	}
 	
 	/**
@@ -273,4 +272,8 @@ public class LineVector3D
 		this.end = end;
 	}
 	
+	public double[] toArray()
+	{
+		return new double[] { x, y, z, w };
+	}
 }
