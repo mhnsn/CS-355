@@ -45,7 +45,7 @@ public class ProjectTests
 		String[] testClasses = new String[] {
 				// "server.ServerUnitTests",
 				"test.CircleTest", "test.EllipseTest", "test.LineTest", "test.SquareTest", "test.RectangleTest",
-				"test.TriangleTest", "test.ShapeTest", "test.GUIModelTest", "test.MVCTests", "test.Transform3DTest", };
+				"test.TriangleTest", "test.ShapeTest", "test.GUIModelTest", "test.Transform3DTest", };
 		
 		setup();
 		org.junit.runner.JUnitCore.main(testClasses);

@@ -122,7 +122,7 @@
 	</target>-->
 	
 	<target name="test" depends="compile" description="run automated server tests">
-		<java classname="server.ServerUnitTests" fork="yes">
+		<java classname="test.ProjectTests" fork="yes">
 			<classpath>
 				<path refid="all-classpath"/>
 			</classpath>

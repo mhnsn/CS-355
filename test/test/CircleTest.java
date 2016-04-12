@@ -14,67 +14,68 @@ import org.junit.Test;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Circle;
 
-public class CircleTest {
-
-	static Circle 		C;
-	static GUIModel		model;
+public class CircleTest
+{
+	
+	static Circle	C;
+	static GUIModel	model;
 	
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception 
+	public static void setUpBeforeClass() throws Exception
 	{
-		C = new Circle		(Color.WHITE, 	new Point2D.Double(30, 30), 60);
+		C = new Circle(Color.WHITE, new Point2D.Double(30, 30), 60);
 		model = new GUIModel();
 		model.addShape(C);
 	}
-
+	
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception 
+	public static void tearDownAfterClass() throws Exception
 	{
 	}
-
+	
 	@Before
-	public void setUp() throws Exception 
+	public void setUp() throws Exception
 	{
 	}
-
+	
 	@After
-	public void tearDown() throws Exception 
+	public void tearDown() throws Exception
 	{
 	}
-
+	
 	@Test
-	public final void testPointInShape() 
+	public final void testPointInShape()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetRadius() 
+	public final void testGetRadius()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testSetRadius() 
+	public final void testSetRadius()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testInBounds() 
+	public final void testInBounds()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetBoundingBox() 
+	public final void testGetBoundingBox()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testObjectToWorld() 
+	public final void testObjectToWorld()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
 }

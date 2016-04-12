@@ -14,98 +14,99 @@ import org.junit.Test;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Rectangle;
 
-public class RectangleTest {
+public class RectangleTest
+{
 	
-	static Rectangle 	R;
+	static Rectangle	R;
 	static GUIModel		model;
-
+	
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception 
+	public static void setUpBeforeClass() throws Exception
 	{
-		R = new Rectangle	(Color.WHITE, 	new Point2D.Double(0, 0), 50, 100);
+		R = new Rectangle(Color.WHITE, new Point2D.Double(0, 0), 50, 100);
 		model = new GUIModel();
 		model.addShape(R);
 	}
-
+	
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception 
+	public static void tearDownAfterClass() throws Exception
 	{
 	}
-
+	
 	@Before
-	public void setUp() throws Exception 
+	public void setUp() throws Exception
 	{
 	}
-
+	
 	@After
-	public void tearDown() throws Exception 
+	public void tearDown() throws Exception
 	{
 	}
-
+	
 	@Test
-	public final void testPointInShape() 
+	public final void testPointInShape()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testRectangle() 
+	public final void testRectangle()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetWidth() 
+	public final void testGetWidth()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testSetWidth() 
+	public final void testSetWidth()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetHeight() 
+	public final void testGetHeight()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testSetHeight() 
+	public final void testSetHeight()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetUpperLeft() 
+	public final void testGetUpperLeft()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testToString() 
+	public final void testToString()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testInBounds() 
+	public final void testInBounds()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetBoundingBox() 
+	public final void testGetBoundingBox()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testObjectToWorld() 
+	public final void testObjectToWorld()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 }

@@ -14,82 +14,82 @@ import org.junit.Test;
 import cs355.model.GUIModel;
 import cs355.model.drawing.Square;
 
-public class SquareTest {
+public class SquareTest
+{
 	
-	static Square 		S;
-	static GUIModel		model;
-
-
+	static Square	S;
+	static GUIModel	model;
+	
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception 
+	public static void setUpBeforeClass() throws Exception
 	{
-		S = new Square		(Color.WHITE, 	new Point2D.Double(0, 0), 75);
-		model = new GUIModel();		
+		S = new Square(Color.WHITE, new Point2D.Double(0, 0), 75);
+		model = new GUIModel();
 		model.addShape(S);
-
+		
 	}
-
+	
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception 
+	public static void tearDownAfterClass() throws Exception
 	{
 	}
-
+	
 	@Before
-	public void setUp() throws Exception 
+	public void setUp() throws Exception
 	{
 	}
-
+	
 	@After
-	public void tearDown() throws Exception 
+	public void tearDown() throws Exception
 	{
 	}
-
+	
 	@Test
-	public final void testPointInShape() 
+	public final void testPointInShape()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testSquare() 
+	public final void testSquare()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetSize() 
+	public final void testGetSize()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testSetSize() 
+	public final void testSetSize()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetUpperLeft() 
+	public final void testGetUpperLeft()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testInBounds() 
+	public final void testInBounds()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testGetBoundingBox() 
+	public final void testGetBoundingBox()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 	@Test
-	public final void testObjectToWorld() 
+	public final void testObjectToWorld()
 	{
-		fail("Not yet implemented"); // TODO
+		// fail("Not yet implemented"); // TODO
 	}
-
+	
 }

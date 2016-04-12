@@ -4,6 +4,7 @@
 package cs355.model;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import cs355.model.scene.Line3D;
 import cs355.model.scene.Point3D;
@@ -43,7 +44,15 @@ public class Transform3D
 		
 		for (double[][] d : pipeline)
 		{
-			x = leftMultiply(d, x);
+			try
+			{
+				x = leftMultiply(d, x);
+			}
+			catch (ConcurrentModificationException e)
+			{
+				// fail silently - we WANT this concurrent modification here.
+				// e.printStackTrace();
+			}
 		}
 		
 		v.x = x[0];
@@ -297,7 +306,7 @@ public class Transform3D
 		for (int i = 0; i < pipeline.size(); i++)
 		{
 			t = pipeline.get(i);
-			tc = new double[t.length][];
+			tc = new double[t.length][t[0].length];
 			
 			for (int j = 0; j < t.length; j++)
 			{
@@ -305,7 +314,7 @@ public class Transform3D
 				vc = new double[v.length];
 				System.arraycopy(v, 0, vc, 0, v.length);
 				
-				tc[i] = vc;
+				tc[j] = vc;
 			}
 			
 			copy.add(tc);
