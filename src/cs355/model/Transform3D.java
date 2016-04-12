@@ -40,6 +40,11 @@ public class Transform3D
 	{
 		// TODO: verify that this is properly storing and updating
 		// transformations in the passed objects.
+		if (pipeline.size() == 0)
+		{
+			pipeline.add(IDENTITY);
+		}
+		
 		double[] x = LVToArray(v);
 		
 		for (double[][] d : pipeline)
@@ -203,27 +208,22 @@ public class Transform3D
 	
 	private static void addTranslateToPipeline(Point3D p)
 	{
-		double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
-		
-		pipeline.add(t);
-	}
-	
-	private static void addUntranslateToPipeline(Point3D p)
-	{
-		double[][] tInv = new double[][] { { 1, 0, 0, -p.x }, { 0, 1, 0, -p.y }, { 0, 0, 1, -p.z }, { 0, 0, 0, 1 } };
-		
-		pipeline.add(tInv);
+		if (outOfToleranceRange(p.x, 0, .01) && outOfToleranceRange(p.y, 0, .01) && outOfToleranceRange(p.z, 0, .01))
+		{
+			double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
+			pipeline.add(t);
+		}
 	}
 	
 	private static void addRotateToPipeline(double xAxis, double yAxis, double zAxis)
 	{
-		if (-.00001 < xAxis && xAxis > .00001)
+		if (outOfToleranceRange(xAxis, 0, .00001))
 		{
 			double[][] rX = new double[][] { { 1, 0, 0, 0 }, { 0, Math.cos(xAxis), Math.sin(xAxis), 0 },
 					{ 0, -Math.sin(xAxis), Math.cos(xAxis), 0 }, { 0, 0, 0, 1 } };
 			pipeline.add(rX);
 		}
-		if (-.00001 < zAxis && yAxis > .00001)
+		if (outOfToleranceRange(yAxis, 0, .00001))
 		{
 			
 			double[][] rY = new double[][] { { Math.cos(yAxis), 0, -Math.sin(yAxis), 0 }, { 0, 1, 0, 0 },
@@ -231,7 +231,7 @@ public class Transform3D
 			pipeline.add(rY);
 			
 		}
-		if (-.00001 < zAxis && zAxis > .00001)
+		if (outOfToleranceRange(zAxis, 0, .00001))
 		{
 			double[][] rZ = new double[][] { { Math.cos(zAxis), Math.sin(zAxis), 0, 0 },
 					{ -Math.sin(zAxis), Math.cos(zAxis), 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
@@ -247,6 +247,28 @@ public class Transform3D
 		// {
 		// leftMultiply(rZ, rX[i]);
 		// }
+	}
+	
+	private static boolean outOfToleranceRange(double check, double expected, double tolerance)
+	{
+		double a = expected - tolerance;
+		double b = expected + tolerance;
+		
+		double lowBound = Math.min(a, b);
+		double hiBound = Math.max(a, b);
+		
+		if (lowBound > check || check > hiBound)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	private static void addUntranslateToPipeline(Point3D p)
+	{
+		double[][] tInv = new double[][] { { 1, 0, 0, -p.x }, { 0, 1, 0, -p.y }, { 0, 0, 1, -p.z }, { 0, 0, 0, 1 } };
+		
+		pipeline.add(tInv);
 	}
 	
 	private static void setIdentityTransform()

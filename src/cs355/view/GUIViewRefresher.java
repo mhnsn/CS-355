@@ -263,6 +263,8 @@ public class GUIViewRefresher implements ViewRefresher
 		WireFrame wf;
 		Iterator<Line3D> it;
 		
+		Transform3D.clearPipeline();
+		
 		// TODO: verify that this render process isn't destructive to original
 		// data
 		for (Instance i : GUIModel.getForegroundScene().instances())
