@@ -317,7 +317,7 @@ public class GUIViewRefresher implements ViewRefresher
 		
 		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
 		
-		double zX = .1, zY = .1; // a 10cm*10cm window
+		double zX = 50, zY = 50; // 50 degrees in each direction
 		double n = .05; // please don't show me anything less than 5cm from my
 						// face.
 		double f = 100; // I can see about 100m away.

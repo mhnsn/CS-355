@@ -208,7 +208,7 @@ public class Transform3D
 	
 	private static void addTranslateToPipeline(Point3D p)
 	{
-		if (outOfToleranceRange(p.x, 0, .01) && outOfToleranceRange(p.y, 0, .01) && outOfToleranceRange(p.z, 0, .01))
+		if (outOfToleranceRange(p.x, 0, .01) || outOfToleranceRange(p.y, 0, .01) || outOfToleranceRange(p.z, 0, .01))
 		{
 			double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
 			pipeline.add(t);
@@ -347,13 +347,30 @@ public class Transform3D
 	
 	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		double[][] clipMatrix = { { Math.atan(degreesToRadians((float) zX)), 0, 0, 0 },
+				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 },
+				{ 0, 0, -((f + n) / (f - n)), -2 * ((n * f) / (f - n)) }, { 0, 0, -1, 0 } };
+		
+		return clipMatrix;
 	}
 	
 	public static boolean clip(LineVector3D h, double[][] frustum)
 	{
-		// TODO Auto-generated method stub
+		/*******************************************************************
+		 * Apply this clip matrix to the 3D homogeneous camera-space point to
+		 * get 3D homogeneous points in clip space.
+		 *******************************************************************
+		 * Apply the clipping tests described in class and in your textbook.
+		 * Reject a line if both points fail the same view frustum test OR if
+		 * either endpoint fails the near-plane test. For this lab, we'll let
+		 * Java's 2D line-drawing handing any other clipping.
+		 *******************************************************************
+		 * n.b. The clip tests and the result of clip application are all
+		 * handled within Transform3D.clip(), which runs through clip tests and
+		 * immediately returns false if the line doesn't pass. It then
+		 * transforms the line, storing the values in the LineVector3D arg
+		 ******************************************************************/
+		
 		return false;
 	}
 	
