@@ -244,7 +244,7 @@ public class Transform3DTest
 	@Test
 	public void testRotate()
 	{
-		double[] x = Transform3D.rotate(lvX, origin, 0, 90, 0, false);
+		double[] x = Transform3D.rotate(lvX, origin, 0, -90, 0, false);
 		
 		assertEquals(0, x[0], tolerance);
 		assertEquals(0, x[1], tolerance);
@@ -253,45 +253,44 @@ public class Transform3DTest
 		Transform3D.clearPipeline();
 		
 		// only should be able to turn around y-axis
-		double[] y = Transform3D.rotate(lvY, origin, 0, 0, 90, false);
+		double[] y = Transform3D.rotate(lvY, origin, 0, 0, -90, false);
 		assertEquals(0, y[0], tolerance);
 		assertEquals(1, y[1], tolerance);
 		assertEquals(0, y[2], tolerance);
 
 		Transform3D.clearPipeline();
-		double[] z = Transform3D.rotate(lvZ, origin, 90, 0, 0, false);
+		double[] z = Transform3D.rotate(lvZ, origin, -90, 0, 0, false);
 		assertEquals(0, z[0], tolerance);
 		assertEquals(0, z[1], tolerance);
 		assertEquals(1, z[2], tolerance);
 
 		// now check a full 360-degree rotation
 		Transform3D.clearPipeline();
-		Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
+		z = Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
 		assertEquals(1, z[0], tolerance);
 		assertEquals(0, z[1], tolerance);
 		assertEquals(0, z[2], tolerance);
 
 		// should point backwards after this
 		Transform3D.clearPipeline();
-		Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
+		z = Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
 		assertEquals(0, z[0], tolerance);
 		assertEquals(0, z[1], tolerance);
 		assertEquals(-1, z[2], tolerance);
 
 		// should point left
 		Transform3D.clearPipeline();
-		Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
+		z = Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
 		assertEquals(-1, z[0], tolerance);
 		assertEquals(0, z[1], tolerance);
 		assertEquals(0, z[2], tolerance);
 
 		// now back to original value
 		Transform3D.clearPipeline();
-		Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
+		z = Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
 		assertEquals(0, z[0], tolerance);
 		assertEquals(0, z[1], tolerance);
 		assertEquals(1, z[2], tolerance);
-
 	}
 	
 	/**
@@ -412,9 +411,9 @@ public class Transform3DTest
 		lvZ = new LineVector3D(0, 0, 1, origin, false);
 
 		Transform3D.transform(lvZ);
-		assertEquals(1, lvX.x, tolerance);
-		assertEquals(0, lvX.y, tolerance);
-		assertEquals(0, lvX.z, tolerance);
+		assertEquals(1, lvZ.x, tolerance);
+		assertEquals(0, lvZ.y, tolerance);
+		assertEquals(0, lvZ.z, tolerance);
 
 		/**
 		 * keep going...
@@ -425,28 +424,29 @@ public class Transform3DTest
 		assertEquals(-1, lvX.z, tolerance);
 		
 		Transform3D.transform(lvZ);
-		assertEquals(-1, lvX.x, tolerance);
-		assertEquals(0, lvX.y, tolerance);
-		assertEquals(0, lvX.z, tolerance);
+		assertEquals(-1, lvZ.x, tolerance);
+		assertEquals(0, lvZ.y, tolerance);
+		assertEquals(0, lvZ.z, tolerance);
 		
 		Transform3D.transform(lvZ);
-		assertEquals(0, lvX.x, tolerance);
-		assertEquals(0, lvX.y, tolerance);
-		assertEquals(1, lvX.z, tolerance);
+		assertEquals(0, lvZ.x, tolerance);
+		assertEquals(0, lvZ.y, tolerance);
+		assertEquals(1, lvZ.z, tolerance);
 		
 		/**
 		 * test turning left
 		 */
 		Transform3D.clearPipeline();
 		lvZ = new LineVector3D(0, 0, 1, origin, false);
-		Transform3D.rotate(lvZ, origin, 0, 90, 0, false);
+		
+		Transform3D.rotate(lvZ, origin, 0, -90, 0, false);
 
 		lvZ = new LineVector3D(0, 0, 1, origin, false);
 
 		Transform3D.transform(lvZ);
-		assertEquals(0, lvX.x, tolerance);
-		assertEquals(0, lvX.y, tolerance);
-		assertEquals(2, lvX.z, tolerance);
+		assertEquals(-1, lvZ.x, tolerance);
+		assertEquals(0, lvZ.y, tolerance);
+		assertEquals(0, lvZ.z, tolerance);
 	}
 	
 	/**

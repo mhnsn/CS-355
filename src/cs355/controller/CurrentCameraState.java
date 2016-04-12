@@ -168,10 +168,10 @@ public class CurrentCameraState
 		dump();
 	}
 	
-	public void setLocation(Point3D location)
+	public void setLocation(Point3D l)
 	{
-		this.location = location;
-		StateMachine.where_i_am = location;
+		this.location = l;
+		StateMachine.where_i_am = l;
 		dump();
 	}
 	

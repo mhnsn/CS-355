@@ -34,6 +34,7 @@ public class GUIViewRefresherTest
 	{
 		new KeyboardInterface();
 		new GUIModel();
+		new StateMachine();
 	}
 
 	@AfterClass
@@ -199,17 +200,14 @@ public class GUIViewRefresherTest
 		 * generate world-to-camera transform (result of concatenating a
 		 * translation matrix and a rotation matrix).
 		 **********************************************************************/
-		
-		LineVector3D cameraLoc = GUIModel.getCameraLocation();
+
+		// LineVector3D cameraLoc = GUIModel.getCameraLocation();
+		Point3D cameraLoc = StateMachine.where_i_am;
 		double[] cameraOr = GUIModel.getCameraOrientation();
 		
-		// Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0),
-		// cameraOr[0], 0, 0, true);
-		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), 0, -cameraOr[1], 0, false);
-		// Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), 0,
-		// 0, cameraOr[2], true);
-		
-		Transform3D.translate(Transform3D.IDENTITY_V, cameraLoc.getOrigin());
+		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), cameraOr[0], cameraOr[1], cameraOr[2], false);
+		Transform3D.translate(Transform3D.IDENTITY_V, cameraLoc);
+
 		Transform3D.setWorldToCamera();
 		
 		/***********************************************************************
@@ -232,16 +230,16 @@ public class GUIViewRefresherTest
 
 		Transform3D.transform(IDENTITY_V);
 
-		assertEquals(1, IDENTITY_V.x, tolerance);
-		assertEquals(1, IDENTITY_V.y, tolerance);
-		assertEquals(1, IDENTITY_V.z, tolerance);
+		assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
+		assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
+		assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
 		assertEquals(1, IDENTITY_V.w, tolerance);
 
 		IDENTITY_V.normalize();
 		
-		assertEquals(1, IDENTITY_V.x, tolerance);
-		assertEquals(1, IDENTITY_V.y, tolerance);
-		assertEquals(1, IDENTITY_V.z, tolerance);
+		assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
+		assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
+		assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
 		assertEquals(1, IDENTITY_V.w, tolerance);
 		
 		/***********************************************************************
@@ -251,13 +249,15 @@ public class GUIViewRefresherTest
 		 **********************************************************************/
 		
 		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
+
+		// 45f, 1f, 0.01f, 1000f
 		
-		double zX = 50, zY = 50; // 50 degrees in each direction
-		double n = .05; // please don't show me anything less than 5cm from my
+		double fovX = 45, fovY = 45; // 50 degrees in each direction
+		double n = .01; // please don't show me anything less than 5cm from my
 						// face.
-		double f = 100; // I can see about 100m away.
+		double f = 1000; // I can see about 100m away.
 		
-		double[][] frustum = Transform3D.generateClipMatrix(zX, zY, n, f);
+		double[][] frustum = Transform3D.generateClipMatrix(fovX, fovY, n, f);
 		
 		/*******************************************************************
 		 * Apply this clip matrix to the 3D homogeneous camera-space point to
