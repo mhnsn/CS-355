@@ -15,21 +15,21 @@ import cs355.model.scene.Point3D;
 public class LineVector3D
 {
 	private static final Point3D	viewSpaceOrigin	= new Point3D(0, 0, 0);
-
+	
 	public double					x;
 	public double					y;
 	public double					z;
 	public double					w;
-
+	
 	// where to start the line
 	private Point3D					origin;
 	private double					oW;
-
+	
 	// vector representation of line from origin
 	private Point3D					end;
-
+	
 	private boolean					isVector;
-
+	
 	/**
 	 * A new LineVector3D. This class consists of lines and unit vectors only -
 	 * when isVector is true, the resulting LineVector3D will be normalized and
@@ -49,7 +49,7 @@ public class LineVector3D
 		x = xVal;
 		y = yVal;
 		z = zVal;
-
+		
 		if (v)
 		{
 			normalize();
@@ -57,7 +57,7 @@ public class LineVector3D
 			{
 				System.out.println("Possible error: vector has non-0 origin.");
 			}
-
+			
 			origin = new Point3D(0, 0, 0);
 			w = 0;
 			isVector = true;
@@ -68,11 +68,11 @@ public class LineVector3D
 			w = 1;
 			isVector = false;
 		}
-
+		
 		oW = 1;
 		setEnd(new Point3D(x, y, z));
 	}
-
+	
 	/**
 	 * It's not elegant, but it sure works nice for debugging the pipeline.
 	 *
@@ -82,25 +82,26 @@ public class LineVector3D
 	{
 		this(new Line3D(viewSpaceOrigin, new Point3D(v[0], v[1], v[2])));
 	}
-
+	
 	/**
 	 *
 	 * @param l
 	 */
 	public LineVector3D(Line3D l)
 	{
+		
 		x = l.end.x;
 		y = l.end.y;
 		z = l.end.z;
 		w = 1;
-		
-		end = l.end;
-		origin = l.start;
 
+		end = new Point3D(l.end.x, l.end.y, l.end.z);
+		origin = new Point3D(l.start.x, l.start.y, l.start.z);
+		
 		isVector = false;
 		oW = 1;
 	}
-
+	
 	/**
 	 *
 	 * @param b
@@ -122,16 +123,16 @@ public class LineVector3D
 		 *
 		 * = (aY*bZ - aZ*bY, aZ*bX - aX*bZ, aX*bY - aY*bX)
 		 */
-
+		
 		double crossX = y * b.z - z * b.y;
 		double crossY = z * b.x - x * b.z;
 		double crossZ = x * b.y - y * b.x;
-
+		
 		LineVector3D product = new LineVector3D(crossX, crossY, crossZ, viewSpaceOrigin, true);
-
+		
 		return product;
 	}
-
+	
 	/**
 	 *
 	 * @param v
@@ -141,10 +142,10 @@ public class LineVector3D
 	public double dotProduct(LineVector3D v)
 	{
 		double d = x * v.x + y * v.y + z * v.z;
-
+		
 		return d;
 	}
-
+	
 	/**
 	 * @return the end
 	 */
@@ -152,7 +153,7 @@ public class LineVector3D
 	{
 		return end;
 	}
-
+	
 	/**
 	 *
 	 * @return
@@ -161,7 +162,7 @@ public class LineVector3D
 	{
 		return origin;
 	}
-
+	
 	/**
 	 *
 	 * @return
@@ -170,7 +171,7 @@ public class LineVector3D
 	{
 		return new double[] { origin.x, origin.y, origin.z, 1 };
 	}
-
+	
 	/**
 	 *
 	 * @return
@@ -179,7 +180,7 @@ public class LineVector3D
 	{
 		return new double[] { x, y, z, w };
 	}
-
+	
 	/**
 	 *
 	 * @return
@@ -195,7 +196,7 @@ public class LineVector3D
 			return new LineVector3D(x, y, z, viewSpaceOrigin, true);
 		}
 	}
-
+	
 	/**
 	 * @return the value of isVector
 	 */
@@ -203,7 +204,7 @@ public class LineVector3D
 	{
 		return isVector;
 	}
-
+	
 	/**
 	 * Normalize this LineVector3D. This operation will work independent of
 	 * whether the given lineVector3D is a vector or line representation
@@ -223,12 +224,12 @@ public class LineVector3D
 		x /= w;
 		y /= w;
 		z /= w;
-
-		updateEnd();
 		
+		updateEnd();
+
 		return;
 	}
-
+	
 	/**
 	 * Rotate this vector. This will overwrite the current values for xyz.
 	 *
@@ -242,17 +243,17 @@ public class LineVector3D
 	{
 		double[] newV = Transform3D.rotate(this, viewSpaceOrigin, xAxis, yAxis, zAxis, useRadians);
 		double[] newP = Transform3D.rotate(this, origin, xAxis, yAxis, zAxis, useRadians);
-		
+
 		x = newV[0];
 		y = newV[1];
 		z = newV[2];
 		w = newV[3];
-
-		updateEnd();
 		
+		updateEnd();
+
 		return true;
 	}
-
+	
 	/**
 	 * Scale this vector. This will overwrite the xyzw values.
 	 *
@@ -268,18 +269,18 @@ public class LineVector3D
 		else
 		{
 			double[] s = Transform3D.scale(this, c);
-
+			
 			x = s[0];
 			y = s[1];
 			z = s[2];
 			w = s[3];
-
+			
 			updateEnd();
-
+			
 			return true;
 		}
 	}
-
+	
 	/**
 	 * @param end
 	 *            the end to set. DO NOT CALL.
@@ -291,7 +292,7 @@ public class LineVector3D
 		y = e.y - origin.y;
 		z = e.z - origin.z;
 	}
-
+	
 	/**
 	 *
 	 * @param newOrigin
@@ -302,11 +303,11 @@ public class LineVector3D
 		origin.y = a[1];
 		origin.z = a[2];
 		oW = a[3];
-
+		
 		updateEnd();
 		return;
 	}
-
+	
 	/**
 	 *
 	 * @param newOrigin
@@ -317,7 +318,7 @@ public class LineVector3D
 		updateEnd();
 		return;
 	}
-	
+
 	/**
 	 * @param isVector
 	 *            what to set isVector to
@@ -326,7 +327,7 @@ public class LineVector3D
 	{
 		this.isVector = isVector;
 	}
-
+	
 	/**
 	 *
 	 */
@@ -335,7 +336,7 @@ public class LineVector3D
 	{
 		return "[X: " + x + ", Y: " + y + ", Z:" + z + ']';
 	}
-
+	
 	/**
 	 * Translate this vector. This will overwrite the xyz values for this
 	 * vector.
@@ -351,17 +352,17 @@ public class LineVector3D
 		{
 			return false;
 		}
-
+		
 		// but only because this is easier than the matrix approach
 		// TODO: use matrix multiplication just 'cuz
-
+		
 		origin.x += xVal;
 		origin.y += yVal;
 		origin.z += zVal;
-
+		
 		return true;
 	}
-
+	
 	private void updateEnd()
 	{
 		end = new Point3D(origin.x + x, origin.y + y, origin.y + y);
