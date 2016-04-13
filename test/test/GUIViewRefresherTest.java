@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,8 +28,10 @@ import cs355.model.scene.WireFrame;
 
 public class GUIViewRefresherTest
 {
-	private static final Point3D viewSpaceOrigin = new Point3D(0, 0, 0);
+	private static final Point3D	viewSpaceOrigin	= new Point3D(0, 0, 0);
 
+	static public ArrayList<Line3D>	clippedLines;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
 	{
@@ -44,10 +47,9 @@ public class GUIViewRefresherTest
 	
 	public LineVector3D				IDENTITY_V	= new LineVector3D(
 			new Line3D(new Point3D(0, 0, 0), new Point3D(1, 1, 1)));
-	
 	private ArrayList<LineVector3D>	al			= new ArrayList<LineVector3D>();
-	private ArrayList<LineVector3D>	bl			= new ArrayList<LineVector3D>();
 
+	private ArrayList<LineVector3D>	bl			= new ArrayList<LineVector3D>();
 	LineVector3D					a;
 	LineVector3D					b;
 	LineVector3D					c;
@@ -83,6 +85,9 @@ public class GUIViewRefresherTest
 	
 	private final int				dimensions	= 2048;
 	private double					tolerance	= .01;
+
+	private Point3D					I_AM_SAM	= new Point3D(0, 2, -100);
+	List<Line3D>					lines		= new ArrayList<>();
 	
 	@Before
 	public void setUp() throws Exception
@@ -93,7 +98,6 @@ public class GUIViewRefresherTest
 		d = new LineVector3D(new double[] { 0.999999, 0, 5, 1 });
 		e = new LineVector3D(new double[] { -1.000002, 0, 5, 1 });
 		f = new LineVector3D(new double[] { -1.000002, 3, 5, 1 });
-		g = new LineVector3D(new double[] { 2.00E-06, 8, -5, 1 });
 		homogeneousLines = new LineVector3D(new double[] { 5.000001, 5, -4.999999, 1 });
 		i = new LineVector3D(new double[] { -4.999999, 5, -5.000001, 1 });
 		j = new LineVector3D(new double[] { -4.999999, 0, -5.000001, 1 });
@@ -104,21 +108,50 @@ public class GUIViewRefresherTest
 		o = new LineVector3D(new double[] { 5.000001, 5, -4.999999, 1 });
 		p = new LineVector3D(new double[] { 4.999999, 5, 5.000001, 1 });
 		q = new LineVector3D(new double[] { 4.999999, 0, 5.000001, 1 });
-		r = new LineVector3D(new double[] { -2.00E-06, 8, 5, 1 });
 		s = new LineVector3D(new double[] { -5.000001, 5, 4.999999, 1 });
 		t = new LineVector3D(new double[] { 4.999999, 5, 5.000001, 1 });
 		u = new LineVector3D(new double[] { -5.000001, 0, 4.999999, 1 });
 		v = new LineVector3D(new double[] { -5.000001, 5, 4.999999, 1 });
 		w = new LineVector3D(new double[] { -4.999999, 5, -5.000001, 1 });
 		x = new LineVector3D(new double[] { -4.999999, 0, -5.000001, 1 });
-		y = new LineVector3D(new double[] { 2.00E-06, 8, -5, 1 });
-		z = new LineVector3D(new double[] { -2.00E-06, 8, 5, 1 });
 		aa = new LineVector3D(new double[] { 4.999999, 5, 5.000001, 1 });
 		ab = new LineVector3D(new double[] { 5.000001, 5, -4.999999, 1 });
 		ac = new LineVector3D(new double[] { -5.000001, 5, 4.999999, 1 });
+		af = new LineVector3D(new double[] { -4.999999, 5, -5.000001, 1 });
+		
+		g = new LineVector3D(new double[] { 2.00E-06, 8, -5, 1 });
+		r = new LineVector3D(new double[] { -2.00E-06, 8, 5, 1 });
+		y = new LineVector3D(new double[] { 2.00E-06, 8, -5, 1 });
+		z = new LineVector3D(new double[] { -2.00E-06, 8, 5, 1 });
 		ad = new LineVector3D(new double[] { -2.00E-06, 8, 5, 1 });
 		ae = new LineVector3D(new double[] { 2.00E-06, 8, -5, 1 });
-		af = new LineVector3D(new double[] { -4.999999, 5, -5.000001, 1 });
+
+		// Make the object:
+		// Floor
+		lines.add(new Line3D(new Point3D(-5, 0, -5), new Point3D(5, 0, -5)));
+		lines.add(new Line3D(new Point3D(5, 0, -5), new Point3D(5, 0, 5)));
+		lines.add(new Line3D(new Point3D(5, 0, 5), new Point3D(-5, 0, 5)));
+		lines.add(new Line3D(new Point3D(-5, 0, 5), new Point3D(-5, 0, -5)));
+		// Ceiling
+		lines.add(new Line3D(new Point3D(-5, 5, -5), new Point3D(5, 5, -5)));
+		lines.add(new Line3D(new Point3D(5, 5, -5), new Point3D(5, 5, 5)));
+		lines.add(new Line3D(new Point3D(5, 5, 5), new Point3D(-5, 5, 5)));
+		lines.add(new Line3D(new Point3D(-5, 5, 5), new Point3D(-5, 5, -5)));
+		// Walls
+		lines.add(new Line3D(new Point3D(-5, 5, -5), new Point3D(-5, 0, -5)));
+		lines.add(new Line3D(new Point3D(5, 5, -5), new Point3D(5, 0, -5)));
+		lines.add(new Line3D(new Point3D(5, 5, 5), new Point3D(5, 0, 5)));
+		lines.add(new Line3D(new Point3D(-5, 5, 5), new Point3D(-5, 0, 5)));
+		// Roof
+		lines.add(new Line3D(new Point3D(-5, 5, -5), new Point3D(0, 8, -5)));
+		lines.add(new Line3D(new Point3D(0, 8, -5), new Point3D(5, 5, -5)));
+		lines.add(new Line3D(new Point3D(-5, 5, 5), new Point3D(0, 8, 5)));
+		lines.add(new Line3D(new Point3D(0, 8, 5), new Point3D(5, 5, 5)));
+		lines.add(new Line3D(new Point3D(0, 8, -5), new Point3D(0, 8, 5)));
+		// Door
+		lines.add(new Line3D(new Point3D(1, 0, 5), new Point3D(1, 3, 5)));
+		lines.add(new Line3D(new Point3D(-1, 0, 5), new Point3D(-1, 3, 5)));
+		lines.add(new Line3D(new Point3D(1, 3, 5), new Point3D(-1, 3, 5)));
 		
 		IDENTITY_V = new LineVector3D(new Line3D(new Point3D(0, 0, 0), new Point3D(1, 1, 1)));
 		
@@ -172,8 +205,8 @@ public class GUIViewRefresherTest
 		/***********************************************************************
 		 * get all lines and convert to homogeneous coordinates
 		 **********************************************************************/
-
-		ArrayList<LineVector3D> lines = new ArrayList<LineVector3D>();
+		
+		// ArrayList<LineVector3D> lines = new ArrayList<LineVector3D>();
 		LineVector3D lv;
 		WireFrame wf;
 		Iterator<Line3D> it;
@@ -201,26 +234,23 @@ public class GUIViewRefresherTest
 		 * translation matrix and a rotation matrix).
 		 **********************************************************************/
 		
-		// LineVector3D cameraLoc = GUIModel.getCameraLocation();
-		Point3D cameraLoc = StateMachine.where_i_am;
+		Point3D cameraLoc = I_AM_SAM;
 		double[] cameraDir = GUIModel.getCameraOrientation();
 
-		// Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0),
-		// cameraOr[0], cameraOr[1], cameraOr[2], false);
-		Transform3D.rotate(Transform3D.IDENTITY_V, new Point3D(0, 0, 0), cameraDir[0], cameraDir[1], cameraDir[2],
+		double[][] rMatrix = Transform3D.rotate(Transform3D.IDENTITY_V, cameraDir[0], cameraDir[1], cameraDir[2],
 				false);
-		Transform3D.translate(Transform3D.IDENTITY_V, cameraLoc);
-		
+		double[][] tMatrix = Transform3D.translate(cameraLoc);
+
 		Transform3D.setWorldToCamera();
 
 		/***********************************************************************
 		 * Apply this matrix to the 3D homogeneous world-space point to get a 3D
 		 * homogeneous camera-space point.
 		 **********************************************************************/
-		ArrayList<LineVector3D> homogeneousLines = new ArrayList<LineVector3D>();
+		ArrayList<Line3D> homogeneousLines = new ArrayList<Line3D>();
 
-		// for (LineVector3D l : lines)
-		for (LineVector3D l : al)
+		// for (LineVector3D l : al)
+		for (Line3D l : lines)
 		{
 			Transform3D.transform(l);
 
@@ -228,21 +258,29 @@ public class GUIViewRefresherTest
 			// I know this isn't optimum, but I don't have to optimize this. =)
 			homogeneousLines.add(l);
 		}
-
-		assertEquals(32, homogeneousLines.size());
+		
+		// assertEquals(32, homogeneousLines.size());
 		
 		Transform3D.transform(IDENTITY_V);
 		
-		assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
-		assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
-		assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
+		// assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
+		// assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
+		// assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
+		assertEquals(cameraLoc.x + 1, IDENTITY_V.x, tolerance);
+		assertEquals(cameraLoc.y + 1, IDENTITY_V.y, tolerance);
+		assertEquals(cameraLoc.z + 1, IDENTITY_V.z, tolerance);
+		
 		assertEquals(1, IDENTITY_V.w, tolerance);
 		
 		IDENTITY_V.normalize();
-
-		assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
-		assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
-		assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
+		
+		// assertEquals(StateMachine.where_i_am.x + 1, IDENTITY_V.x, tolerance);
+		// assertEquals(StateMachine.where_i_am.y + 1, IDENTITY_V.y, tolerance);
+		// assertEquals(StateMachine.where_i_am.z + 1, IDENTITY_V.z, tolerance);
+		assertEquals(cameraLoc.x + 1, IDENTITY_V.x, tolerance);
+		assertEquals(cameraLoc.y + 1, IDENTITY_V.y, tolerance);
+		assertEquals(cameraLoc.z + 1, IDENTITY_V.z, tolerance);
+		
 		assertEquals(1, IDENTITY_V.w, tolerance);
 
 		/***********************************************************************
@@ -251,14 +289,15 @@ public class GUIViewRefresherTest
 		 * n, and far-plane distance f.
 		 **********************************************************************/
 
-		ArrayList<LineVector3D> clippedLines = new ArrayList<LineVector3D>();
+		clippedLines = new ArrayList<Line3D>();
 		
 		// 45f, 1f, 0.01f, 1000f
 
-		double fovX = 45, fovY = 45; // 50 degrees in each direction
-		double n = .01; // please don't show me anything less than 5cm from my
+		double fovX = 50, fovY = 50; // 50 degrees in each direction
+		double n = .05; // please don't show me anything less than 5cm from my
 						// face.
-		double f = 1000; // I can see about 100m away.
+		double f = 10000; // I can see about ten kilometers away. As they say in
+							// Chile, tengo ojo de águila
 
 		double[][] frustum = Transform3D.generateClipMatrix(fovX, fovY, n, f);
 
@@ -281,10 +320,11 @@ public class GUIViewRefresherTest
 		double[] cameraSpaceV, cameraSpaceP, clipSpaceV, clipSpaceP;
 		int i, j;
 		
-		for (LineVector3D v : homogeneousLines)
+		for (Line3D v : homogeneousLines)
 		{
-			cameraSpaceV = v.getVArray();
-			cameraSpaceP = v.getPArray();
+			cameraSpaceV = new double[] { v.end.x, v.end.y, v.end.z, 1 };// v.getVArray();
+			cameraSpaceP = new double[] { v.start.x, v.start.y, v.start.z, 1 };// =
+																				// v.getPArray();
 			
 			clipSpaceV = Transform3D.leftMultiply(frustum, cameraSpaceV);
 			clipSpaceP = Transform3D.leftMultiply(frustum, cameraSpaceP);
@@ -295,8 +335,19 @@ public class GUIViewRefresherTest
 			// TODO: make sure that operator precedence holds as expected
 			if (i == j && i != 0 || j == -2 || i == -2)
 			{
+				System.out.println("====================================\r\n" + "Clipping\r\n\t" + v.toString());
 				continue;
 			}
+			
+			// normalize that thing!
+			v.start.x = clipSpaceP[0] / clipSpaceP[3];
+			v.start.y = clipSpaceP[1] / clipSpaceP[3];
+			v.start.z = clipSpaceP[2] / clipSpaceP[3];
+
+			v.end.x = clipSpaceV[0] / clipSpaceV[3];
+			v.end.y = clipSpaceV[1] / clipSpaceV[3];
+			v.end.z = clipSpaceV[2] / clipSpaceV[3];
+
 			clippedLines.add(v);
 		}
 
@@ -305,22 +356,22 @@ public class GUIViewRefresherTest
 
 		System.out.println(clippedLines.size() + " lines after clipping.");
 
-		for (LineVector3D vt : clippedLines)
+		for (Line3D vt : clippedLines)
 		{
 			/*******************************************************************
 			 * Apply perspective by normalizing the 3D homogeneous clip-space
 			 * coordinate to get the (x/w,y/w) location of the point in
 			 * canonical screen space.
 			 ******************************************************************/
-			vt.normalize();
+			// vt.normalize();
 
 			/*******************************************************************
 			 * Apply a viewport transformation to map the canonical screen space
 			 * to the actual drawing space (2048*2048, with the origin in the
 			 * upper left).
 			 *******************************************************************/
-
-			Transform3D.mapToDrawingSpace(vt, dimensions);
+			
+			// Transform3D.mapToDrawingSpace(vt, dimensions);
 
 			/*******************************************************************
 			 * Apply the same viewing transformation you use to implement
@@ -328,8 +379,8 @@ public class GUIViewRefresherTest
 			 * portion of the 2048*2048 to the 512*512 screen area.
 			 ******************************************************************/
 
-			Point3D o = vt.getOrigin();
-			Point3D e3D = vt.getEnd();
+			Point3D o = vt.start;
+			Point3D e3D = vt.end;
 
 			Line l = new Line(Color.WHITE, new Point2D.Double(o.x, o.y), new Point2D.Double(e3D.x, e3D.y));
 
@@ -344,7 +395,6 @@ public class GUIViewRefresherTest
 			// g2d.setTransform(worldToView);
 			// Point2D.Double e2D = l.getEndV();
 			// g2d.drawLine(0, 0, (int) e2D.getX(), (int) e2D.getY());
-
 		}
 	}
 	

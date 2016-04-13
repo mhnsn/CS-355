@@ -33,62 +33,38 @@ public class Transform3D
 	 * @param xAxis
 	 * @param yAxis
 	 * @param zAxis
+	 * @return TODO
 	 */
-	private static void addRotateToPipeline(double xAxis, double yAxis, double zAxis)
+	private static double[][] addRotateToPipeline(double xAxis, double yAxis, double zAxis)
 	{
-		// if (outOfToleranceRange(xAxis, 0, .00001))
-		// {
-		// double[][] rX = new double[][] { { 1, 0, 0, 0 }, { 0,
-		// Math.cos(xAxis), Math.sin(xAxis), 0 },
-		// { 0, -Math.sin(xAxis), Math.cos(xAxis), 0 }, { 0, 0, 0, 1 } };
-		// pipeline.add(rX);
-		// }
 		if (outOfToleranceRange(yAxis, 0, .01))
 		{
 			
 			double[][] rY = new double[][] { { Math.cos(yAxis), 0, Math.sin(yAxis), 0 }, { 0, 1, 0, 0 },
 					{ -Math.sin(yAxis), 0, Math.cos(yAxis), 0 }, { 0, 0, 0, 1 } };
-			// double[][] rY = new double[][]
-			//
-			// { { Math.cos(yAxis), 0, -Math.sin(yAxis), 0 },
-			// { 0, 1, 0, 0 },
-			// { Math.sin(yAxis), 0, Math.cos(yAxis), 0 },
-			// { 0, 0, 0, 1 } };
 
 			pipeline.add(rY);
-
+			
+			return rY;
 		}
-		// if (outOfToleranceRange(zAxis, 0, .00001))
-		// {
-		// double[][] rZ = new double[][] { { Math.cos(zAxis), Math.sin(zAxis),
-		// 0, 0 },
-		// { -Math.sin(zAxis), Math.cos(zAxis), 0, 0 }, { 0, 0, 1, 0 }, { 0, 0,
-		// 0, 1 } };
-		// pipeline.add(rZ);
-		// }
-		
-		// int i;
-		// for (i = 0; i < 3; i++)
-		// {
-		// leftMultiply(rY, rX[i]);
-		// }
-		// for (i = 0; i < 3; i++)
-		// {
-		// leftMultiply(rZ, rX[i]);
-		// }
+		return null;
 	}
 
 	/**
 	 *
 	 * @param p
+	 * @return
 	 */
-	private static void addTranslateToPipeline(Point3D p)
+	private static double[][] addTranslateToPipeline(Point3D p)
 	{
 		if (outOfToleranceRange(p.x, 0, .01) || outOfToleranceRange(p.y, 0, .01) || outOfToleranceRange(p.z, 0, .01))
 		{
 			double[][] t = new double[][] { { 1, 0, 0, p.x }, { 0, 1, 0, p.y }, { 0, 0, 1, p.z }, { 0, 0, 0, 1 } };
 			pipeline.add(t);
+
+			return t;
 		}
+		return null;
 	}
 
 	/**
@@ -169,16 +145,15 @@ public class Transform3D
 			// TODO: make sure that operator precedence holds as expected
 			if (i == j && i != 0 || j == -3 || i == -3)
 			{
-				// System.out.println("Clipping line.");
 				continue;
 			}
 			clippedLines.add(v);
 		}
 		
-		if (clippedLines.size() > 0)
-		{
-			System.out.print("");
-		}
+		// if (clippedLines.size() > 0)
+		// {
+		// System.out.print("");
+		// }
 
 		return clippedLines;
 	}
@@ -191,6 +166,11 @@ public class Transform3D
 	private static double degreesToRadians(float d)
 	{
 		return d * Math.PI / 180;
+	}
+
+	private static double dotProduct(double[] a, double[] b)
+	{
+		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
 	}
 
 	/**
@@ -225,7 +205,7 @@ public class Transform3D
 	}
 
 	/**
-	 * will handle case of 1 column in A
+	 * Must pass two 4x4 matrices.
 	 *
 	 * @param L
 	 * @param A
@@ -233,30 +213,75 @@ public class Transform3D
 	 */
 	public static double[][] fullLeftMultiply(double[][] L, double[][] A)
 	{
-		int j = A.length;
+		// int j = A.length;
+		
+		// double x1, y1, z1, w1;
+		// double x2, y2, z2, w2;
+		// double x3, y3, z3, w3;
+		// double x4, y4, z4, w4;
+		
+		// x1 = L[0][0] * A[0][0] + L[0][1] * A[1][0] + L[0][2] * A[2][0] +
+		// L[0][3] * A[3][0];
+		// y1 = L[0][0] * A[0][0] + L[0][1] * A[1][0] + L[0][2] * A[2][0] +
+		// L[0][3] * A[3][0];
+		// z1 = L[0][0] * A[0][0] + L[0][1] * A[1][0] + L[0][2] * A[2][0] +
+		// L[0][3] * A[3][0];
+		// w1 = L[0][0] * A[0][0] + L[0][1] * A[1][0] + L[0][2] * A[2][0] +
+		// L[0][3] * A[3][0];
+		//
+		// x2 = L[1][0] * A[0][1] + L[1][1] * A[1][1] + L[0][2] * A[2][1] +
+		// L[0][3] * A[3][1];
+		// y2 = L[1][0] * A[0][1] + L[1][1] * A[1][1] + L[1][2] * A[2][1] +
+		// L[1][3] * A[3][1];
+		// z2 = L[1][0] * A[0][1] + L[1][1] * A[1][1] + L[2][2] * A[2][1] +
+		// L[2][3] * A[3][1];
+		// w2 = L[1][0] * A[0][1] + L[1][1] * A[1][1] + L[3][2] * A[2][1] +
+		// L[3][3] * A[3][1];
+		//
+		// x3 =
+		// y3 =
+		// z3 =
+		// w3 =
+		//
+		// x4 =
+		// y4 =
+		// z4 =
+		// w4 =
 
-		for (int i = 0; i < j; i++)
+		double[][] aT = transpose(A);
+		
+		for (int i = 0; i < 4; i++)
 		{
-			leftMultiply(L, A[i]);
+			for (int j = 0; j < 4; j++)
+			{
+				leftMultiply(L, aT[i]);
+			}
 		}
 
+		for (int i = 0; i < 4; i++)
+		{
+			System.arraycopy(aT[i], 0, A[i], 0, 4);
+		}
+		
 		return A;
 	}
 
 	/**
 	 *
-	 * @param zX
-	 * @param zY
+	 * @param fovX
+	 * @param fovY
 	 * @param n
 	 * @param f
 	 * @return
 	 */
-	public static double[][] generateClipMatrix(double zX, double zY, double n, double f)
+	public static double[][] generateClipMatrix(double fovX, double fovY, double n, double f)
 	{
 		// TODO: verify I didn't just break the clip matrix with this change.
-		double[][] clipMatrix = { { Math.atan(degreesToRadians((float) zX)), 0, 0, 0 },
-				{ 0, Math.atan(degreesToRadians((float) zY)), 0, 0 }, { 0, 0, (f + n) / (f - n), 1 },
-				{ 0, 0, 2 * (n * f / (f - n)), 0 } };
+		double[][] clipMatrix = {
+
+				{ Math.atan(degreesToRadians((float) fovX)), 0, 0, 0 },
+				{ 0, Math.atan(degreesToRadians((float) fovY)), 0, 0 }, { 0, 0, (f + n) / (f - n), 1 },
+				{ 0, 0, -2 * (n * f / (f - n)), 0 } };
 
 		return clipMatrix;
 	}
@@ -325,6 +350,24 @@ public class Transform3D
 			return new double[] { a, b, c };
 		}
 	}
+	
+	/**
+	 * it is assumed that this line has been normalized.
+	 *
+	 * @param vt
+	 * @param dimensions
+	 * @param clipSpaceV
+	 * @param clipSpaceP
+	 */
+	public static void mapToDrawingSpace(Line3D vt, int dimensions, double clipSpaceP, double clipSpaceV)
+	{
+		
+		vt.start.x = vt.start.x * dimensions / (2 * clipSpaceP) + 1024;
+		vt.start.y = -(vt.start.y * dimensions / (2 * clipSpaceP)) + 1024;
+
+		vt.end.x = vt.end.x * dimensions / (2 * clipSpaceV) + 1024;
+		vt.end.y = -(vt.end.y * dimensions) / (2 * clipSpaceV) + 1024;
+	}
 
 	/**
 	 * Scales a normalized clip-space vector based on given screen dimension.
@@ -382,14 +425,10 @@ public class Transform3D
 
 		if (outOfToleranceRange(clipSpaceV[0], 0, w)) // test left and right
 		{
-			// System.out.println("1. Failed left-right test. (clipSpaceV[0] = "
-			// + clipSpaceV[0] + ").");
 			return clipSpaceV[0] > 0 ? 1 : -1;
 		}
 		else if (outOfToleranceRange(clipSpaceV[1], 0, w)) // top and bottom
 		{
-			// System.out.println("2. Failed top-bottom test. (clipSpaceV[1] = "
-			// + clipSpaceV[1] + ").");
 			return clipSpaceV[1] > 0 ? 2 : -2;
 		}
 		else if (outOfToleranceRange(clipSpaceV[2], 0, w)) // front and back
@@ -417,19 +456,41 @@ public class Transform3D
 		return pipeline.size();
 	}
 
+	// /**
+	// * Rotate the passed LineVector. This will overwrite the current values
+	// * stored there.
+	// *
+	// * @param v
+	// * @param rotationOrigin
+	// * @param xAxis
+	// * @param yAxis
+	// * @param zAxis
+	// * @param valuesPassedInRadians
+	// * @return
+	// * @deprecated Use
+	// * {@link #rotate(LineVector3D,double,double,double,boolean)}
+	// * instead
+	// */
+	// @Deprecated
+	// public static double[] rotate(LineVector3D v, Point3D rotationOrigin,
+	// double xAxis, double yAxis, double zAxis,
+	// boolean valuesPassedInRadians)
+	// {
+	// return rotate(v, xAxis, yAxis, zAxis, valuesPassedInRadians);
+	// }
+
 	/**
 	 * Rotate the passed LineVector. This will overwrite the current values
 	 * stored there.
 	 *
 	 * @param v
-	 * @param rotationOrigin
 	 * @param xAxis
 	 * @param yAxis
 	 * @param zAxis
 	 * @param valuesPassedInRadians
 	 * @return
 	 */
-	public static double[] rotate(LineVector3D v, Point3D rotationOrigin, double xAxis, double yAxis, double zAxis,
+	public static double[][] rotate(LineVector3D v, double xAxis, double yAxis, double zAxis,
 			boolean valuesPassedInRadians)
 	{
 		if (!valuesPassedInRadians)
@@ -438,12 +499,10 @@ public class Transform3D
 			yAxis = degreesToRadians((float) yAxis);
 			zAxis = degreesToRadians((float) zAxis);
 		}
+		
+		// double[] r = transform(v);
 
-		addRotateToPipeline(xAxis, yAxis, zAxis);
-
-		double[] r = transform(v);
-
-		return r;
+		return addRotateToPipeline(xAxis, yAxis, zAxis);
 	}
 
 	/**
@@ -452,15 +511,24 @@ public class Transform3D
 	 * @param c
 	 * @return
 	 */
-	public static double[] scale(LineVector3D v, double c)
+	public static void scale(Line3D v, double c)
 	{
 		double[][] scaleV = { { c, c, c, c } };
-		double[] scaleVals = v.getVArray();
+		double[] scaleValsP = { v.start.x, v.start.y, v.start.z, 1 };
+		double[] scaleValsV = { v.end.x, v.end.y, v.end.z, 1 };
 
-		leftMultiply(scaleV, scaleVals);
+		leftMultiply(scaleV, scaleValsP);
+		leftMultiply(scaleV, scaleValsV);
 
-		// return scaleVals;
-		return leftMultiply(scaleV, scaleVals);
+		v.start.x = scaleValsP[0] / scaleValsP[3];
+		v.start.y = scaleValsP[1] / scaleValsP[3];
+		v.start.z = scaleValsP[2] / scaleValsP[3];
+		
+		v.end.x = scaleValsV[0] / scaleValsV[3];
+		v.end.y = scaleValsV[1] / scaleValsV[3];
+		v.end.z = scaleValsV[2] / scaleValsV[3];
+
+		return;
 	}
 
 	/**
@@ -493,6 +561,26 @@ public class Transform3D
 		worldToCamera = fullCopy(pipeline);
 
 		push = false;
+	}
+	
+	public static void transform(Line3D v)
+	{
+		double[] rArray = new double[] { v.end.x, v.end.y, v.end.z, 1 };
+		double[] qArray = new double[] { v.start.x, v.start.y, v.start.z, 1 };
+		
+		// this should no longer have in-place modification issues.
+		for (double[][] d : pipeline)
+		{
+			rArray = leftMultiply(d, rArray);
+			// System.arraycopy(rArray, 0, x, 0, x.length);
+			
+			qArray = leftMultiply(d, qArray);
+			// System.arraycopy(qArray, 0, p, 0, p.length);
+		}
+		
+		v.start = new Point3D(qArray[0] / qArray[3], qArray[1] / qArray[3], qArray[2] / qArray[3]);
+		v.end = new Point3D(rArray[0] / rArray[3], rArray[1] / rArray[3], rArray[2] / rArray[3]);
+
 	}
 
 	/**
@@ -529,7 +617,7 @@ public class Transform3D
 			qArray = leftMultiply(d, p);
 			System.arraycopy(qArray, 0, p, 0, p.length);
 		}
-		
+
 		v.x = rArray[0];
 		v.y = rArray[1];
 		v.z = rArray[2];
@@ -542,18 +630,29 @@ public class Transform3D
 
 	/**
 	 *
-	 * @param v
 	 * @param amountToTranslate
 	 * @return
 	 */
-	public static double[] translate(LineVector3D v, Point3D amountToTranslate)
+	public static double[][] translate(Point3D amountToTranslate)
 	{
-		addTranslateToPipeline(amountToTranslate);
-		double[] t = transform(v);
-
-		return t;
+		return addTranslateToPipeline(amountToTranslate);
 	}
+	
+	private static double[][] transpose(double[][] a)
+	{
+		double[][] temp = new double[][] { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
 
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				temp[i][j] = a[j][i];
+			}
+		}
+		
+		return temp;
+	}
+	
 	/**
 	 *
 	 */
@@ -564,5 +663,33 @@ public class Transform3D
 				worldToCamera = new ArrayList<double[][]>();
 
 		push = true;
+	}
+	
+	public static double[][] worldToCamera(Line3D l)
+	{
+		double[][] lArr = new double[][] { { l.start.x, l.start.y, l.start.z, 1 }, { l.end.x, l.end.y, l.end.z, 1 },
+				{ 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
+		
+		if (worldToCamera.size() == 0)
+		{
+			worldToCamera.add(IDENTITY);
+		}
+		
+		for (double[][] t : worldToCamera)
+		{
+			double[][] temp = fullLeftMultiply(t, lArr);
+			System.arraycopy(temp[0], 0, lArr[0], 0, 4);
+			System.arraycopy(temp[1], 0, lArr[1], 0, 4);
+		}
+
+		// normalize assignments
+		l.start.x = lArr[0][0] / lArr[0][3];
+		l.start.y = lArr[0][1] / lArr[0][3];
+		l.start.z = lArr[0][2] / lArr[0][3];
+		l.end.x = lArr[1][0] / lArr[1][3];
+		l.end.y = lArr[1][1] / lArr[1][3];
+		l.end.z = lArr[1][2] / lArr[1][3];
+
+		return lArr;
 	}
 }
