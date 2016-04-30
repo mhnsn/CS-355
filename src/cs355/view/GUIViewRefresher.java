@@ -219,14 +219,14 @@ public class GUIViewRefresher implements ViewRefresher
 			{
 				if (StateMachine.doRotation())
 				{
-					g2d.fillOval((int) (sb.getHandleCenter().getX() - 5 * scaleFactor),
-							(int) (sb.getHandleCenter().getY() - 5 * scaleFactor), (int) (10 * scaleFactor),
+					g2d.fillOval((int) (sb.getHandleCenter().getX() - (5 * scaleFactor)),
+							(int) (sb.getHandleCenter().getY() - (5 * scaleFactor)), (int) (10 * scaleFactor),
 							(int) (10 * scaleFactor));
 				}
 				else
 				{
-					g2d.drawOval((int) (sb.getHandleCenter().getX() - 5 * scaleFactor),
-							(int) (sb.getHandleCenter().getY() - 5 * scaleFactor), (int) (10 * scaleFactor),
+					g2d.drawOval((int) (sb.getHandleCenter().getX() - (5 * scaleFactor)),
+							(int) (sb.getHandleCenter().getY() - (5 * scaleFactor)), (int) (10 * scaleFactor),
 							(int) (10 * scaleFactor));
 				}
 			}
@@ -374,9 +374,7 @@ public class GUIViewRefresher implements ViewRefresher
 			Point2D.Double e2D = l.getEndV();
 
 			g2d.drawLine(0, 0, (int) e2D.getX(), (int) e2D.getY());
-
 		}
-
 	}
 
 	@Override

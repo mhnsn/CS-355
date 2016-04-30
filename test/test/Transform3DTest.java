@@ -34,7 +34,7 @@ public class Transform3DTest
 	public static void setUpBeforeClass() throws Exception
 	{
 	}
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -159,14 +159,23 @@ public class Transform3DTest
 
 		double s = 5;
 
-		double[][] scale = { { s, s, s, s } };
+		double[][] scale = { { s }, { s }, { s }, { s } };
 		d = Transform3D.fullLeftMultiply(I, scale);
 
 		assertEquals(s, d[0][0], .01);
-		assertEquals(s, d[0][1], .01);
-		assertEquals(s, d[0][2], .01);
-		assertEquals(s, d[0][3], .01);
-
+		assertEquals(s, d[1][0], .01);
+		assertEquals(s, d[2][0], .01);
+		assertEquals(s, d[3][0], .01);
+		
+		double[][] testReverse = { { 0, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 }, { 1, 0, 0, 0 } };
+		double[][] sampleVectors = { { 1, 1, 1, 1 }, { 2, 2, 2, 2 }, { 3, 3, 3, 3 }, { 4, 4, 4, 4 } };
+		
+		double[][] rVal = Transform3D.fullLeftMultiply(testReverse, sampleVectors);
+		
+		assertEquals(rVal[0][0], 4, .01);
+		assertEquals(rVal[1][0], 3, .01);
+		assertEquals(rVal[2][0], 2, .01);
+		assertEquals(rVal[3][0], 1, .01);
 	}
 
 	/**
