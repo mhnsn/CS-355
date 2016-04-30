@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package cs355.model;
 
@@ -20,10 +20,10 @@ public class Filter
 	private static int		gMask		= 0x0000FF00;
 	private static int		bMask		= 0x000000FF;
 	private static float[]	sharpenA2	= { 0, -1, 0, -1, 6, -1, 0, -1, 0 };
-	
+
 	/**
 	 * brightness
-	 * 
+	 *
 	 * @param source
 	 * @param amount
 	 * @return
@@ -32,18 +32,18 @@ public class Filter
 	{
 		/**
 		 * Convert the image to HSB
-		 * 
+		 *
 		 * // Make sure to convert the adjustment parameter to the range //
 		 * [-1.0,1.0.]. // // s = r + b // // where as used in class, r denotes
 		 * the input brightness and s denotes // the output brightness. // Do
 		 * the above operation solely on the brightness channel.
-		 * 
+		 *
 		 */
-		
+
 		BufferedImage b = source.getImage();
 		WritableRaster wr = b.getRaster();
 		double brightness = ((double) amount) / ((double) 100);
-		
+
 		float[] hsb = { 0, 0, 0 };
 		int[] rgb = { 0, 0, 0 };
 		int x = 0;
@@ -51,7 +51,7 @@ public class Filter
 		int y = 0;
 		int h = b.getHeight();
 		int rgbInt = 0;
-		
+
 		for (x = 0; x < w; x++)
 		{
 			for (y = 0; y < h; y++)
@@ -68,74 +68,62 @@ public class Filter
 				{
 					hsb[2] = 0;
 				}
-				
+
 				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
 																	// to RGB.
-				
+
 				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
 				rgb[1] = (rgbInt & gMask) >> 8;
 				rgb[2] = (rgbInt & bMask);
-				
+
 				wr.setPixel(x, y, rgb);
 			}
 		}
-		
+
 		b.setData(wr);
 		return b;
 	}
-	
+
 	/**
-	 * grayscale (saturation)
-	 * 
-	 * @param source
+	 * grayscale (rgb)
+	 *
+	 * This could be implemented at some future time if you're bored.
+	 *
+	 * @param curRGB
+	 * @param medRGB
 	 * @return
 	 */
-	public static BufferedImage grayscaleSaturation(Image source)
+	/**
+	 * mean filter (gaussian)
+	 *
+	 * This could be implemented at some future time if you're really bored.
+	 *
+	 * @param curRGB
+	 * @param medRGB
+	 * @return
+	 */
+
+	private static int calculateDistance(int[] curRGB, int[] medRGB)
 	{
-		// Convert the image to HSB
-		BufferedImage b = source.getImage();
-		WritableRaster wr = b.getRaster();
-		
-		float[] hsb = { 0, 0, 0 };
-		int[] rgb = { 0, 0, 0 };
-		int x = 0;
-		int w = b.getWidth();
-		int y = 0;
-		int h = b.getHeight();
-		int rgbInt = 0;
-		
-		for (x = 0; x < w; x++)
-		{
-			for (y = 0; y < h; y++)
-			{
-				rgb = wr.getPixel(x, y, rgb);
-				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-				hsb[1] = 0; // zero the saturation channel
-				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
-																	// to RGB.
-				
-				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
-				rgb[1] = (rgbInt & gMask) >> 8;
-				rgb[2] = (rgbInt & bMask);
-				
-				wr.setPixel(x, y, rgb);
-			}
-		}
-		
-		b.setData(wr);
-		return b;
+		// pythagorean theorem, sort of. Just use distance squared.
+		// a^2 + b^2 + c^2 = d^2
+
+		int a2 = (medRGB[0] - curRGB[0]) * (medRGB[0] - curRGB[0]);
+		int b2 = (medRGB[1] - curRGB[1]) * (medRGB[1] - curRGB[1]);
+		int c2 = (medRGB[2] - curRGB[2]) * (medRGB[2] - curRGB[2]);
+
+		return a2 + b2 + c2;
 	}
-	
+
 	/**
 	 * contrast
-	 * 
+	 *
 	 * @param source
 	 * @param amount
 	 * @return
 	 */
 	public static BufferedImage contrast(Image source, int amount)
 	{
-		
 		/**
 		 * Rather than a straight linear operation, we will use a mapping //
 		 * similar to what Photoshop does. In particular, the contrast will be
@@ -145,13 +133,15 @@ public class Filter
 		 * // applied is // // > s = ((c+100)/100)^4)(r - 128)+128 // // For
 		 * this operation, you should also convert to HSB, apply the //
 		 * operation to the brightness channel, and convert back to RGB.
-		 * 
+		 *
 		 */
-		
+
 		BufferedImage b = source.getImage();
 		WritableRaster wr = b.getRaster();
-		float contrast = (float) amount;
-		
+		WritableRaster r = b.copyData(null);
+
+		float contrast = amount;
+
 		float[] hsb = { 0, 0, 0 };
 		int[] rgb = { 0, 0, 0 };
 		int x = 0;
@@ -160,25 +150,25 @@ public class Filter
 		int h = b.getHeight();
 		int rgbInt = 0;
 		float factor;
-		
+
 		for (x = 0; x < w; x++)
 		{
 			for (y = 0; y < h; y++)
 			{
 				rgb = wr.getPixel(x, y, rgb);
 				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-				
+
 				// s = ((c+100)/100)^4 (r-128)+128
 				factor = contrast + 100;
 				factor /= 100;
 				factor *= factor * factor * factor;
 				factor *= (hsb[2] - .5);
 				factor += .5;
-				
+
 				// hsb[2] = (float) (Math.pow(((contrast + 100) / 100), 4) *
 				// (factor)) + 128;
 				hsb[2] = factor;
-				
+
 				if (hsb[2] > 1)
 				{
 					hsb[2] = 1;
@@ -187,231 +177,132 @@ public class Filter
 				{
 					hsb[2] = 0;
 				}
-				
+
 				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
 																	// to RGB.
-				
+
 				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
 				rgb[1] = (rgbInt & gMask) >> 8;
 				rgb[2] = (rgbInt & bMask);
-				
-				wr.setPixel(x, y, rgb);
+
+				r.setPixel(x, y, rgb);
 			}
 		}
-		
-		b.setData(wr);
+
+		b.setData(r);
 		return b;
 	}
-	
-	/**
-	 * median filter
-	 * 
-	 * In this case, you should find the median of all three channels
-	 * individually. Put them together to make the "median color."
-	 * 
-	 * At that point, treat the colors as vectors. Compute the squared distance
-	 * from the median color to all nine colors from all nine pixels. The color
-	 * you select should be the color with the least squared distance from the
-	 * median color.
-	 * 
-	 */
-	public static BufferedImage medianFilter(Image source, int windowSize)
+
+	private static float[][][] convertToHSB(WritableRaster wr)
 	{
-		/**
-		 * generic algorithm from Wikipedia:
-		 * 
-		 * allocate outputPixelValue[image width][image height] allocate
-		 * window[window width * window height] edgex := (window width / 2)
-		 * rounded down edgey := (window height / 2) rounded down for x from
-		 * edgex to image width - edgex { for y from edgey to image height -
-		 * edgey { i = 0 for fx from 0 to window width { for fy from 0 to window
-		 * height { window[i] := inputPixelValue[x + fx - edgex][y + fy - edgey]
-		 * i := i + 1 } } sort entries in window[] outputPixelValue[x][y] :=
-		 * window[window width * window height / 2] } }
-		 */
-		
-		// TODO: optimize this into a snake-scrawl of sorted lists.
-		
-		BufferedImage b = source.getImage();
-		WritableRaster wr = b.getRaster();
-		DataBuffer db = wr.getDataBuffer();
-		
-		int w = b.getWidth();
-		int h = b.getHeight();
-		
-		int edgeX = windowSize / 2; // automagically rounded down thanks to int
-									// division
-		int edgeY = windowSize / 2;
-		
-		int x = edgeX;
-		int y = edgeY;
-		int i;
-		
-		// note that an array is allocated for each channel here.
-		int[][] window = new int[3][windowSize * windowSize];
-		
-		int curPixelData = 0;
-		int[] windowR = new int[windowSize * windowSize];
-		int[] windowG = new int[windowSize * windowSize];
-		int[] windowB = new int[windowSize * windowSize];
-		
-		int[] minRGB = { 0, 0, 0 };
-		int[] curRGB = { 0, 0, 0 };
-		int[] medRGB = { 0, 0, 0 };
-		
-		int curDist = Integer.MAX_VALUE;
-		int minDist = Integer.MAX_VALUE;
-		
-		for (x = edgeX; x < (w - edgeX); x++)
-		{
-			for (y = edgeY; y < (h - edgeY); y++)
-			{
-				i = 0;
-				curDist = Integer.MAX_VALUE;
-				minDist = Integer.MAX_VALUE;
-				
-				for (int fx = 0; fx < windowSize; fx++)
-				{
-					
-					for (int fy = 0; fy < windowSize; fy++)
-					{
-						curPixelData = db.getElem(0, ((y + fy - edgeY) * w) + (x + fx - edgeX));
-						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
-						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
-						window[2][i] = windowB[i] = (curPixelData & bMask);
-						
-						i += 1;
-					}
-				}
-				
-				// sort entries in window[], and pick median value from that
-				medRGB = Filter.sortAndSelectMedian(windowR, windowG, windowB);
-				
-				/*
-				 * 1. Treat the colors as vectors in 3-space.
-				 * 
-				 * 2. Compute the squared distance from the median color to all
-				 * nine colors from all nine pixels.
-				 * 
-				 * 3. keep the one with smallest distance squared value
-				 */
-				i = 0;
-				
-				for (int fx = 0; fx < windowSize; fx++)
-				{
-					for (int fy = 0; fy < windowSize; fy++)
-					{
-						curDist = Integer.MAX_VALUE;
-						
-						curRGB[0] = window[0][i];
-						curRGB[1] = window[1][i];
-						curRGB[2] = window[2][i];
-						
-						curDist = calculateDistance(curRGB, medRGB);
-						
-						if (curDist < minDist)
-						{
-							minDist = curDist;
-							minRGB = curRGB.clone();
-						}
-						
-						i += 1;
-					}
-				}
-				wr.setPixel(x, y, minRGB);
-			}
-		}
-		
-		postprocess(wr, w, h, edgeX, edgeY, curRGB);
-		
-		b.setData(wr);
-		return b;
-	}
-	
-	/**
-	 * mean filter (uniform blurring)
-	 * 
-	 * @param source
-	 * @param windowSize
-	 * @return
-	 */
-	public static BufferedImage uniformBlur(Image source, int windowSize)
-	{
-		// This operation should blur the image using a 3*3 uniform averaging
-		// kernel.
-		// The averaging should happen on all three channels in the RGB color
-		// space.
-		
-		BufferedImage b = source.getImage();
-		WritableRaster wr = b.getRaster();
-		DataBuffer db = wr.getDataBuffer();
-		
+		int x, y;
+		int w = wr.getWidth();
+		int h = wr.getHeight();
 		int[] rgb = { 0, 0, 0 };
-		int w = b.getWidth();
-		int h = b.getHeight();
-		
-		int edgex = windowSize / 2; // automagically rounded down thanks to int
-									// division
-		int edgey = windowSize / 2;
-		
-		int x = edgex;
-		int y = edgey;
-		int i;
-		int meanR, meanG, meanB;
-		
-		int curPixelData = 0;
-		int[] windowR = new int[windowSize * windowSize];
-		int[] windowG = new int[windowSize * windowSize];
-		int[] windowB = new int[windowSize * windowSize];
-		int[][] window = new int[3][windowSize * windowSize];
-		
-		for (x = edgex; x < (w - edgex); x++)
+
+		float[] hsb = { 0, 0, 0 };
+		float[][][] convertedImage = new float[3][w][h];
+
+		for (x = 0; x < w; x++)
 		{
-			for (y = edgey; y < (h - edgey); y++)
+			for (y = 0; y < h; y++)
 			{
-				i = 0;
-				meanR = meanG = meanB = 0;
 				rgb = wr.getPixel(x, y, rgb);
-				
-				for (int fx = 0; fx < windowSize; fx++)
-				{
-					
-					for (int fy = 0; fy < windowSize; fy++)
-					{
-						curPixelData = db.getElem(0, ((y + fy - edgey) * w) + (x + fx - edgex));
-						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
-						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
-						window[2][i] = windowB[i] = (curPixelData & bMask);
-						
-						meanR += windowR[i];
-						meanG += windowG[i];
-						meanB += windowB[i];
-						
-						i += 1;
-					}
-				}
-				
-				meanR /= 9; // takes the floor value for the mean
-				meanG /= 9;
-				meanB /= 9;
-				
-				rgb[0] = meanR; // 1337 H4X0RZ
-				rgb[1] = meanG;
-				rgb[2] = meanB;
-				
-				wr.setPixel(x, y, rgb);
+				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+
+				convertedImage[0][x][y] = hsb[0];
+				convertedImage[1][x][y] = hsb[1];
+				convertedImage[2][x][y] = hsb[2];
 			}
 		}
-		
-		postprocess(wr, w, h, edgex, edgey, rgb);
-		
-		b.setData(wr);
-		return b;
+
+		return convertedImage;
 	}
-	
+
+	public static float convolve(float[] window, float[] kernel)
+	{
+		return convolve(window, kernel, 1);
+	}
+
+	public static float convolve(float[] window, float[] kernel, float scale)
+	{
+		if (kernel.length != window.length)
+		{
+			return Float.MAX_VALUE; // convolution not defined on this
+		}
+
+		float sum = 0;
+
+		int dimension = kernel.length;
+		int i;
+
+		for (i = 0; i < dimension; i++)
+		{
+			sum += (window[i] * kernel[i]);
+		}
+
+		sum *= scale;
+
+		return sum;
+	}
+
+	/**
+	 * More broken code - this will generate television snow if used on a
+	 * grayscale image.
+	 *
+	 * BufferedImage b = source.getImage(); WritableRaster wr = b.getRaster();
+	 * DataBuffer db = wr.getDataBuffer();
+	 *
+	 * int w = b.getWidth(); int h = b.getHeight();
+	 *
+	 * int edgex = windowSize / 2; // automagically rounded down thanks to int
+	 * // division int edgey = windowSize / 2;
+	 *
+	 * int x = edgex; int y = edgey; int i;
+	 *
+	 * // note that an array is allocated for each channel here. float[][]
+	 * window = new float[3][windowSize * windowSize];
+	 *
+	 * int curPixelData = 0; float[] windowR = new float[windowSize *
+	 * windowSize]; float[] windowG = new float[windowSize * windowSize];
+	 * float[] windowB = new float[windowSize * windowSize];
+	 *
+	 * int[] newRGB = { 0, 0, 0 };
+	 *
+	 * int curPixelValR, curPixelValG, curPixelValB;
+	 *
+	 * for (x = edgex; x < (w - edgex); x++) { for (y = edgey; y < (h - edgey);
+	 * y++) { i = 0;
+	 *
+	 * // populate window for this pixel for (int fx = 0; fx < windowSize; fx++)
+	 * { for (int fy = 0; fy < windowSize; fy++) { curPixelData = db.getElem(0,
+	 * ((y + fy - edgey) * w) + (x + fx - edgex)); window[0][i] = windowR[i] =
+	 * (curPixelData & rMask) >> 16; window[1][i] = windowG[i] = (curPixelData &
+	 * gMask) >> 8; window[2][i] = windowB[i] = (curPixelData & bMask);
+	 *
+	 * i += 1; } }
+	 *
+	 * curPixelValR = (int) convolve(windowR, unsharpA2, (float) .5);
+	 * curPixelValG = (int) convolve(windowG, unsharpA2, (float) .5);
+	 * curPixelValB = (int) convolve(windowB, unsharpA2, (float) .5);
+	 *
+	 * newRGB[0] = (int) (windowR[5] + curPixelValR); newRGB[1] = (int)
+	 * (windowG[5] + curPixelValG); newRGB[2] = (int) (windowB[5] +
+	 * curPixelValB);
+	 *
+	 * wr.setPixel(x, y, newRGB); } }
+	 *
+	 * b.setData(wr); return b;
+	 */
+
+	public static void doNothing()
+	{
+		// do nothing. just because you can.
+	}
+
 	/**
 	 * edge detection
-	 * 
+	 *
 	 * @param source
 	 * @param windowSize
 	 * @return
@@ -422,90 +313,343 @@ public class Filter
 		 * This operation computes the gradient magnitude for the image by first
 		 * applying Sobel kernels to the image. You will want to convert to HSB
 		 * and apply the operation to the brightness channel.
-		 * 
+		 *
 		 * At that point, you should convert the resulting value from a float in
 		 * the range [0.0, 1.0] to an int in the range [0, 255]. Then combine
 		 * the results into a gradient magnitude image. Use the result as the
 		 * value for all three channels of RGB.
-		 * 
+		 *
 		 * For the Sobel kernels, make sure to divide the result of the
 		 * convolution by 8 before using them for the gradient computations.
 		 *
 		 */
-		
+
 		BufferedImage b = source.getImage();
 		WritableRaster wr = b.getRaster();
-		
+		WritableRaster r = b.copyData(null);
+
 		int w = b.getWidth();
 		int h = b.getHeight();
 		int[] rgbGradientVal = { 0, 0, 0 };
-		
+
 		int edgex = windowSize / 2; // automagically rounded down thanks to int
 									// division
 		int edgey = windowSize / 2;
-		
+
 		int x = edgex;
 		int y = edgey;
 		int i;
-		
+
 		float[] sobelX = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
 		float[] sobelY = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
-		
+
 		double sobelXResult;
 		double sobelYResult;
 		double gradientMagnitude;
-		
+
 		float[][][] imageAsHSB = convertToHSB(wr);
 		float[][] brightnessChannel = imageAsHSB[2];
 		float[] windowB = new float[windowSize * windowSize];
-		
+
 		int gradientVal;
-		
+
 		for (x = edgex; x < (w - edgex); x++)
 		{
 			for (y = edgey; y < (h - edgey); y++)
 			{
 				i = 0;
-				
+
 				for (int fx = 0; fx < windowSize; fx++)
 				{
 					for (int fy = 0; fy < windowSize; fy++)
 					{
-						windowB[i] = brightnessChannel[x + fx - edgex][y + fy - edgey];
-						
+						windowB[i] = brightnessChannel[(x + fx) - edgex][(y + fy) - edgey];
+
 						i += 1;
 					}
 				}
-				
+
 				sobelXResult = convolve(windowB, sobelX, (float) .125); // note
 				// that
 				// convolve
 				// is normalized
 				sobelYResult = convolve(windowB, sobelY, (float) .125); // (see
 				// below)
-				
+
 				gradientMagnitude = Math.sqrt(Math.pow(sobelXResult, 2) + Math.pow(sobelYResult, 2));
 				// gradientMagnitude = sobelXResult + sobelYResult;
-				
+
 				gradientVal = (int) (255 * gradientMagnitude);
-				
-				rgbGradientVal[0] = 128 + gradientVal;
-				rgbGradientVal[1] = 128 + gradientVal;
-				rgbGradientVal[2] = 128 + gradientVal;
-				
-				wr.setPixel(x, y, rgbGradientVal);
+
+				rgbGradientVal[0] = gradientVal;
+				rgbGradientVal[1] = gradientVal;
+				rgbGradientVal[2] = gradientVal;
+
+				r.setPixel(x, y, rgbGradientVal);
 			}
 		}
-		
-		postprocess(wr, w, h, edgex, edgey, rgbGradientVal);
-		
+
+		postprocess(r, w, h, edgex, edgey, rgbGradientVal);
+
+		b.setData(r);
+		return b;
+	}
+
+	/**
+	 * grayscale (saturation)
+	 *
+	 * @param source
+	 * @return
+	 */
+	public static BufferedImage grayscaleSaturation(Image source)
+	{
+		// Convert the image to HSB
+		BufferedImage b = source.getImage();
+		WritableRaster wr = b.getRaster();
+
+		float[] hsb = { 0, 0, 0 };
+		int[] rgb = { 0, 0, 0 };
+		int x = 0;
+		int w = b.getWidth();
+		int y = 0;
+		int h = b.getHeight();
+		int rgbInt = 0;
+
+		for (x = 0; x < w; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				rgb = wr.getPixel(x, y, rgb);
+				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+				hsb[1] = 0; // zero the saturation channel
+				rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]); // convert back
+																	// to RGB.
+
+				rgb[0] = (rgbInt & rMask) >> 16; // 1337 H4X0RZ
+				rgb[1] = (rgbInt & gMask) >> 8;
+				rgb[2] = (rgbInt & bMask);
+
+				wr.setPixel(x, y, rgb);
+			}
+		}
+
 		b.setData(wr);
 		return b;
 	}
-	
+
+	/**
+	 * median filter
+	 *
+	 * In this case, you should find the median of all three channels
+	 * individually. Put them together to make the "median color."
+	 *
+	 * At that point, treat the colors as vectors. Compute the squared distance
+	 * from the median color to all nine colors from all nine pixels. The color
+	 * you select should be the color with the least squared distance from the
+	 * median color.
+	 *
+	 */
+	public static BufferedImage medianFilter(Image source, int windowSize)
+	{
+		/**
+		 * generic algorithm from Wikipedia:
+		 *
+		 * allocate outputPixelValue[image width][image height] allocate
+		 * window[window width * window height] edgex := (window width / 2)
+		 * rounded down edgey := (window height / 2) rounded down for x from
+		 * edgex to image width - edgex { for y from edgey to image height -
+		 * edgey { i = 0 for fx from 0 to window width { for fy from 0 to window
+		 * height { window[i] := inputPixelValue[x + fx - edgex][y + fy - edgey]
+		 * i := i + 1 } } sort entries in window[] outputPixelValue[x][y] :=
+		 * window[window width * window height / 2] } }
+		 */
+
+		// TODO: optimize this into a snake-scrawl of sorted lists.
+
+		BufferedImage b = source.getImage();
+		WritableRaster wr = b.getRaster();
+		WritableRaster r = b.copyData(null);
+
+		DataBuffer db = wr.getDataBuffer();
+
+		int w = b.getWidth();
+		int h = b.getHeight();
+
+		int edgeX = windowSize / 2; // automagically rounded down thanks to int
+									// division
+		int edgeY = windowSize / 2;
+
+		int x = edgeX;
+		int y = edgeY;
+		int i;
+
+		// note that an array is allocated for each channel here.
+		int[][] window = new int[3][windowSize * windowSize];
+
+		int curPixelData = 0;
+		int[] windowR = new int[windowSize * windowSize];
+		int[] windowG = new int[windowSize * windowSize];
+		int[] windowB = new int[windowSize * windowSize];
+
+		int[] minRGB = { 0, 0, 0 };
+		int[] curRGB = { 0, 0, 0 };
+		int[] medRGB = { 0, 0, 0 };
+
+		int curDist = Integer.MAX_VALUE;
+		int minDist = Integer.MAX_VALUE;
+
+		for (x = edgeX; x < (w - edgeX); x++)
+		{
+			for (y = edgeY; y < (h - edgeY); y++)
+			{
+				i = 0;
+				curDist = Integer.MAX_VALUE;
+				minDist = Integer.MAX_VALUE;
+
+				for (int fx = 0; fx < windowSize; fx++)
+				{
+					
+					for (int fy = 0; fy < windowSize; fy++)
+					{
+						curPixelData = db.getElem(0, (((y + fy) - edgeY) * w) + ((x + fx) - edgeX));
+						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
+						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
+						window[2][i] = windowB[i] = (curPixelData & bMask);
+
+						i += 1;
+					}
+				}
+
+				// sort entries in window[], and pick median value from that
+				medRGB = Filter.sortAndSelectMedian(windowR, windowG, windowB);
+
+				/*
+				 * 1. Treat the colors as vectors in 3-space.
+				 *
+				 * 2. Compute the squared distance from the median color to all
+				 * nine colors from all nine pixels.
+				 *
+				 * 3. keep the one with smallest distance squared value
+				 */
+				i = 0;
+
+				for (int fx = 0; fx < windowSize; fx++)
+				{
+					for (int fy = 0; fy < windowSize; fy++)
+					{
+						curDist = Integer.MAX_VALUE;
+
+						curRGB[0] = window[0][i];
+						curRGB[1] = window[1][i];
+						curRGB[2] = window[2][i];
+
+						curDist = calculateDistance(curRGB, medRGB);
+
+						if (curDist < minDist)
+						{
+							minDist = curDist;
+							minRGB = curRGB.clone();
+						}
+
+						i += 1;
+					}
+				}
+				r.setPixel(x, y, minRGB);
+			}
+		}
+
+		postprocess(r, w, h, edgeX, edgeY, curRGB);
+
+		b.setData(r);
+		return b;
+	}
+
+	public static float[] multiChannelConvolve(float[][] window, float[] kernel)
+	{
+		return multiChannelConvolve(window, kernel, 1);
+	}
+
+	public static float[] multiChannelConvolve(float[][] window, float[] kernel, float scale)
+	{
+		float[] channels = { 0, 0, 0 };
+		float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
+		channel0Sum = convolve(window[0], kernel, scale);
+		channel1Sum = convolve(window[1], kernel, scale);
+		channel2Sum = convolve(window[2], kernel, scale);
+
+		if ((channel0Sum == Float.MAX_VALUE) || (channel1Sum == Float.MAX_VALUE) || (channel2Sum == Float.MAX_VALUE))
+		{
+			return null;
+		}
+		channels[0] = channel0Sum;
+		channels[1] = channel1Sum;
+		channels[2] = channel2Sum;
+
+		return channels;
+	}
+
+	private static void postprocess(WritableRaster wr, int w, int h, int edgex, int edgey, int[] rgbGradientVal)
+	{
+		int x, y;
+
+		for (x = 0; x < edgex; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				wr.setPixel(x, y, wr.getPixel(edgex, y, rgbGradientVal));
+				wr.setPixel((w - 1) - x, y, wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal));
+
+				if (wr.getPixel(edgex, y, rgbGradientVal) != wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal))
+				{
+					System.out.print("");
+				}
+			}
+		}
+		for (y = 0; y < edgey; y++)
+		{
+			for (x = 0; x < w; x++)
+			{
+				wr.setPixel(x, y, wr.getPixel(x, edgey, rgbGradientVal));
+				wr.setPixel(x, (h - 1) - y, wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal));
+
+				if (wr.getPixel(x, edgey, rgbGradientVal) != wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal))
+				{
+					System.out.print("");
+				}
+			}
+		}
+
+		for (x = 0; x < edgex; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				wr.setPixel(x, y, wr.getPixel(edgex, y, rgbGradientVal));
+				wr.setPixel((w - 1) - x, y, wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal));
+
+				if (wr.getPixel(edgex, y, rgbGradientVal) != wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal))
+				{
+					System.out.print("");
+				}
+			}
+		}
+		for (y = 0; y < edgey; y++)
+		{
+			for (x = 0; x < w; x++)
+			{
+				wr.setPixel(x, y, wr.getPixel(x, edgey, rgbGradientVal));
+				wr.setPixel(x, (h - 1) - y, wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal));
+
+				if (wr.getPixel(x, edgey, rgbGradientVal) != wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal))
+				{
+					System.out.print("");
+				}
+			}
+		}
+	}
+
 	/**
 	 * sharpen
-	 * 
+	 *
 	 * @param source
 	 * @param windowSize
 	 * @return
@@ -516,132 +660,99 @@ public class Filter
 		 * This operation sharpens the image using an unsharp masking kernel
 		 * with A = 2 (i.e., a 6 in the middle and -1s for the four-connected
 		 * neighbors, then divide by 2).
-		 * 
+		 *
 		 * This operation should be done in the RGB color space.
-		 * 
+		 *
 		 */
-		
+
 		// TODO: optimize this into a snake-scrawl of sorted lists.
-		
+
 		BufferedImage b = source.getImage();
 		WritableRaster wr = b.getRaster();
+		WritableRaster r = b.copyData(null);
+
 		DataBuffer db = wr.getDataBuffer();
-		
+
 		int w = b.getWidth();
 		int h = b.getHeight();
-		
+
 		int edgex = windowSize / 2; // automagically rounded down thanks to int
 									// division
 		int edgey = windowSize / 2;
-		
+
 		int x = edgex;
 		int y = edgey;
 		int i;
-		
+
 		// note that an array is allocated for each channel here.
 		float[][] window = new float[3][windowSize * windowSize];
-		
+
 		int curPixelData;
 		float[] convolutionVals = { 0, 0, 0 };
 		float[] windowR = new float[windowSize * windowSize];
 		float[] windowG = new float[windowSize * windowSize];
 		float[] windowB = new float[windowSize * windowSize];
-		
+
 		int[] newRGB = { 0, 0, 0 };
-		
-		int curPixelValR, curPixelValG, curPixelValB;
-		
-		float k = (float) 1;
-		
+
 		for (x = edgex; x < (w - edgex); x++)
 		{
 			for (y = edgey; y < (h - edgey); y++)
 			{
 				i = 0;
-				
+
 				// populate window for this pixel
 				for (int fx = 0; fx < windowSize; fx++)
 				{
 					for (int fy = 0; fy < windowSize; fy++)
 					{
-						curPixelData = db.getElem(0, ((y + fy - edgey) * w) + (x + fx - edgex));
+						curPixelData = db.getElem(0, (((y + fy) - edgey) * w) + ((x + fx) - edgex));
 						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
 						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
 						window[2][i] = windowB[i] = (curPixelData & bMask);
-						
+
 						i += 1;
 					}
 				}
-				
+
 				convolutionVals = multiChannelConvolve(window, sharpenA2, (float) .5);
-				
+
 				newRGB[0] = (int) Math.max(0, Math.min(255, (convolutionVals[0])));
 				newRGB[1] = (int) Math.max(0, Math.min(255, (convolutionVals[1])));
 				newRGB[2] = (int) Math.max(0, Math.min(255, (convolutionVals[2])));
-				
-				wr.setPixel(x, y, newRGB);
+
+				r.setPixel(x, y, newRGB);
 			}
 		}
-		
-		postprocess(wr, w, h, edgex, edgey, newRGB);
-		
-		b.setData(wr);
+
+		postprocess(r, w, h, edgex, edgey, newRGB);
+
+		b.setData(r);
 		return b;
 	}
-	
-	/**
-	 * grayscale (rgb)
-	 * 
-	 * This could be implemented at some future time if you're bored.
-	 * 
-	 * @param curRGB
-	 * @param medRGB
-	 * @return
-	 */
-	/**
-	 * mean filter (gaussian)
-	 * 
-	 * This could be implemented at some future time if you're really bored.
-	 * 
-	 * @param curRGB
-	 * @param medRGB
-	 * @return
-	 */
-	
-	private static int calculateDistance(int[] curRGB, int[] medRGB)
-	{
-		// pythagorean theorem, sort of. Just use distance squared.
-		// a^2 + b^2 + c^2 = d^2
-		
-		int a2 = (medRGB[0] - curRGB[0]) * (medRGB[0] - curRGB[0]);
-		int b2 = (medRGB[1] - curRGB[1]) * (medRGB[1] - curRGB[1]);
-		int c2 = (medRGB[2] - curRGB[2]) * (medRGB[2] - curRGB[2]);
-		
-		return a2 + b2 + c2;
-	}
-	
+
 	private static int[] sortAndSelectMedian(int[] windowR, int[] windowG, int[] windowB)
 	{
 		// NOTE: THIS ONLY APPLIES TO 3x3 WINDOWS AT PRESENT.
-		
+
 		if (windowR.length > 9)
 		{
 			return new int[] { 128, 128, 128 };
 		}
-		
+
 		int[] r = windowR.clone();
 		int[] g = windowG.clone();
 		int[] b = windowB.clone();
 		int n = r.length;
-		
+
 		int minR = Integer.MAX_VALUE;
 		int minG = Integer.MAX_VALUE;
 		int minB = Integer.MAX_VALUE;
-		
+
 		// lame selection sort (only sorts to find the median of 9 elements.)
 		int i, j;
 		// for (i = 0; i < n - 1; i++)
-		for (i = 0; i <= n / 2; i++)
+		for (i = 0; i <= (n / 2); i++)
 		{
 			minR = minG = minB = i;
 			for (j = i + 1; j < n; j++)
@@ -681,266 +792,159 @@ public class Filter
 				b[i] = b[i] ^ b[minB];
 			}
 		}
-		
+
 		int[] median = { 0, 0, 0 };
-		
+
 		median[0] = r[n / 2];
 		median[1] = g[n / 2];
 		median[2] = b[n / 2];
-		
+
 		return median;
 	}
-	
-	private static void postprocess(WritableRaster wr, int w, int h, int edgex, int edgey, int[] rgbGradientVal)
-	{
-		int x, y;
-		
-		for (x = 0; x < edgex; x++)
-		{
-			for (y = 0; y < h; y++)
-			{
-				wr.setPixel(x, y, wr.getPixel(edgex, y, rgbGradientVal));
-				wr.setPixel((w - 1) - x, y, wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal));
-				
-				if (wr.getPixel(edgex, y, rgbGradientVal) != wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal))
-				{
-					System.out.print("");
-				}
-			}
-		}
-		for (y = 0; y < edgey; y++)
-		{
-			for (x = 0; x < w; x++)
-			{
-				wr.setPixel(x, y, wr.getPixel(x, edgey, rgbGradientVal));
-				wr.setPixel(x, (h - 1) - y, wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal));
-				
-				if (wr.getPixel(x, edgey, rgbGradientVal) != wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal))
-				{
-					System.out.print("");
-				}
-			}
-		}
-		
-		for (x = 0; x < edgex; x++)
-		{
-			for (y = 0; y < h; y++)
-			{
-				wr.setPixel(x, y, wr.getPixel(edgex, y, rgbGradientVal));
-				wr.setPixel((w - 1) - x, y, wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal));
-				
-				if (wr.getPixel(edgex, y, rgbGradientVal) != wr.getPixel((w - 1 - edgex) - x, y, rgbGradientVal))
-				{
-					System.out.print("");
-				}
-			}
-		}
-		for (y = 0; y < edgey; y++)
-		{
-			for (x = 0; x < w; x++)
-			{
-				wr.setPixel(x, y, wr.getPixel(x, edgey, rgbGradientVal));
-				wr.setPixel(x, (h - 1) - y, wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal));
-				
-				if (wr.getPixel(x, edgey, rgbGradientVal) != wr.getPixel(x, (h - 1 - edgey) - y, rgbGradientVal))
-				{
-					System.out.print("");
-				}
-			}
-		}
-	}
-	
-	private static float[][][] convertToHSB(WritableRaster wr)
-	{
-		int x, y;
-		int w = wr.getWidth();
-		int h = wr.getHeight();
-		int[] rgb = { 0, 0, 0 };
-		
-		float[] hsb = { 0, 0, 0 };
-		float[][][] convertedImage = new float[3][w][h];
-		
-		for (x = 0; x < w; x++)
-		{
-			for (y = 0; y < h; y++)
-			{
-				rgb = wr.getPixel(x, y, rgb);
-				hsb = Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-				
-				convertedImage[0][x][y] = hsb[0];
-				convertedImage[1][x][y] = hsb[1];
-				convertedImage[2][x][y] = hsb[2];
-			}
-		}
-		
-		return convertedImage;
-	}
-	
-	public static float convolve(float[] window, float[] kernel, float scale)
-	{
-		if (kernel.length != window.length)
-		{
-			return Float.MAX_VALUE; // convolution not defined on this
-		}
-		
-		float sum = 0;
-		
-		int dimension = kernel.length;
-		int i;
-		
-		for (i = 0; i < dimension; i++)
-		{
-			sum += (window[i] * kernel[i]);
-		}
-		
-		sum *= scale;
-		
-		return sum;
-	}
-	
-	public static float convolve(float[] window, float[] kernel)
-	{
-		return convolve(window, kernel, 1);
-	}
-	
-	public static float[] multiChannelConvolve(float[][] window, float[] kernel, float scale)
-	{
-		float[] channels = { 0, 0, 0 };
-		float channel0Sum = 0, channel1Sum = 0, channel2Sum = 0;
-		channel0Sum = convolve(window[0], kernel, scale);
-		channel1Sum = convolve(window[1], kernel, scale);
-		channel2Sum = convolve(window[2], kernel, scale);
-		
-		if (channel0Sum == Float.MAX_VALUE || channel1Sum == Float.MAX_VALUE || channel2Sum == Float.MAX_VALUE)
-		{
-			return null;
-		}
-		channels[0] = channel0Sum;
-		channels[1] = channel1Sum;
-		channels[2] = channel2Sum;
-		
-		return channels;
-	}
-	
-	public static float[] multiChannelConvolve(float[][] window, float[] kernel)
-	{
-		return multiChannelConvolve(window, kernel, 1);
-	}
-	
+
 	/**
 	 * Hilarious and interesting broken edge detection code. To look at later.
-	 * 
-	 * 
+	 *
+	 *
 	 * This operation computes the gradient magnitude for the image by first
 	 * applying Sobel kernels to the image
-	 * 
+	 *
 	 * then combining the results into a gradient magnitude image. For the Sobel
 	 * kernels, make sure to divide the result of the convolution by 8 before
 	 * using them for the gradient computations.
-	 * 
+	 *
 	 * You will want to convert to HSB and apply the operation to the brightness
 	 * channel.
-	 * 
+	 *
 	 * At that point, you should convert the resulting value from a float in the
 	 * range [0.0, 1.0] to an int in the range [0, 255]
-	 * 
+	 *
 	 * and use the result as the value for all three channels of RGB. The reason
 	 * for this is because the resulting image will be grayscale.
-	 * 
+	 *
 	 * BufferedImage b = source.getImage(); WritableRaster wr = b.getRaster();
 	 * DataBuffer db = wr.getDataBuffer();
-	 * 
+	 *
 	 * int[] rgb = { 0, 0, 0 }; int w = b.getWidth(); int h = b.getHeight();
-	 * 
+	 *
 	 * int edgex = windowSize / 2; // automagically rounded down thanks to int
 	 * // division int edgey = windowSize / 2;
-	 * 
+	 *
 	 * int x = edgex; int y = edgey; int i;
-	 * 
+	 *
 	 * int curPixelData = 0; int[] windowR = new int[windowSize * windowSize];
 	 * int[] windowG = new int[windowSize * windowSize]; int[] windowB = new
 	 * int[windowSize * windowSize]; int[][] window = new int[3][windowSize *
 	 * windowSize]; int[][] sobelX = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 }
 	 * }; int[][] sobelY = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
-	 * 
+	 *
 	 * int[] sobelXResult = new int[3]; int[] sobelYResult = new int[3];
-	 * 
+	 *
 	 * for (x = edgex; x < (w - edgex); x++) { for (y = edgey; y < (h - edgey);
 	 * y++) { i = 0; rgb = wr.getPixel(x, y, rgb);
-	 * 
+	 *
 	 * // this is still in RGB, so that needs fixing
-	 * 
+	 *
 	 * for (int fx = 0; fx < windowSize; fx++) { for (int fy = 0; fy <
 	 * windowSize; fy++) { curPixelData = db.getElem(0, ((y + fy - edgey) * w) +
 	 * (x + fx - edgex)); window[0][i] = windowR[i] = (curPixelData & rMask) >>
 	 * 16; window[1][i] = windowG[i] = (curPixelData & gMask) >> 8; window[2][i]
 	 * = windowB[i] = (curPixelData & bMask);
-	 * 
+	 *
 	 * i += 1; } }
-	 * 
+	 *
 	 * sobelXResult = convolve(window, sobelX); // note that convolve // is
 	 * normalized sobelYResult = convolve(window, sobelY); // (see below)
-	 * 
+	 *
 	 * rgb[0] = sobelXResult[0] + sobelYResult[0]; rgb[1] = sobelXResult[1] +
 	 * sobelYResult[1]; rgb[2] = sobelXResult[2] + sobelYResult[2];
-	 * 
+	 *
 	 * wr.setPixel(x, y, rgb); } }
-	 * 
+	 *
 	 * b.setData(wr); return b;
 	 */
-	
+
 	/**
-	 * More broken code - this will generate television snow if used on a
-	 * grayscale image.
-	 * 
-	 * BufferedImage b = source.getImage(); WritableRaster wr = b.getRaster();
-	 * DataBuffer db = wr.getDataBuffer();
-	 * 
-	 * int w = b.getWidth(); int h = b.getHeight();
-	 * 
-	 * int edgex = windowSize / 2; // automagically rounded down thanks to int
-	 * // division int edgey = windowSize / 2;
-	 * 
-	 * int x = edgex; int y = edgey; int i;
-	 * 
-	 * // note that an array is allocated for each channel here. float[][]
-	 * window = new float[3][windowSize * windowSize];
-	 * 
-	 * int curPixelData = 0; float[] windowR = new float[windowSize *
-	 * windowSize]; float[] windowG = new float[windowSize * windowSize];
-	 * float[] windowB = new float[windowSize * windowSize];
-	 * 
-	 * int[] newRGB = { 0, 0, 0 };
-	 * 
-	 * int curPixelValR, curPixelValG, curPixelValB;
-	 * 
-	 * for (x = edgex; x < (w - edgex); x++) { for (y = edgey; y < (h - edgey);
-	 * y++) { i = 0;
-	 * 
-	 * // populate window for this pixel for (int fx = 0; fx < windowSize; fx++)
-	 * { for (int fy = 0; fy < windowSize; fy++) { curPixelData = db.getElem(0,
-	 * ((y + fy - edgey) * w) + (x + fx - edgex)); window[0][i] = windowR[i] =
-	 * (curPixelData & rMask) >> 16; window[1][i] = windowG[i] = (curPixelData &
-	 * gMask) >> 8; window[2][i] = windowB[i] = (curPixelData & bMask);
-	 * 
-	 * i += 1; } }
-	 * 
-	 * curPixelValR = (int) convolve(windowR, unsharpA2, (float) .5);
-	 * curPixelValG = (int) convolve(windowG, unsharpA2, (float) .5);
-	 * curPixelValB = (int) convolve(windowB, unsharpA2, (float) .5);
-	 * 
-	 * newRGB[0] = (int) (windowR[5] + curPixelValR); newRGB[1] = (int)
-	 * (windowG[5] + curPixelValG); newRGB[2] = (int) (windowB[5] +
-	 * curPixelValB);
-	 * 
-	 * wr.setPixel(x, y, newRGB); } }
-	 * 
-	 * b.setData(wr); return b;
+	 * mean filter (uniform blurring)
+	 *
+	 * @param source
+	 * @param windowSize
+	 * @return
 	 */
-	
-	public static void doNothing()
+	public static BufferedImage uniformBlur(Image source, int windowSize)
 	{
-		// do nothing. just because you can.
+		// This operation should blur the image using a 3*3 uniform averaging
+		// kernel.
+		// The averaging should happen on all three channels in the RGB color
+		// space.
+
+		BufferedImage b = source.getImage();
+		// WritableRaster wr = b.getRaster();
+		WritableRaster wr = b.copyData(null);
+
+		DataBuffer db = wr.getDataBuffer();
+
+		int[] rgb = { 0, 0, 0 };
+		int w = b.getWidth();
+		int h = b.getHeight();
+
+		int edgex = windowSize / 2; // automagically rounded down thanks to int
+									// division
+		int edgey = windowSize / 2;
+
+		int x = edgex;
+		int y = edgey;
+		int i;
+		int meanR, meanG, meanB;
+
+		int curPixelData = 0;
+		int[] windowR = new int[windowSize * windowSize];
+		int[] windowG = new int[windowSize * windowSize];
+		int[] windowB = new int[windowSize * windowSize];
+		int[][] window = new int[3][windowSize * windowSize];
+
+		for (x = edgex; x < (w - edgex); x++)
+		{
+			for (y = edgey; y < (h - edgey); y++)
+			{
+				i = 0;
+				meanR = meanG = meanB = 0;
+				rgb = wr.getPixel(x, y, rgb);
+
+				for (int fx = 0; fx < windowSize; fx++)
+				{
+					
+					for (int fy = 0; fy < windowSize; fy++)
+					{
+						curPixelData = db.getElem(0, (((y + fy) - edgey) * w) + ((x + fx) - edgex));
+						window[0][i] = windowR[i] = (curPixelData & rMask) >> 16;
+						window[1][i] = windowG[i] = (curPixelData & gMask) >> 8;
+						window[2][i] = windowB[i] = (curPixelData & bMask);
+
+						meanR += windowR[i];
+						meanG += windowG[i];
+						meanB += windowB[i];
+
+						i += 1;
+					}
+				}
+
+				meanR /= 9; // takes the floor value for the mean
+				meanG /= 9;
+				meanB /= 9;
+
+				rgb[0] = meanR; // 1337 H4X0RZ
+				rgb[1] = meanG;
+				rgb[2] = meanB;
+
+				wr.setPixel(x, y, rgb);
+			}
+		}
+
+		postprocess(wr, w, h, edgex, edgey, rgb);
+
+		b.setData(wr);
+		return b;
 	}
-	
+
 }
